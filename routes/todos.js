@@ -15,8 +15,8 @@ router.get('/', async (req, res) => {
 // Create a todo
 router.post('/', async (req, res) => {
     try {
-        const { task, date } = req.body;
-        const todo = new Todo({ task, date });
+        const { task, date, author } = req.body;
+        const todo = new Todo({ task, date, author });
         await todo.save();
         res.json(todo);
     } catch (err) {

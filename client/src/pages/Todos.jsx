@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config';
 import { Calendar, CheckCircle2, Circle, Trash2 } from 'lucide-react';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
 
@@ -15,7 +16,7 @@ const Todos = () => {
 
     const fetchTodos = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/todos');
+            const res = await axios.get('${API_URL}/api/todos');
             setTodos(res.data);
         } catch (err) {
             console.error(err);
@@ -25,10 +26,16 @@ const Todos = () => {
     const addTodo = async (e) => {
         e.preventDefault();
         if (!newTask.trim()) return;
+
+        // Extract author from token
+        const token = localStorage.getItem('token');
+        const author = token ? token.replace('fake-jwt-token-', '') : 'Unknown';
+
         try {
-            const res = await axios.post('http://localhost:5000/api/todos', {
+            const res = await axios.post(`${API_URL}/api/todos`, {
                 task: newTask,
-                date: newDate
+                date: newDate,
+                author
             });
             setTodos([...todos, res.data]);
             setNewTask('');
@@ -39,7 +46,7 @@ const Todos = () => {
 
     const toggleTodo = async (id, currentStatus) => {
         try {
-            const res = await axios.put(`http://localhost:5000/api/todos/${id}`, {
+            const res = await axios.put(`${API_URL}/api/todos/${id}`, {
                 isCompleted: !currentStatus
             });
             setTodos(todos.map(t => t._id === id ? res.data : t));
@@ -50,7 +57,7 @@ const Todos = () => {
 
     const deleteTodo = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/todos/${id}`);
+            await axios.delete(`${API_URL}/api/todos/${id}`);
             setTodos(todos.filter(t => t._id !== id));
         } catch (err) {
             console.error(err);
@@ -125,6 +132,11 @@ const Todos = () => {
                                 <span className={`text-lg ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}>
                                     {todo.task}
                                 </span>
+                                {todo.author && (
+                                    <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2">
+                                        {todo.author}
+                                    </span>
+                                )}
                             </div>
                             <div className="flex items-center gap-2 text-sm text-text-muted bg-card px-3 py-1 rounded-full">
                                 {format(parseISO(todo.date), 'MMM d, yyyy')}

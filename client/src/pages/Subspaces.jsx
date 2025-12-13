@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config';
 import { Plus, FileText, Save, Trash2 } from 'lucide-react';
 
 const Subspaces = () => {
@@ -21,7 +22,7 @@ const Subspaces = () => {
 
     const fetchSubspaces = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/subspaces');
+            const res = await axios.get('${API_URL}/api/subspaces');
             setSubspaces(res.data);
         } catch (err) {
             console.error(err);
@@ -32,7 +33,7 @@ const Subspaces = () => {
         e.preventDefault();
         if (!newTitle.trim()) return;
         try {
-            const res = await axios.post('http://localhost:5000/api/subspaces', { title: newTitle });
+            const res = await axios.post('${API_URL}/api/subspaces', { title: newTitle });
             setSubspaces([res.data, ...subspaces]);
             setNewTitle('');
             setSelectedSubspace(res.data);
@@ -45,7 +46,7 @@ const Subspaces = () => {
         if (!selectedSubspace) return;
         setLoading(true);
         try {
-            const res = await axios.put(`http://localhost:5000/api/subspaces/${selectedSubspace._id}`, {
+            const res = await axios.put(`${API_URL}/api/subspaces/${selectedSubspace._id}`, {
                 content: noteContent
             });
             // Update local state
@@ -63,7 +64,7 @@ const Subspaces = () => {
         if (!window.confirm("Are you sure you want to delete this subspace?")) return;
 
         try {
-            await axios.delete(`http://localhost:5000/api/subspaces/${id}`);
+            await axios.delete(`${API_URL}/api/subspaces/${id}`);
             setSubspaces(subspaces.filter(s => s._id !== id));
             if (selectedSubspace && selectedSubspace._id === id) {
                 setSelectedSubspace(null);

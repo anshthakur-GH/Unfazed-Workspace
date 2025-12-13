@@ -9,6 +9,7 @@ const subspaceSchema = new mongoose.Schema({
 const todoSchema = new mongoose.Schema({
     task: { type: String, required: true },
     date: { type: Date },
+    author: { type: String, required: true },
     isCompleted: { type: Boolean, default: false }
 });
 

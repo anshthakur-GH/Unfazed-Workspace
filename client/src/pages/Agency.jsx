@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL } from '../config';
 import { User, Clock, Send, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -15,7 +16,7 @@ const Agency = () => {
 
     const fetchWorks = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/agency');
+            const res = await axios.get('${API_URL}/api/agency');
             setWorks(res.data);
         } catch (err) {
             console.error(err);
@@ -24,7 +25,7 @@ const Agency = () => {
 
     const deleteWork = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/agency/${id}`);
+            await axios.delete(`${API_URL}/api/agency/${id}`);
             setWorks(works.filter(w => w._id !== id));
         } catch (err) {
             console.error(err);
@@ -36,7 +37,7 @@ const Agency = () => {
         if (!note.trim()) return;
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5000/api/agency', { note, assignedTo });
+            const res = await axios.post('${API_URL}/api/agency', { note, assignedTo });
             setWorks([res.data, ...works]);
             setNote('');
             setLoading(false);
