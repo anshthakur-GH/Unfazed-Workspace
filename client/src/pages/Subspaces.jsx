@@ -22,10 +22,16 @@ const Subspaces = () => {
 
     const fetchSubspaces = async () => {
         try {
-            const res = await axios.get('${API_URL}/api/subspaces');
-            setSubspaces(res.data);
+            const res = await axios.get(`${API_URL}/api/subspaces`);
+            if (Array.isArray(res.data)) {
+                setSubspaces(res.data);
+            } else {
+                console.error("Invalid API response format (expected array):", res.data);
+                setSubspaces([]);
+            }
         } catch (err) {
             console.error(err);
+            setSubspaces([]);
         }
     };
 

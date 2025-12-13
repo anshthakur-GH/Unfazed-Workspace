@@ -16,10 +16,16 @@ const Todos = () => {
 
     const fetchTodos = async () => {
         try {
-            const res = await axios.get('${API_URL}/api/todos');
-            setTodos(res.data);
+            const res = await axios.get(`${API_URL}/api/todos`);
+            if (Array.isArray(res.data)) {
+                setTodos(res.data);
+            } else {
+                console.error("Invalid API response format (expected array):", res.data);
+                setTodos([]);
+            }
         } catch (err) {
             console.error(err);
+            setTodos([]);
         }
     };
 
