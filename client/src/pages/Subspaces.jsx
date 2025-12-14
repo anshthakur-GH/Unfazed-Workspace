@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { Plus, FileText, Save, Trash2 } from 'lucide-react';
@@ -9,16 +9,48 @@ const Subspaces = () => {
     const [newTitle, setNewTitle] = useState('');
     const [noteContent, setNoteContent] = useState('');
     const [loading, setLoading] = useState(false);
+    const lastSubspaceIdRef = useRef(null);
 
     useEffect(() => {
         fetchSubspaces();
     }, []);
 
     useEffect(() => {
-        if (selectedSubspace) {
+        if (selectedSubspace && selectedSubspace._id !== lastSubspaceIdRef.current) {
             setNoteContent(selectedSubspace.content || '');
+            lastSubspaceIdRef.current = selectedSubspace._id;
         }
     }, [selectedSubspace]);
+
+    // Ctrl+S Shortcut
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                updateContent();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [noteContent, selectedSubspace]);
+
+    // Auto-Save (Debounced)
+    useEffect(() => {
+        if (!selectedSubspace) return;
+
+        // Don't auto-save if content matches what we just loaded (prevents initial save loop)
+        // actually, logic is simpler: just debounce every change. 
+        // If user is typing, we wait.
+
+        const timer = setTimeout(() => {
+            if (selectedSubspace && noteContent !== selectedSubspace.content) {
+                updateContent();
+            }
+        }, 200);
+
+        return () => clearTimeout(timer);
+    }, [noteContent]);
 
     const fetchSubspaces = async () => {
         try {

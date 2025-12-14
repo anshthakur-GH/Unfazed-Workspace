@@ -3,12 +3,14 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import { Calendar, CheckCircle2, Circle, Trash2 } from 'lucide-react';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
+import CustomCalendar from '../components/CustomCalendar';
 
 const Todos = () => {
     const [todos, setTodos] = useState([]);
     const [view, setView] = useState('today'); // 'today' or 'future'
     const [newTask, setNewTask] = useState('');
     const [newDate, setNewDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+    const [showCalendar, setShowCalendar] = useState(false);
 
     useEffect(() => {
         fetchTodos();
@@ -107,12 +109,29 @@ const Todos = () => {
                     value={newTask}
                     onChange={(e) => setNewTask(e.target.value)}
                 />
-                <input
-                    type="date"
-                    className="bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent"
-                    value={newDate}
-                    onChange={(e) => setNewDate(e.target.value)}
-                />
+                <div className="relative">
+                    <button
+                        type="button"
+                        onClick={() => setShowCalendar(!showCalendar)}
+                        className="flex items-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]"
+                    >
+                        <Calendar size={20} className="text-accent" />
+                        <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
+                    </button>
+                    {showCalendar && (
+                        <div className="absolute top-full left-0 mt-2 z-50">
+                            <CustomCalendar
+                                selectedDate={newDate}
+                                onChange={(date) => {
+                                    setNewDate(date);
+                                    setShowCalendar(false);
+                                }}
+                                onClose={() => setShowCalendar(false)}
+                            />
+                            {/* Click outside closer could be added here or in layout but for now rely on selection close */}
+                        </div>
+                    )}
+                </div>
                 <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors">
                     Add Task
                 </button>
