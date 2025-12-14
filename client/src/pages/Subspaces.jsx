@@ -39,7 +39,7 @@ const Subspaces = () => {
         e.preventDefault();
         if (!newTitle.trim()) return;
         try {
-            const res = await axios.post('${API_URL}/api/subspaces', { title: newTitle });
+            const res = await axios.post(`${API_URL}/api/subspaces`, { title: newTitle });
             setSubspaces([res.data, ...subspaces]);
             setNewTitle('');
             setSelectedSubspace(res.data);

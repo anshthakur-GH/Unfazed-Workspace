@@ -16,7 +16,7 @@ const Agency = () => {
 
     const fetchWorks = async () => {
         try {
-            const res = await axios.get('${API_URL}/api/agency');
+            const res = await axios.get(`${API_URL}/api/agency`);
             setWorks(res.data);
         } catch (err) {
             console.error(err);
@@ -37,7 +37,7 @@ const Agency = () => {
         if (!note.trim()) return;
         setLoading(true);
         try {
-            const res = await axios.post('${API_URL}/api/agency', { note, assignedTo });
+            const res = await axios.post(`${API_URL}/api/agency`, { note, assignedTo });
             setWorks([res.data, ...works]);
             setNote('');
             setLoading(false);
