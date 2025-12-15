@@ -10,6 +10,7 @@ const todoSchema = new mongoose.Schema({
     task: { type: String, required: true },
     date: { type: Date },
     author: { type: String, required: true },
+    tags: { type: [String], default: [] },
     isCompleted: { type: Boolean, default: false }
 });
 

@@ -15,8 +15,8 @@ router.get('/', async (req, res) => {
 // Create a todo
 router.post('/', async (req, res) => {
     try {
-        const { task, date, author } = req.body;
-        const todo = new Todo({ task, date, author });
+        const { task, date, author, tags } = req.body;
+        const todo = new Todo({ task, date, author, tags });
         await todo.save();
         res.json(todo);
     } catch (err) {
@@ -27,10 +27,16 @@ router.post('/', async (req, res) => {
 // Toggle completion
 router.put('/:id', async (req, res) => {
     try {
-        const { isCompleted } = req.body;
+        const { isCompleted, date, task, tags } = req.body;
+        const updateData = {};
+        if (isCompleted !== undefined) updateData.isCompleted = isCompleted;
+        if (date !== undefined) updateData.date = date;
+        if (task !== undefined) updateData.task = task;
+        if (tags !== undefined) updateData.tags = tags;
+
         const todo = await Todo.findByIdAndUpdate(
             req.params.id,
-            { isCompleted },
+            updateData,
             { new: true }
         );
         res.json(todo);
