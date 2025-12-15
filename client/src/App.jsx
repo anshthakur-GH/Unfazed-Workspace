@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Subspaces from './pages/Subspaces';
 import Todos from './pages/Todos';
 import Agency from './pages/Agency';
+import Records from './pages/Records';
 
 function App() {
   const isAuthenticated = () => {
@@ -33,6 +34,7 @@ function App() {
           <Route path="subspaces" element={<Subspaces />} />
           <Route path="todos" element={<Todos />} />
           <Route path="agency" element={<Agency />} />
+          <Route path="records" element={<Records />} />
           <Route path="" element={<Navigate to="subspaces" replace />} />
         </Route>
       </Routes>

@@ -24,6 +24,25 @@ router.post('/', async (req, res) => {
     }
 });
 
+// Update work
+router.put('/:id', async (req, res) => {
+    try {
+        const { note, assignedTo } = req.body;
+        const updateData = {};
+        if (note) updateData.note = note;
+        if (assignedTo) updateData.assignedTo = assignedTo;
+
+        const work = await AgencyWork.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true }
+        );
+        res.json(work);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Delete work
 router.delete('/:id', async (req, res) => {
     try {

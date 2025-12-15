@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { User, Clock, Send, Trash2 } from 'lucide-react';
+import { User, Clock, Send, Trash2, Edit2, Save, X } from 'lucide-react';
 import { format } from 'date-fns';
 
 const Agency = () => {
@@ -46,6 +46,47 @@ const Agency = () => {
             setLoading(false);
         }
     };
+
+    // Editing Logic
+    const [editingId, setEditingId] = useState(null);
+    const [editContent, setEditContent] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    const startEditing = (work) => {
+        setEditingId(work._id);
+        setEditContent(work.note);
+    };
+
+    const cancelEditing = () => {
+        setEditingId(null);
+        setEditContent('');
+    };
+
+    const saveEdit = async (id, content) => {
+        setSaving(true);
+        try {
+            const res = await axios.put(`${API_URL}/api/agency/${id}`, { note: content });
+            setWorks(works.map(w => w._id === id ? res.data : w));
+            setSaving(false);
+        } catch (err) {
+            console.error(err);
+            setSaving(false);
+        }
+    };
+
+    // Auto-Save for Editing
+    useEffect(() => {
+        if (!editingId) return;
+
+        const timer = setTimeout(() => {
+            const work = works.find(w => w._id === editingId);
+            if (work && editContent !== work.note) {
+                saveEdit(editingId, editContent);
+            }
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [editContent, editingId]);
 
     return (
         <div className="flex h-full gap-8">
@@ -112,15 +153,43 @@ const Agency = () => {
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-start gap-2">
-                                    <p className="text-text leading-relaxed mt-1 flex-1">
-                                        {work.note}
-                                    </p>
-                                    <button
-                                        onClick={() => deleteWork(work._id)}
-                                        className="text-text-muted hover:text-red-500 transition-colors p-1"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {editingId === work._id ? (
+                                        <div className="flex-1">
+                                            <textarea
+                                                className="w-full bg-background border border-accent rounded p-2 text-text text-sm resize-none focus:outline-none"
+                                                rows={3}
+                                                value={editContent}
+                                                onChange={(e) => setEditContent(e.target.value)}
+                                                autoFocus
+                                            />
+                                            <div className="flex justify-end gap-2 mt-2">
+                                                <span className="text-xs text-text-muted self-center">
+                                                    {saving ? 'Auto-saving...' : 'Saved'}
+                                                </span>
+                                                <button onClick={cancelEditing} className="text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded hover:bg-red-500/20">
+                                                    Done
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-text leading-relaxed mt-1 flex-1 whitespace-pre-wrap">
+                                            {work.note}
+                                        </p>
+                                    )}
+                                    <div className="flex flex-col gap-1">
+                                        <button
+                                            onClick={() => editingId === work._id ? cancelEditing() : startEditing(work)}
+                                            className={`text-text-muted transition-colors p-1 ${editingId === work._id ? 'text-accent' : 'hover:text-accent'}`}
+                                        >
+                                            {editingId === work._id ? <X size={16} /> : <Edit2 size={16} />}
+                                        </button>
+                                        <button
+                                            onClick={() => deleteWork(work._id)}
+                                            className="text-text-muted hover:text-red-500 transition-colors p-1"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         ))

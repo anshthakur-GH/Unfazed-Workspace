@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table } from 'lucide-react';
 
 const Sidebar = () => {
     const navigate = useNavigate();
@@ -14,6 +14,7 @@ const Sidebar = () => {
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Subspaces' },
         { path: '/dashboard/todos', icon: CheckSquare, label: 'To-Do List' },
         { path: '/dashboard/agency', icon: Briefcase, label: 'Agency Work' },
+        { path: '/dashboard/records', icon: Table, label: 'Records' },
     ];
 
     return (

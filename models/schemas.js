@@ -20,8 +20,19 @@ const agencyWorkSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 
+const recordSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    // 2D array for table data: 50 rows x 10 columns
+    data: {
+        type: [[String]],
+        default: Array(50).fill(Array(10).fill(''))
+    },
+    createdAt: { type: Date, default: Date.now }
+});
+
 module.exports = {
     Subspace: mongoose.model('Subspace', subspaceSchema),
     Todo: mongoose.model('Todo', todoSchema),
-    AgencyWork: mongoose.model('AgencyWork', agencyWorkSchema)
+    AgencyWork: mongoose.model('AgencyWork', agencyWorkSchema),
+    Record: mongoose.model('Record', recordSchema)
 };
