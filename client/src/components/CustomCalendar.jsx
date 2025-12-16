@@ -36,7 +36,7 @@ const CustomCalendar = ({ selectedDate, onChange, onClose }) => {
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     return (
-        <div className="absolute z-50 top-full mt-2 bg-card border border-border rounded-xl shadow-2xl p-4 w-72 animate-in fade-in zoom-in-95 duration-200">
+        <div className="bg-card border border-border rounded-xl shadow-2xl p-4 w-72 animate-in fade-in zoom-in-95 duration-200">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
                 <button onClick={prevMonth} className="p-1 hover:text-accent transition-colors">
