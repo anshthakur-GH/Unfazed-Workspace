@@ -12,6 +12,11 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
+// Health Check
+app.get("/health", (req, res) => {
+    res.status(200).send("ok");
+});
+
 // Routes
 const subspaceRoutes = require('../routes/subspaces');
 const todoRoutes = require('../routes/todos');
