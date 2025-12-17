@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -18,38 +18,59 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="w-64 bg-card border-r border-border h-screen flex flex-col p-4">
-            <h1 className="text-2xl font-bold text-accent mb-8 px-2">Unfazed</h1>
-            <nav className="flex-1 space-y-2">
+        <aside
+            className={`${isOpen ? 'w-64' : 'w-20'} bg-card border-r border-border h-screen flex flex-col transition-all duration-300 relative`}
+        >
+            <div className={`p-4 flex items-center ${isOpen ? 'justify-between' : 'justify-center'} mb-4`}>
+                {isOpen && <h1 className="text-2xl font-bold text-accent px-2 whitespace-nowrap overflow-hidden">Unfazed</h1>}
+                <button
+                    onClick={toggleSidebar}
+                    className="p-2 rounded-full hover:bg-accent/10 text-text-muted hover:text-accent transition-colors"
+                >
+                    {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                </button>
+            </div>
+
+            <nav className="flex-1 space-y-2 px-2">
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
                         className={({ isActive }) =>
-                            `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-border/50 hover:text-text'
+                            `flex items-center ${isOpen ? 'px-4 space-x-3' : 'justify-center px-2'} py-3 rounded-lg transition-colors ${isActive ? 'bg-accent/10 text-accent' : 'text-text-muted hover:bg-border/50 hover:text-text'
                             }`
                         }
+                        title={!isOpen ? item.label : ''}
                     >
-                        <item.icon size={20} />
-                        <span>{item.label}</span>
+                        <item.icon size={20} className="min-w-[20px]" />
+                        {isOpen && <span className="whitespace-nowrap overflow-hidden">{item.label}</span>}
                     </NavLink>
                 ))}
             </nav>
-            <button
-                onClick={handleLogout}
-                className="flex items-center space-x-3 px-4 py-3 text-text-muted hover:text-red-500 transition-colors mt-auto"
-            >
-                <LogOut size={20} />
-                <span>Logout</span>
-            </button>
+            <div className="p-4">
+                <button
+                    onClick={handleLogout}
+                    className={`flex items-center ${isOpen ? 'px-4 space-x-3' : 'justify-center px-2'} py-3 text-text-muted hover:text-red-500 transition-colors w-full rounded-lg hover:bg-border/50`}
+                    title={!isOpen ? 'Logout' : ''}
+                >
+                    <LogOut size={20} className="min-w-[20px]" />
+                    {isOpen && <span className="whitespace-nowrap overflow-hidden">Logout</span>}
+                </button>
+            </div>
         </aside>
     );
 };
 
 const Layout = () => {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
     return (
         <div className="flex h-screen bg-background text-text overflow-hidden">
-            <Sidebar />
+            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
             <main className="flex-1 overflow-auto p-8 custom-scrollbar">
                 <Outlet />
             </main>
