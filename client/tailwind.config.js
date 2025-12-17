@@ -15,6 +15,10 @@ export default {
                 text: '#eaeaea',
                 'text-muted': '#a0a0a0',
             },
+            fontFamily: {
+                sans: ['Space Grotesk', 'sans-serif'],
+                roboto: ['Roboto', 'sans-serif'],
+            },
             borderRadius: {
                 'xl': '12px',
             }
