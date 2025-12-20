@@ -14,6 +14,8 @@ const Todos = () => {
     const [selectedTags, setSelectedTags] = useState([]);
     const [newDate, setNewDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const [reschedulingId, setReschedulingId] = useState(null);
+    const [editingTodoId, setEditingTodoId] = useState(null);
+    const [editingText, setEditingText] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
 
     useEffect(() => {
@@ -76,6 +78,27 @@ const Todos = () => {
             });
             setTodos(todos.map(t => t._id === id ? res.data : t));
             setReschedulingId(null);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const startEditing = (todo) => {
+        setEditingTodoId(todo._id);
+        setEditingText(todo.task);
+    };
+
+    const updateTodoTask = async () => {
+        if (!editingTodoId || !editingText.trim()) {
+            setEditingTodoId(null);
+            return;
+        }
+        try {
+            const res = await axios.put(`${API_URL}/api/todos/${editingTodoId}`, {
+                task: editingText
+            });
+            setTodos(todos.map(t => t._id === editingTodoId ? res.data : t));
+            setEditingTodoId(null);
         } catch (err) {
             console.error(err);
         }
@@ -225,9 +248,25 @@ const Todos = () => {
                                 >
                                     {todo.isCompleted ? <CheckCircle2 size={24} /> : <Circle size={24} />}
                                 </button>
-                                <span className={`text-lg ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}>
-                                    {todo.task}
-                                </span>
+                                {editingTodoId === todo._id ? (
+                                    <input
+                                        type="text"
+                                        value={editingText}
+                                        onChange={(e) => setEditingText(e.target.value)}
+                                        onBlur={updateTodoTask}
+                                        onKeyDown={(e) => e.key === 'Enter' && updateTodoTask()}
+                                        autoFocus
+                                        className="text-lg bg-transparent border-b border-accent focus:outline-none flex-1 min-w-[200px]"
+                                    />
+                                ) : (
+                                    <span
+                                        className={`text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
+                                        onDoubleClick={() => startEditing(todo)}
+                                        title="Double click to edit"
+                                    >
+                                        {todo.task}
+                                    </span>
+                                )}
                                 {todo.author && (
                                     <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2">
                                         {todo.author}

@@ -10,6 +10,8 @@ const Records = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [newTitle, setNewTitle] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [editedTitle, setEditedTitle] = useState('');
 
     useEffect(() => {
         fetchRecords();
@@ -42,6 +44,12 @@ const Records = () => {
     const [lastSaved, setLastSaved] = useState(null);
 
     useEffect(() => {
+        if (selectedRecord) {
+            setEditedTitle(selectedRecord.title);
+        }
+    }, [selectedRecord]);
+
+    useEffect(() => {
         if (!selectedRecord) return;
 
         const originalRecord = records.find(r => r._id === selectedRecord._id);
@@ -71,6 +79,20 @@ const Records = () => {
         } catch (err) {
             console.error(err);
             setIsLoading(false);
+        }
+    };
+
+    const updateTitle = async () => {
+        if (!selectedRecord || !editedTitle.trim()) return;
+        try {
+            const res = await axios.put(`${API_URL}/api/records/${selectedRecord._id}`, {
+                title: editedTitle
+            });
+            setRecords(prev => prev.map(r => r._id === selectedRecord._id ? res.data : r));
+            setSelectedRecord(res.data);
+            setIsEditingTitle(false);
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -172,7 +194,25 @@ const Records = () => {
                                     <ChevronLeft />
                                 </button>
                                 <div>
-                                    <h2 className="text-xl font-bold text-white">{selectedRecord.title}</h2>
+                                    {isEditingTitle ? (
+                                        <input
+                                            type="text"
+                                            value={editedTitle}
+                                            onChange={(e) => setEditedTitle(e.target.value)}
+                                            onBlur={updateTitle}
+                                            onKeyDown={(e) => e.key === 'Enter' && updateTitle()}
+                                            autoFocus
+                                            className="text-xl font-bold text-white bg-transparent border-b border-accent focus:outline-none mb-1"
+                                        />
+                                    ) : (
+                                        <h2
+                                            className="text-xl font-bold text-white cursor-pointer hover:text-accent transition-colors"
+                                            onClick={() => setIsEditingTitle(true)}
+                                            title="Click to rename"
+                                        >
+                                            {selectedRecord.title}
+                                        </h2>
+                                    )}
                                     <div className="flex items-center gap-2">
                                         <p className="text-xs text-text-muted">10 Columns x 50 Rows</p>
                                         {lastSaved && (

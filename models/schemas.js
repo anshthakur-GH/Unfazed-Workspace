@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const subspaceSchema = new mongoose.Schema({
     title: { type: String, required: true },
     content: { type: String, default: '' },
+    assignedTo: { type: [String], default: [] },
     createdAt: { type: Date, default: Date.now }
 });
 

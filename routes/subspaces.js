@@ -15,8 +15,8 @@ router.get('/', async (req, res) => {
 // Create a subspace
 router.post('/', async (req, res) => {
     try {
-        const { title } = req.body;
-        const subspace = new Subspace({ title });
+        const { title, assignedTo } = req.body;
+        const subspace = new Subspace({ title, assignedTo });
         await subspace.save();
         res.json(subspace);
     } catch (err) {
@@ -27,10 +27,15 @@ router.post('/', async (req, res) => {
 // Update subspace (add content/files represented as text)
 router.put('/:id', async (req, res) => {
     try {
-        const { content } = req.body;
+        const { content, title, assignedTo } = req.body;
+        const updateData = {};
+        if (content !== undefined) updateData.content = content;
+        if (title !== undefined) updateData.title = title;
+        if (assignedTo !== undefined) updateData.assignedTo = assignedTo;
+
         const subspace = await Subspace.findByIdAndUpdate(
             req.params.id,
-            { content },
+            updateData,
             { new: true }
         );
         res.json(subspace);

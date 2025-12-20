@@ -7,8 +7,11 @@ const Subspaces = () => {
     const [subspaces, setSubspaces] = useState([]);
     const [selectedSubspace, setSelectedSubspace] = useState(null);
     const [newTitle, setNewTitle] = useState('');
+    const [assignedTo, setAssignedTo] = useState([]); // ['Ansh', 'Navtej']
     const [noteContent, setNoteContent] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [editedTitle, setEditedTitle] = useState('');
     const lastSubspaceIdRef = useRef(null);
 
     useEffect(() => {
@@ -18,9 +21,13 @@ const Subspaces = () => {
     useEffect(() => {
         if (selectedSubspace && selectedSubspace._id !== lastSubspaceIdRef.current) {
             setNoteContent(selectedSubspace.content || '');
+            setEditedTitle(selectedSubspace.title);
             lastSubspaceIdRef.current = selectedSubspace._id;
+        } else if (selectedSubspace && selectedSubspace._id === lastSubspaceIdRef.current && !isEditingTitle) {
+            // Keep title in sync if it changes externally or after save, but not while editing
+            setEditedTitle(selectedSubspace.title);
         }
-    }, [selectedSubspace]);
+    }, [selectedSubspace, isEditingTitle]);
 
     // Ctrl+S Shortcut
     useEffect(() => {
@@ -71,9 +78,13 @@ const Subspaces = () => {
         e.preventDefault();
         if (!newTitle.trim()) return;
         try {
-            const res = await axios.post(`${API_URL}/api/subspaces`, { title: newTitle });
+            const res = await axios.post(`${API_URL}/api/subspaces`, {
+                title: newTitle,
+                assignedTo
+            });
             setSubspaces([res.data, ...subspaces]);
             setNewTitle('');
+            setAssignedTo([]);
             setSelectedSubspace(res.data);
         } catch (err) {
             console.error(err);
@@ -94,6 +105,20 @@ const Subspaces = () => {
         } catch (err) {
             console.error(err);
             setLoading(false);
+        }
+    };
+
+    const updateTitle = async () => {
+        if (!selectedSubspace || !editedTitle.trim()) return;
+        try {
+            const res = await axios.put(`${API_URL}/api/subspaces/${selectedSubspace._id}`, {
+                title: editedTitle
+            });
+            setSubspaces(subspaces.map(s => s._id === res.data._id ? res.data : s));
+            setSelectedSubspace(res.data);
+            setIsEditingTitle(false);
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -118,17 +143,45 @@ const Subspaces = () => {
             <div className="w-1/3 flex flex-col gap-4">
                 <div className="bg-card p-4 rounded-xl border border-border">
                     <h2 className="text-xl font-bold text-white mb-4">Subspaces</h2>
-                    <form onSubmit={createSubspace} className="flex gap-2 mb-4">
-                        <input
-                            type="text"
-                            placeholder="New Subspace..."
-                            className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-accent"
-                            value={newTitle}
-                            onChange={(e) => setNewTitle(e.target.value)}
-                        />
-                        <button type="submit" className="bg-accent hover:bg-accent-hover text-white p-2 rounded-lg transition-colors">
-                            <Plus size={20} />
-                        </button>
+                    <form onSubmit={createSubspace} className="flex flex-col gap-2 mb-4">
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="New Subspace..."
+                                className="flex-1 bg-background border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:border-accent"
+                                value={newTitle}
+                                onChange={(e) => setNewTitle(e.target.value)}
+                            />
+                            <button type="submit" className="bg-accent hover:bg-accent-hover text-white p-2 rounded-lg transition-colors">
+                                <Plus size={20} />
+                            </button>
+                        </div>
+                        <div className="flex gap-2 text-xs">
+                            <label className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes('Ansh') ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}>
+                                <input
+                                    type="checkbox"
+                                    className="hidden"
+                                    checked={assignedTo.includes('Ansh')}
+                                    onChange={(e) => {
+                                        if (e.target.checked) setAssignedTo([...assignedTo, 'Ansh']);
+                                        else setAssignedTo(assignedTo.filter(u => u !== 'Ansh'));
+                                    }}
+                                />
+                                Ansh
+                            </label>
+                            <label className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes('Navtej') ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}>
+                                <input
+                                    type="checkbox"
+                                    className="hidden"
+                                    checked={assignedTo.includes('Navtej')}
+                                    onChange={(e) => {
+                                        if (e.target.checked) setAssignedTo([...assignedTo, 'Navtej']);
+                                        else setAssignedTo(assignedTo.filter(u => u !== 'Navtej'));
+                                    }}
+                                />
+                                Navtej
+                            </label>
+                        </div>
                     </form>
                     <div className="space-y-2 overflow-y-auto max-h-[60vh] custom-scrollbar pr-2">
                         {subspaces.map(sub => (
@@ -140,7 +193,16 @@ const Subspaces = () => {
                                     : 'bg-background hover:bg-border/50 border-transparent text-text-muted'
                                     }`}
                             >
-                                <div className="font-medium">{sub.title}</div>
+                                <div className="font-medium flex items-center justify-between">
+                                    <span className="truncate">{sub.title}</span>
+                                    <div className="flex gap-1">
+                                        {sub.assignedTo?.map(user => (
+                                            <span key={user} className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded border border-border">
+                                                {user}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
 
                                 <div className="flex justify-between items-center mt-1">
                                     <div className="text-xs opacity-70">
@@ -164,7 +226,25 @@ const Subspaces = () => {
                 {selectedSubspace ? (
                     <>
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold text-white">{selectedSubspace.title}</h2>
+                            {isEditingTitle ? (
+                                <input
+                                    type="text"
+                                    value={editedTitle}
+                                    onChange={(e) => setEditedTitle(e.target.value)}
+                                    onBlur={updateTitle}
+                                    onKeyDown={(e) => e.key === 'Enter' && updateTitle()}
+                                    autoFocus
+                                    className="text-2xl font-bold text-white bg-transparent border-b border-accent focus:outline-none"
+                                />
+                            ) : (
+                                <h2
+                                    className="text-2xl font-bold text-white cursor-pointer hover:text-accent transition-colors"
+                                    onClick={() => setIsEditingTitle(true)}
+                                    title="Click to rename"
+                                >
+                                    {selectedSubspace.title}
+                                </h2>
+                            )}
                             <button
                                 onClick={updateContent}
                                 disabled={loading}
