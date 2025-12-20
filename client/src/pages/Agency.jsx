@@ -90,9 +90,9 @@ const Agency = () => {
     }, [editContent, editingId]);
 
     return (
-        <div className="flex h-full gap-8">
+        <div className="flex flex-col md:flex-row h-full gap-8">
             {/* Section 1: Latest Work Input */}
-            <div className="w-1/3 flex flex-col">
+            <div className="w-full md:w-1/3 flex flex-col order-2 md:order-1">
                 <div className="bg-card p-6 rounded-xl border border-border shadow-lg">
                     <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                         <Send size={24} className="text-accent" />
@@ -134,7 +134,7 @@ const Agency = () => {
             </div>
 
             {/* Section 2: Work Progress Feed */}
-            <div className="flex-1 flex flex-col bg-card rounded-xl border border-border p-6 shadow-lg overflow-hidden">
+            <div className="flex-1 flex flex-col bg-card rounded-xl border border-border p-6 shadow-lg overflow-hidden order-1 md:order-2 h-[50vh] md:h-auto">
                 <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
                     <Clock size={24} className="text-accent" />
                     Work Progress

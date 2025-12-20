@@ -139,9 +139,9 @@ const Subspaces = () => {
     };
 
     return (
-        <div className="flex h-full gap-6">
+        <div className="flex flex-col md:flex-row h-full gap-6">
             {/* List of Subspaces */}
-            <div className="w-1/3 flex flex-col gap-4">
+            <div className="w-full md:w-1/3 flex flex-col gap-4 h-[40vh] md:h-auto">
                 <div className="bg-card p-4 rounded-xl border border-border">
                     <h2 className="text-xl font-bold text-white mb-4">Subspaces</h2>
                     <form onSubmit={createSubspace} className="flex flex-col gap-2 mb-4">

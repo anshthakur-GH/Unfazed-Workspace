@@ -176,7 +176,7 @@ const Todos = () => {
 
 
             <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
-                <div className="flex gap-4">
+                <div className="flex flex-col md:flex-row gap-4">
                     <input
                         type="text"
                         placeholder="Add a new task..."
@@ -185,7 +185,7 @@ const Todos = () => {
                         onChange={(e) => setNewTask(e.target.value)}
                     />
                     <div className="relative">
-                        <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="flex items-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
+                        <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
                             <Calendar size={20} className="text-accent" />
                             <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
                         </button>
@@ -202,7 +202,7 @@ const Todos = () => {
                             </div>
                         )}
                     </div>
-                    <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors">
+                    <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
                         Add Task
                     </button>
                 </div>
