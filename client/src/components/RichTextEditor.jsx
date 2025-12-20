@@ -69,8 +69,36 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
         // execCommand usually keeps selection. 
     };
 
+    const toggleHighlight = () => {
+        const highlightColor = '#FDE68A'; // Warm aesthetic yellow
+
+        let isHighlighted = false;
+
+        // Method 1: queryCommandValue
+        const val = document.queryCommandValue('hiliteColor');
+        if (val && val !== 'transparent' && val !== 'rgba(0, 0, 0, 0)') {
+            isHighlighted = true;
+        }
+
+        // Method 2: Manual DOM check (fallback)
+        if (!isHighlighted) {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const node = selection.anchorNode;
+                const element = node.nodeType === 3 ? node.parentElement : node;
+
+                // Check inline style specifically
+                if (element && element.style.backgroundColor && element.style.backgroundColor !== 'transparent') {
+                    isHighlighted = true;
+                }
+            }
+        }
+
+        format('hiliteColor', isHighlighted ? 'transparent' : highlightColor);
+    };
+
     return (
-        <div className={`relative ${className}`}>
+        <div className={`relative rich-text-editor ${className}`}>
             {showToolbar && !readOnly && (
                 <div
                     ref={toolbarRef}
@@ -103,8 +131,8 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
                     </button>
                     <div className="w-px h-4 bg-gray-600 mx-1"></div>
                     <button
-                        onClick={() => format('hiliteColor', 'yellow')}
-                        className="p-2 hover:bg-gray-700 rounded transition-colors text-yellow-400"
+                        onClick={toggleHighlight}
+                        className="p-2 hover:bg-gray-700 rounded transition-colors text-[#FDE68A]"
                         title="Highlight"
                     >
                         <Highlighter size={16} />
@@ -141,10 +169,18 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
                 </div>
             )}
 
-            {/* Style to ensure highlights are visible and yellow */}
+            {/* Style to ensure highlights are visible and clean - targeted within this component */}
             <style>{`
-                span[style*="background-color: yellow"] {
-                    color: black !important; /* Ensure text is readable on yellow */
+                .rich-text-editor span[style*="background-color"] {
+                    color: black !important;
+                    text-shadow: none !important;
+                    box-shadow: none !important; /* Extra safety */
+                }
+                /* Explicitly target the new color for robustness */
+                span[style*="background-color: #FDE68A"],
+                span[style*="background-color: rgb(253, 230, 138)"] {
+                    color: black !important;
+                    text-shadow: none !important;
                 }
             `}</style>
         </div>
