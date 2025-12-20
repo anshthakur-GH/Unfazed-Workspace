@@ -148,7 +148,7 @@ const Todos = () => {
     return (
         <div className="bg-card rounded-xl border border-border p-6 h-full flex flex-col">
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold text-white">To-Do List</h2>
+                <h2 className="text-xl font-bold text-white">To-Do List</h2>
                 <div className="flex bg-background rounded-lg p-1 border border-border">
                     <button
                         onClick={() => setView('previous')}
