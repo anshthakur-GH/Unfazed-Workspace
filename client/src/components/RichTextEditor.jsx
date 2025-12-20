@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bold, Italic, Highlighter, X } from 'lucide-react';
+import { Bold, Italic, Highlighter, X, Strikethrough } from 'lucide-react';
 
 const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "200px", readOnly = false }) => {
     const editorRef = useRef(null);
@@ -50,7 +50,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
 
         setToolbarPosition({
             top: rect.top - 50, // Position above text
-            left: rect.left + (rect.width / 2) - 75 // Center horizontally (approx width)
+            left: rect.left + (rect.width / 2) - 85 // Center horizontally (approx width)
         });
         setShowToolbar(true);
     };
@@ -92,6 +92,14 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
                         title="Italic"
                     >
                         <Italic size={16} />
+                    </button>
+                    <div className="w-px h-4 bg-gray-600 mx-1"></div>
+                    <button
+                        onClick={() => format('strikeThrough')}
+                        className="p-2 hover:bg-gray-700 rounded transition-colors"
+                        title="Strikethrough"
+                    >
+                        <Strikethrough size={16} />
                     </button>
                     <div className="w-px h-4 bg-gray-600 mx-1"></div>
                     <button
