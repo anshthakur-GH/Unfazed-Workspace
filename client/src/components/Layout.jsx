@@ -25,8 +25,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 bg-card border-b md:border-b-0 md:border-r border-border flex flex-col justify-start transition-all duration-300 relative z-50
             `}
         >
-            <div className={`p-4 flex items-center justify-between md:mb-4`}>
-                <div className="flex flex-col px-2 bg-transparent">
+            <div className={`p-4 flex items-center justify-between md:mb-4 ${!isOpen ? 'md:justify-center' : ''}`}>
+                <div className={`flex flex-col px-2 bg-transparent ${!isOpen ? 'md:hidden' : ''}`}>
                     <h1 className="text-2xl font-bold text-accent whitespace-nowrap overflow-hidden leading-none">Unfazed</h1>
                     <span className="text-[10px] text-white font-normal leading-none opacity-80">Workspace</span>
                 </div>
