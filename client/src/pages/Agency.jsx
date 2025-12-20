@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import { User, Clock, Send, Trash2, Edit2, Save, X } from 'lucide-react';
 import { format } from 'date-fns';
+import RichTextEditor from '../components/RichTextEditor';
 
 const Agency = () => {
     const [works, setWorks] = useState([]);
@@ -100,12 +101,12 @@ const Agency = () => {
                     <form onSubmit={addWork} className="space-y-4">
                         <div>
                             <label className="block text-sm text-text-muted mb-2">Work Description / Note</label>
-                            <textarea
-                                className="w-full bg-background border border-border rounded-lg p-3 text-text h-32 resize-none focus:outline-none focus:border-accent"
-                                placeholder="What's the update?"
+                            <RichTextEditor
                                 value={note}
-                                onChange={(e) => setNote(e.target.value)}
-                            ></textarea>
+                                onChange={setNote}
+                                placeholder="What's the update?"
+                                minHeight="128px"
+                            />
                         </div>
                         <div>
                             <label className="block text-sm text-text-muted mb-2">Assign To</label>
@@ -155,12 +156,11 @@ const Agency = () => {
                                 <div className="flex justify-between items-start gap-2">
                                     {editingId === work._id ? (
                                         <div className="flex-1">
-                                            <textarea
-                                                className="w-full bg-background border border-accent rounded p-2 text-text text-sm resize-none focus:outline-none"
-                                                rows={3}
+                                            <RichTextEditor
                                                 value={editContent}
-                                                onChange={(e) => setEditContent(e.target.value)}
-                                                autoFocus
+                                                onChange={setEditContent}
+                                                minHeight="80px"
+                                                className="mb-2"
                                             />
                                             <div className="flex justify-end gap-2 mt-2">
                                                 <span className="text-xs text-text-muted self-center">
@@ -172,9 +172,10 @@ const Agency = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <p className="text-text leading-relaxed mt-1 flex-1 whitespace-pre-wrap">
-                                            {work.note}
-                                        </p>
+                                        <div
+                                            className="text-text leading-relaxed mt-1 flex-1 whitespace-pre-wrap prose prose-invert max-w-none prose-p:my-0 prose-headings:my-1"
+                                            dangerouslySetInnerHTML={{ __html: work.note }}
+                                        />
                                     )}
                                     <div className="flex flex-col gap-1">
                                         <button

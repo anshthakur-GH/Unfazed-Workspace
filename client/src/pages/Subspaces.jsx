@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
 import { Plus, FileText, Save, Trash2 } from 'lucide-react';
+import RichTextEditor from '../components/RichTextEditor';
 
 const Subspaces = () => {
     const [subspaces, setSubspaces] = useState([]);
@@ -254,12 +255,13 @@ const Subspaces = () => {
                                 {loading ? 'Saving...' : 'Save Notes'}
                             </button>
                         </div>
-                        <textarea
-                            className="flex-1 w-full bg-background border border-border rounded-xl p-4 text-text resize-none focus:outline-none focus:border-accent"
-                            placeholder="Type your notes here... (Simulated file uploads: just type '[File: name.pdf]')"
+                        <RichTextEditor
                             value={noteContent}
-                            onChange={(e) => setNoteContent(e.target.value)}
-                        ></textarea>
+                            onChange={setNoteContent}
+                            placeholder="Type your notes here... (Simulated file uploads: just type '[File: name.pdf]')"
+                            className="flex-1 overflow-hidden flex flex-col"
+                            minHeight="100%"
+                        />
                         <div className="mt-2 text-xs text-text-muted">
                             Auto-fetch enabled. Last saved: {new Date().toLocaleTimeString()}
                         </div>

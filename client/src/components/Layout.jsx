@@ -22,7 +22,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             className={`${isOpen ? 'w-64' : 'w-20'} bg-card border-r border-border h-screen flex flex-col transition-all duration-300 relative`}
         >
             <div className={`p-4 flex items-center ${isOpen ? 'justify-between' : 'justify-center'} mb-4`}>
-                {isOpen && <h1 className="text-2xl font-bold text-accent px-2 whitespace-nowrap overflow-hidden">Unfazed</h1>}
+                {isOpen && (
+                    <div className="flex flex-col px-2 bg-transparent">
+                        <h1 className="text-2xl font-bold text-accent whitespace-nowrap overflow-hidden leading-none">Unfazed</h1>
+                        <span className="text-[10px] text-white font-normal leading-none opacity-80">Workflow</span>
+                    </div>
+                )}
                 <button
                     onClick={toggleSidebar}
                     className="p-2 rounded-full hover:bg-accent/10 text-text-muted hover:text-accent transition-colors"
