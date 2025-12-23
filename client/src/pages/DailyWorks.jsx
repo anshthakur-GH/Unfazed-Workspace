@@ -5,6 +5,11 @@ import { format } from 'date-fns';
 import { Plus, Edit2, Check, Clock, Calendar as CalendarIcon, Save } from 'lucide-react';
 import RichTextEditor from '../components/RichTextEditor';
 
+const getAuthHeader = () => {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: token } : {};
+};
+
 const DailyWorks = () => {
     const [works, setWorks] = useState([]);
     const [selectedWorkId, setSelectedWorkId] = useState(null);
@@ -75,6 +80,8 @@ const DailyWorks = () => {
                 date: new Date(),
                 dateLabel: todayLabel,
                 content: ''
+            }, {
+                headers: getAuthHeader()
             });
             const newWorks = [res.data, ...works];
             setWorks(newWorks);
@@ -152,7 +159,14 @@ const DailyWorks = () => {
                                 className={`p-4 border-b border-border cursor-pointer transition-all hover:bg-secondary/30 ${selectedWorkId === work._id ? 'bg-accent/10 border-l-4 border-l-accent' : 'border-l-4 border-l-transparent'
                                     }`}
                             >
-                                <div className="font-bold text-sm text-text mb-1 truncate">{work.dateLabel}</div>
+                                <div className="font-bold text-sm text-text mb-1 truncate flex items-center gap-2">
+                                    {work.dateLabel}
+                                    {work.createdBy && (
+                                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${work.createdBy === 'Ansh' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-purple-500/10 text-purple-500 border-purple-500/20'}`}>
+                                            {work.createdBy}
+                                        </span>
+                                    )}
+                                </div>
                                 <div className="text-xs text-text-muted flex items-center gap-1">
                                     <Clock size={12} />
                                     {format(new Date(work.updatedAt), 'HH:mm')}

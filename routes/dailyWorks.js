@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { DailyWork } = require('../models/schemas');
+const auth = require('../middleware/auth');
 
 // GET all daily works (sorted by date desc)
 router.get('/', async (req, res) => {
@@ -13,13 +14,14 @@ router.get('/', async (req, res) => {
 });
 
 // POST create new daily work
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     const { date, dateLabel, content } = req.body;
     try {
         const newWork = new DailyWork({
             date,
             dateLabel,
-            content
+            content,
+            createdBy: req.user.name
         });
         const savedWork = await newWork.save();
         res.status(201).json(savedWork);

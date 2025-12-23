@@ -33,6 +33,7 @@ const recordSchema = new mongoose.Schema({
 
 const dailyWorkSchema = new mongoose.Schema({
     dateLabel: { type: String, required: true },
+    createdBy: { type: String }, // 'Ansh' or 'Navtej'
     date: { type: Date, required: true },
     content: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now },
