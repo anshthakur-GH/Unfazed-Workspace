@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Record } = require('../models/schemas');
+const auth = require('../middleware/auth');
 
 // Get all records
 router.get('/', async (req, res) => {
@@ -24,7 +25,8 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a record
-router.post('/', async (req, res) => {
+// Create a record
+router.post('/', auth, async (req, res) => {
     try {
         const { title } = req.body;
         // Initialize 50x10 grid with empty strings if not provided
@@ -33,7 +35,8 @@ router.post('/', async (req, res) => {
 
         const record = new Record({
             title,
-            data: initialData
+            data: initialData,
+            createdBy: req.user.name
         });
         await record.save();
         res.json(record);
@@ -43,8 +46,16 @@ router.post('/', async (req, res) => {
 });
 
 // Update record
-router.put('/:id', async (req, res) => {
+// Update record
+router.put('/:id', auth, async (req, res) => {
     try {
+        const recordToCheck = await Record.findById(req.params.id);
+        if (!recordToCheck) return res.status(404).json({ message: 'Record not found' });
+
+        if (recordToCheck.createdBy && recordToCheck.createdBy !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to edit this record' });
+        }
+
         const { title, data } = req.body;
         const updateData = {};
         if (title) updateData.title = title;
@@ -62,8 +73,16 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete record
-router.delete('/:id', async (req, res) => {
+// Delete record
+router.delete('/:id', auth, async (req, res) => {
     try {
+        const recordToCheck = await Record.findById(req.params.id);
+        if (!recordToCheck) return res.status(404).json({ message: 'Record not found' });
+
+        if (recordToCheck.createdBy && recordToCheck.createdBy !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to delete this record' });
+        }
+
         await Record.findByIdAndDelete(req.params.id);
         res.json({ message: 'Record deleted' });
     } catch (err) {

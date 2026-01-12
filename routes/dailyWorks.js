@@ -31,8 +31,16 @@ router.post('/', auth, async (req, res) => {
 });
 
 // PUT update daily work (content or label)
-router.put('/:id', async (req, res) => {
+// PUT update daily work (content or label)
+router.put('/:id', auth, async (req, res) => {
     try {
+        const workToCheck = await DailyWork.findById(req.params.id);
+        if (!workToCheck) return res.status(404).json({ message: 'Daily work not found' });
+
+        if (workToCheck.createdBy && workToCheck.createdBy !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to edit this daily work' });
+        }
+
         const { dateLabel, content } = req.body;
         const updateData = { updatedAt: Date.now() };
 
@@ -51,8 +59,16 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE daily work
-router.delete('/:id', async (req, res) => {
+// DELETE daily work
+router.delete('/:id', auth, async (req, res) => {
     try {
+        const workToCheck = await DailyWork.findById(req.params.id);
+        if (!workToCheck) return res.status(404).json({ message: 'Daily work not found' });
+
+        if (workToCheck.createdBy && workToCheck.createdBy !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to delete this daily work' });
+        }
+
         await DailyWork.findByIdAndDelete(req.params.id);
         res.json({ message: 'Deleted successfully' });
     } catch (err) {

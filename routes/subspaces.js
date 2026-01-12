@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Subspace } = require('../models/schemas');
+const auth = require('../middleware/auth');
 
 // Get all subspaces
 router.get('/', async (req, res) => {
@@ -13,10 +14,15 @@ router.get('/', async (req, res) => {
 });
 
 // Create a subspace
-router.post('/', async (req, res) => {
+// Create a subspace
+router.post('/', auth, async (req, res) => {
     try {
         const { title, assignedTo } = req.body;
-        const subspace = new Subspace({ title, assignedTo });
+        const subspace = new Subspace({
+            title,
+            assignedTo,
+            createdBy: req.user.name
+        });
         await subspace.save();
         res.json(subspace);
     } catch (err) {
@@ -25,8 +31,16 @@ router.post('/', async (req, res) => {
 });
 
 // Update subspace (add content/files represented as text)
-router.put('/:id', async (req, res) => {
+// Update subspace (add content/files represented as text)
+router.put('/:id', auth, async (req, res) => {
     try {
+        const subspaceToCheck = await Subspace.findById(req.params.id);
+        if (!subspaceToCheck) return res.status(404).json({ message: 'Subspace not found' });
+
+        if (subspaceToCheck.createdBy && subspaceToCheck.createdBy !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to edit this subspace' });
+        }
+
         const { content, title, assignedTo } = req.body;
         const updateData = {};
         if (content !== undefined) updateData.content = content;
@@ -45,8 +59,16 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete subspace
-router.delete('/:id', async (req, res) => {
+// Delete subspace
+router.delete('/:id', auth, async (req, res) => {
     try {
+        const subspaceToCheck = await Subspace.findById(req.params.id);
+        if (!subspaceToCheck) return res.status(404).json({ message: 'Subspace not found' });
+
+        if (subspaceToCheck.createdBy && subspaceToCheck.createdBy !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to delete this subspace' });
+        }
+
         await Subspace.findByIdAndDelete(req.params.id);
         res.json({ message: 'Subspace deleted' });
     } catch (err) {

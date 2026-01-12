@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Todo } = require('../models/schemas');
+const auth = require('../middleware/auth');
 
 // Get all todos
 router.get('/', async (req, res) => {
@@ -13,10 +14,17 @@ router.get('/', async (req, res) => {
 });
 
 // Create a todo
-router.post('/', async (req, res) => {
+// Create a todo
+router.post('/', auth, async (req, res) => {
     try {
-        const { task, date, author, tags } = req.body;
-        const todo = new Todo({ task, date, author, tags });
+        const { task, date, tags } = req.body;
+        // Enforce author as current user
+        const todo = new Todo({
+            task,
+            date,
+            author: req.user.name,
+            tags
+        });
         await todo.save();
         res.json(todo);
     } catch (err) {
@@ -25,8 +33,16 @@ router.post('/', async (req, res) => {
 });
 
 // Toggle completion
-router.put('/:id', async (req, res) => {
+// Toggle completion
+router.put('/:id', auth, async (req, res) => {
     try {
+        const todoToCheck = await Todo.findById(req.params.id);
+        if (!todoToCheck) return res.status(404).json({ message: 'Todo not found' });
+
+        if (todoToCheck.author && todoToCheck.author !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to edit this todo' });
+        }
+
         const { isCompleted, date, task, tags } = req.body;
         const updateData = {};
         if (isCompleted !== undefined) updateData.isCompleted = isCompleted;
@@ -46,8 +62,16 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete todo
-router.delete('/:id', async (req, res) => {
+// Delete todo
+router.delete('/:id', auth, async (req, res) => {
     try {
+        const todoToCheck = await Todo.findById(req.params.id);
+        if (!todoToCheck) return res.status(404).json({ message: 'Todo not found' });
+
+        if (todoToCheck.author && todoToCheck.author !== req.user.name) {
+            return res.status(403).json({ message: 'Not authorized to delete this todo' });
+        }
+
         await Todo.findByIdAndDelete(req.params.id);
         res.json({ message: 'Todo deleted' });
     } catch (err) {
