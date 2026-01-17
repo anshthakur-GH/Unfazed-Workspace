@@ -7,6 +7,7 @@ import Todos from './pages/Todos';
 import Agency from './pages/Agency';
 import Records from './pages/Records';
 import DailyWorks from './pages/DailyWorks';
+import Invoices from './pages/Invoices';
 
 function App() {
   const isAuthenticated = () => {
@@ -33,6 +34,7 @@ function App() {
           }
         >
           <Route path="subspaces" element={<Subspaces />} />
+          <Route path="invoices" element={<Invoices />} />
           <Route path="todos" element={<Todos />} />
           <Route path="agency" element={<Agency />} />
           <Route path="daily-works" element={<DailyWorks />} />
