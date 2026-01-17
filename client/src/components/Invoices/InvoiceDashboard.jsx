@@ -33,11 +33,14 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadP
     // Filter Invoices
     const filteredInvoices = useMemo(() => {
         return invoices.filter(inv => {
-            const matchesSearch = inv.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                inv.invoiceNumber.toString().includes(searchTerm);
+            const clientName = inv.clientName || inv.billTo?.name || '';
+            const invoiceNum = inv.invoiceNumber ? inv.invoiceNumber.toString() : '';
+
+            const matchesSearch = clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                invoiceNum.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesStatus = statusFilter === 'all' || inv.status === statusFilter;
             return matchesSearch && matchesStatus;
-        }).sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date desc
+        }).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)); // Sort by date desc
     }, [invoices, searchTerm, statusFilter]);
 
     return (
@@ -156,13 +159,13 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadP
                                 filteredInvoices.map((inv) => (
                                     <tr key={inv.id} className="hover:bg-accent/5 transition-colors group">
                                         <td className="p-4 text-sm font-medium text-text">#{inv.invoiceNumber}</td>
-                                        <td className="p-4 text-sm text-text">{inv.clientName}</td>
+                                        <td className="p-4 text-sm text-text">{inv.billTo?.name || 'Unknown Client'}</td>
                                         <td className="p-4 text-sm text-text-muted">{formatDate(inv.date)}</td>
                                         <td className="p-4 text-sm font-medium text-text">{formatCurrency(inv.total)}</td>
                                         <td className="p-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid'
-                                                    ? 'bg-green-500/10 text-green-500 border border-green-500/20'
-                                                    : 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
+                                                ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+                                                : 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
                                                 }`}>
                                                 {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                                             </span>

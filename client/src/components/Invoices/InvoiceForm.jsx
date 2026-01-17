@@ -80,10 +80,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.billTo.name) {
-            alert('Please enter a client name');
-            return;
-        }
+        // Validation removed as per request
         onSave({
             ...formData,
             subtotal,
@@ -94,25 +91,27 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
 
     return (
         <div className="bg-card border border-border rounded-xl p-6 md:p-8 animate-in slide-in-from-bottom-5 duration-500">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <div className="flex items-center gap-4 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center font-bold text-white text-xl">
-                            U
-                        </div>
-                        <h2 className="text-2xl font-bold text-text cursor-pointer select-none" onClick={() => setFormData(prev => ({ ...prev, type: prev.type === 'invoice' ? 'quotation' : 'invoice' }))}>
-                            {formData.type === 'invoice' ? 'INVOICE' : 'QUOTATION'}
-                            <span className="text-xs ml-2 text-text-muted font-normal">(Click to toggle)</span>
-                        </h2>
+            <div className="flex justify-between items-start mb-8">
+                {/* Left Side: Logo & Company Info */}
+                <div className="flex flex-col gap-4">
+                    <img src="/Logo.png" alt="Unfazed AI" className="h-16 w-auto object-contain self-start" />
+                    <div>
+                        <h1 className="text-xl font-bold text-text">Unfazed AI</h1>
+                        <p className="text-text-muted text-sm">Ghaziabad, Uttar Pradesh</p>
                     </div>
-                    <p className="text-text-muted text-sm">Unfazed AI</p>
-                    <p className="text-text-muted text-sm">Ghaziabad, Uttar Pradesh</p>
                 </div>
-                <div className="flex gap-2">
+
+                {/* Right Side: Invoice/Quotation Toggle */}
+                <div className="flex flex-col items-end">
+                    <h2 className="text-3xl font-bold text-text cursor-pointer select-none text-right" onClick={() => setFormData(prev => ({ ...prev, type: prev.type === 'invoice' ? 'quotation' : 'invoice' }))}>
+                        {formData.type === 'invoice' ? 'INVOICE' : 'QUOTATION'}
+                    </h2>
+                    <span className="text-xs text-text-muted font-normal">(Click to toggle)</span>
+
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="p-2 text-text-muted hover:text-text hover:bg-white/5 rounded-lg transition-colors"
+                        className="mt-4 p-2 text-text-muted hover:text-text hover:bg-white/5 rounded-lg transition-colors self-end"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -127,7 +126,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                         <div className="flex items-center">
                             <span className="text-text-muted mr-1">#</span>
                             <input
-                                type="number"
+                                type="text"
                                 name="invoiceNumber"
                                 value={formData.invoiceNumber}
                                 onChange={handleInputChange}
@@ -178,8 +177,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                                 name="name"
                                 value={formData.billTo.name}
                                 onChange={(e) => handleInputChange(e, 'billTo')}
-                                placeholder="Client Name (Required)"
-                                required
+                                placeholder="Client Name"
                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none placeholder:text-text-muted/50"
                             />
                             <textarea

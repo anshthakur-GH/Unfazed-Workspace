@@ -15,14 +15,22 @@ export const generateInvoicePDF = (invoice) => {
 
     // --- HEADER ---
     // Company Logo/Name
+    try {
+        const logoImg = new Image();
+        logoImg.src = '/Logo.png';
+        doc.addImage(logoImg, 'PNG', 20, 15, 25, 25); // x, y, w, h
+    } catch (e) {
+        console.warn('Logo could not be loaded', e);
+    }
+
     doc.setFontSize(24);
     doc.setTextColor(...ORANGE);
-    doc.text('Unfazed AI', 20, 20);
+    doc.text('Unfazed AI', 20, 50); // Moved down below logo
 
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text('www.unfazed-ai.online', 20, 26);
-    doc.text('Ghaziabad, Uttar Pradesh', 20, 31);
+    doc.text('Ghaziabad, Uttar Pradesh', 20, 56);
+    doc.text('www.unfazed-ai.online', 20, 61);
 
     // Invoice Details (Right aligned)
     doc.setFontSize(36);
