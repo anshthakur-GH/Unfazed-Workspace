@@ -1,6 +1,12 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { CURRENCY, formatCurrency, formatDate } from './utils';
+import { formatDate } from './utils';
+
+// Helper to format currency for PDF (standard font support)
+// Using 'Rs.' instead of symbol to avoid encoding issues in standard fonts
+const formatCurrencyPDF = (amount) => {
+    return `Rs. ${Number(amount).toFixed(2)}`;
+};
 
 export const generateInvoicePDF = (invoice) => {
     const doc = new jsPDF();
@@ -8,7 +14,6 @@ export const generateInvoicePDF = (invoice) => {
     // Colors
     const ORANGE = [255, 140, 66]; // #FF8C42
     const DARK_GRAY = [26, 26, 26]; // #1a1a1a
-    const LIGHT_GRAY = [240, 240, 240];
 
     // Font setup
     doc.setFont('helvetica');
@@ -24,15 +29,15 @@ export const generateInvoicePDF = (invoice) => {
     }
 
     doc.setFontSize(24);
+    doc.setTextColor(...ORANGE);
     doc.text('Unfazed AI', 20, 50);
 
-    // Website URL beside name (approx X=80 depending on name width, or just spaced)
+    // Website URL beside name
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text('unfazed-ai.online', 75, 50); // Placed beside "Unfazed AI"
+    doc.text('unfazed-ai.online', 65, 50); // Moved closer to name
 
     doc.text('Ghaziabad, Uttar Pradesh', 20, 56);
-    // Removed duplicate URL line
 
     // Invoice Details (Right aligned)
     doc.setFontSize(36);
@@ -50,10 +55,10 @@ export const generateInvoicePDF = (invoice) => {
 
     // Divider
     doc.setDrawColor(200);
-    doc.line(20, 65, 190, 65); // Moved down slightly
+    doc.line(20, 65, 190, 65);
 
     // --- ADDRESS SECTION ---
-    const yAddress = 80; // Moved down
+    const yAddress = 80;
 
     // Bill To
     doc.setFontSize(12);
@@ -88,14 +93,14 @@ export const generateInvoicePDF = (invoice) => {
         const itemData = [
             item.description,
             item.quantity,
-            `${CURRENCY} ${item.rate.toFixed(2)}`,
-            `${CURRENCY} ${item.amount.toFixed(2)}`
+            formatCurrencyPDF(item.rate),
+            formatCurrencyPDF(item.amount)
         ];
         tableRows.push(itemData);
     });
 
     autoTable(doc, {
-        startY: 110, // Moved down
+        startY: 110,
         head: [tableColumn],
         body: tableRows,
         theme: 'grid',
@@ -113,8 +118,8 @@ export const generateInvoicePDF = (invoice) => {
         columnStyles: {
             0: { cellWidth: 'auto' }, // Description
             1: { cellWidth: 20, halign: 'center' }, // Qty
-            2: { cellWidth: 30, halign: 'right' }, // Rate
-            3: { cellWidth: 30, halign: 'right' }, // Amount
+            2: { cellWidth: 35, halign: 'right' }, // Rate - Increased width
+            3: { cellWidth: 35, halign: 'right' }, // Amount - Increased width
         },
         footStyles: {
             fillColor: [255, 255, 255],
@@ -132,7 +137,7 @@ export const generateInvoicePDF = (invoice) => {
 
     // Subtotal
     doc.text('Subtotal:', rightColX, currentYz);
-    doc.text(formatCurrency(invoice.subtotal), valColX, currentYz, { align: 'right' });
+    doc.text(formatCurrencyPDF(invoice.subtotal), valColX, currentYz, { align: 'right' });
     currentYz += 6;
 
     // Discount
@@ -141,15 +146,14 @@ export const generateInvoicePDF = (invoice) => {
         const discountAmount = invoice.discount.type === 'percentage'
             ? (invoice.subtotal * invoice.discount.value / 100)
             : invoice.discount.value;
-        doc.text(`- ${formatCurrency(discountAmount)}`, valColX, currentYz, { align: 'right' });
+        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 
     // Tax
     if (invoice.tax.value > 0) {
         doc.text(`Tax (${invoice.tax.value}%):`, rightColX, currentYz);
-        // Rough calc for display logic consistency, real calc is in total
-        // Assuming tax is on post-discount subtotal:
+
         let taxable = invoice.subtotal;
         if (invoice.discount.value > 0) {
             taxable -= (invoice.discount.type === 'percentage'
@@ -158,14 +162,14 @@ export const generateInvoicePDF = (invoice) => {
         }
         const taxAmount = taxable * (invoice.tax.value / 100);
 
-        doc.text(`+ ${formatCurrency(taxAmount)}`, valColX, currentYz, { align: 'right' });
+        doc.text(`+ ${formatCurrencyPDF(taxAmount)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 
     // Shipping
     if (invoice.shipping > 0) {
         doc.text('Shipping:', rightColX, currentYz);
-        doc.text(`+ ${formatCurrency(invoice.shipping)}`, valColX, currentYz, { align: 'right' });
+        doc.text(`+ ${formatCurrencyPDF(invoice.shipping)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 
@@ -178,7 +182,7 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text('Total:', rightColX, currentYz);
-    doc.text(formatCurrency(invoice.total), valColX, currentYz, { align: 'right' });
+    doc.text(formatCurrencyPDF(invoice.total), valColX, currentYz, { align: 'right' });
     currentYz += 8;
 
     // Amount Paid
@@ -186,7 +190,7 @@ export const generateInvoicePDF = (invoice) => {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text('Amount Paid:', rightColX, currentYz);
-        doc.text(`- ${formatCurrency(invoice.amountPaid)}`, valColX, currentYz, { align: 'right' });
+        doc.text(`- ${formatCurrencyPDF(invoice.amountPaid)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 
@@ -195,19 +199,19 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...ORANGE);
     doc.text('Balance Due:', rightColX, currentYz);
-    doc.text(formatCurrency(invoice.balanceDue), valColX, currentYz, { align: 'right' });
+    doc.text(formatCurrencyPDF(invoice.balanceDue), valColX, currentYz, { align: 'right' });
 
     // --- FOOTER / NOTES ---
     doc.setTextColor(50);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
 
-    let bottomY = finalYz + 50;
-    if (bottomY < 230) bottomY = 230; // Push to bottom if space allows
+    let bottomY = finalYz + 60; // Increased spacing
+    if (bottomY < 230) bottomY = 230;
 
     if (invoice.notes) {
         doc.setFont('helvetica', 'bold');
-        doc.text('Includes:', 20, bottomY); // Renamed from "Notes:"
+        doc.text('Includes:', 20, bottomY);
         doc.setFont('helvetica', 'normal');
         doc.text(invoice.notes, 20, bottomY + 5);
         bottomY += 20;
@@ -221,6 +225,5 @@ export const generateInvoicePDF = (invoice) => {
         doc.text(splitTerms, 20, bottomY + 5);
     }
 
-    // Save the PDF
     doc.save(`${invoice.type === 'quotation' ? 'Quotation' : 'Invoice'}_${invoice.invoiceNumber}.pdf`);
 };
