@@ -96,8 +96,11 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                 <div className="flex flex-col gap-4">
                     <img src="/Logo.png" alt="Unfazed AI" className="h-16 w-auto object-contain self-start" />
                     <div>
-                        <h1 className="text-xl font-bold text-text">Unfazed AI</h1>
-                        <p className="text-text-muted text-sm">Ghaziabad, Uttar Pradesh</p>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-xl font-bold text-text">Unfazed AI</h1>
+                            <span className="text-text-muted text-sm border-l border-text-muted/30 pl-3">unfazed-ai.online</span>
+                        </div>
+                        <p className="text-text-muted text-sm mt-1">Ghaziabad, Uttar Pradesh</p>
                     </div>
                 </div>
 
@@ -242,7 +245,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                                         <input
                                             type="number"
                                             min="0"
-                                            value={item.rate}
+                                            value={item.rate || ''} // Empty string if 0 for cleaner UX
                                             onChange={(e) => handleItemChange(item.id, 'rate', Number(e.target.value))}
                                             className="w-full bg-background border border-border/50 rounded px-2 py-1 text-text text-right focus:border-accent focus:outline-none"
                                         />
@@ -276,12 +279,12 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                 <div className="flex flex-col md:flex-row justify-end border-t border-border pt-6 gap-12">
                     <div className="w-full md:w-1/2 space-y-4">
                         <div>
-                            <label className="block text-xs font-semibold text-text-muted uppercase mb-1">Notes</label>
+                            <label className="block text-xs font-semibold text-text-muted uppercase mb-1">Includes</label>
                             <textarea
                                 name="notes"
                                 value={formData.notes}
                                 onChange={handleInputChange}
-                                placeholder="Notes - any relevant information"
+                                placeholder="Details about what is included in the project..."
                                 rows="2"
                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none text-sm resize-none"
                             />

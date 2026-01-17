@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 import { CURRENCY, formatCurrency, formatDate } from './utils';
 
 export const generateInvoicePDF = (invoice) => {
@@ -24,13 +24,15 @@ export const generateInvoicePDF = (invoice) => {
     }
 
     doc.setFontSize(24);
-    doc.setTextColor(...ORANGE);
-    doc.text('Unfazed AI', 20, 50); // Moved down below logo
+    doc.text('Unfazed AI', 20, 50);
 
+    // Website URL beside name (approx X=80 depending on name width, or just spaced)
     doc.setFontSize(10);
     doc.setTextColor(100);
+    doc.text('unfazed-ai.online', 75, 50); // Placed beside "Unfazed AI"
+
     doc.text('Ghaziabad, Uttar Pradesh', 20, 56);
-    doc.text('www.unfazed-ai.online', 20, 61);
+    // Removed duplicate URL line
 
     // Invoice Details (Right aligned)
     doc.setFontSize(36);
@@ -48,10 +50,10 @@ export const generateInvoicePDF = (invoice) => {
 
     // Divider
     doc.setDrawColor(200);
-    doc.line(20, 55, 190, 55);
+    doc.line(20, 65, 190, 65); // Moved down slightly
 
     // --- ADDRESS SECTION ---
-    const yAddress = 70;
+    const yAddress = 80; // Moved down
 
     // Bill To
     doc.setFontSize(12);
@@ -92,8 +94,8 @@ export const generateInvoicePDF = (invoice) => {
         tableRows.push(itemData);
     });
 
-    doc.autoTable({
-        startY: 100,
+    autoTable(doc, {
+        startY: 110, // Moved down
         head: [tableColumn],
         body: tableRows,
         theme: 'grid',
@@ -205,7 +207,7 @@ export const generateInvoicePDF = (invoice) => {
 
     if (invoice.notes) {
         doc.setFont('helvetica', 'bold');
-        doc.text('Notes:', 20, bottomY);
+        doc.text('Includes:', 20, bottomY); // Renamed from "Notes:"
         doc.setFont('helvetica', 'normal');
         doc.text(invoice.notes, 20, bottomY + 5);
         bottomY += 20;

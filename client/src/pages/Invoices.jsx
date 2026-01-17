@@ -63,6 +63,20 @@ const Invoices = () => {
         generateInvoicePDF(invoice);
     };
 
+    const handleStatusChange = (id, newStatus) => {
+        setInvoices(prev => prev.map(inv => {
+            if (inv.id === id) {
+                return {
+                    ...inv,
+                    status: newStatus,
+                    amountPaid: newStatus === 'paid' ? inv.total : 0,
+                    balanceDue: newStatus === 'paid' ? 0 : inv.total
+                };
+            }
+            return inv;
+        }));
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-2">
@@ -77,6 +91,7 @@ const Invoices = () => {
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onDownloadPDF={handleDownloadPDF}
+                    onStatusChange={handleStatusChange}
                 />
             )}
 

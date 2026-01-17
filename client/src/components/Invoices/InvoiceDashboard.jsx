@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Plus, Search, FileText, Download, Trash2, Edit, Filter, ArrowUpRight, ArrowDownRight, IndianRupee } from 'lucide-react';
 import { formatCurrency, formatDate } from './utils';
 
-const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadPDF }) => {
+const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadPDF, onStatusChange }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // all, paid, unpaid
 
@@ -163,12 +163,16 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadP
                                         <td className="p-4 text-sm text-text-muted">{formatDate(inv.date)}</td>
                                         <td className="p-4 text-sm font-medium text-text">{formatCurrency(inv.total)}</td>
                                         <td className="p-4">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inv.status === 'paid'
-                                                ? 'bg-green-500/10 text-green-500 border border-green-500/20'
-                                                : 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
-                                                }`}>
+                                            <button
+                                                onClick={() => onStatusChange && onStatusChange(inv.id, inv.status === 'paid' ? 'unpaid' : 'paid')}
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer transition-colors hover:opacity-80 ${inv.status === 'paid'
+                                                    ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+                                                    : 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
+                                                    }`}
+                                                title="Click to toggle status"
+                                            >
                                                 {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
-                                            </span>
+                                            </button>
                                         </td>
                                         <td className="p-4 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
