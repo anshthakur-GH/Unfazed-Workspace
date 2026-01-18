@@ -17,7 +17,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         tax: { type: 'percentage', value: 0 },
         shipping: 0,
         amountPaid: 0,
-        notes: '',
+        notes: 'Includes complete workflow setup, API integrations, custom logic, testing, deployment, and 7-day support.',
         terms: '',
     });
 

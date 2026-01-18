@@ -14,6 +14,7 @@ export const generateInvoicePDF = (invoice) => {
     // Colors
     const ORANGE = [255, 140, 66]; // #FF8C42
     const DARK_GRAY = [26, 26, 26]; // #1a1a1a
+    const BLUE_LINK = [0, 0, 238]; // Standard blue for links
 
     // Font setup
     doc.setFont('helvetica');
@@ -32,12 +33,15 @@ export const generateInvoicePDF = (invoice) => {
     doc.setTextColor(...ORANGE);
     doc.text('Unfazed AI', 20, 50);
 
-    // Website URL beside name
+    // Website URL below Unfazed AI
     doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text('unfazed-ai.online', 65, 50); // Moved closer to name
+    doc.setTextColor(100); // Black text for URL
+    doc.text('unfazed-ai.online', 20, 55);
+    doc.link(20, 52, 35, 4, { url: 'https://unfazed-ai.online' });
 
-    doc.text('Ghaziabad, Uttar Pradesh', 20, 56);
+    // Address below URL
+    doc.setTextColor(100);
+    doc.text('Ghaziabad, Uttar Pradesh, 201016', 20, 60);
 
     // Invoice Details (Right aligned)
     doc.setFontSize(36);
@@ -45,9 +49,12 @@ export const generateInvoicePDF = (invoice) => {
     const typeText = invoice.type === 'quotation' ? 'QUOTATION' : 'INVOICE';
     doc.text(typeText, 190, 25, { align: 'right' });
 
-    doc.setFontSize(10);
+    // Invoice Number (Just below header, no label)
+    doc.setFontSize(12);
     doc.setTextColor(100);
-    doc.text(`${invoice.type === 'quotation' ? 'Quotation' : 'Invoice'} #: ${invoice.invoiceNumber}`, 190, 35, { align: 'right' });
+    doc.text(`${invoice.invoiceNumber}`, 190, 32, { align: 'right' });
+
+    doc.setFontSize(10);
     doc.text(`Date: ${formatDate(invoice.date)}`, 190, 40, { align: 'right' });
     if (invoice.dueDate) {
         doc.text(`Due Date: ${formatDate(invoice.dueDate)}`, 190, 45, { align: 'right' });
@@ -55,7 +62,7 @@ export const generateInvoicePDF = (invoice) => {
 
     // Divider
     doc.setDrawColor(200);
-    doc.line(20, 65, 190, 65);
+    doc.line(20, 68, 190, 68); // Adjusted Y
 
     // --- ADDRESS SECTION ---
     const yAddress = 80;
@@ -118,8 +125,8 @@ export const generateInvoicePDF = (invoice) => {
         columnStyles: {
             0: { cellWidth: 'auto' }, // Description
             1: { cellWidth: 20, halign: 'center' }, // Qty
-            2: { cellWidth: 35, halign: 'right' }, // Rate - Increased width
-            3: { cellWidth: 35, halign: 'right' }, // Amount - Increased width
+            2: { cellWidth: 35, halign: 'right' }, // Rate
+            3: { cellWidth: 35, halign: 'right' }, // Amount
         },
         footStyles: {
             fillColor: [255, 255, 255],
@@ -201,28 +208,82 @@ export const generateInvoicePDF = (invoice) => {
     doc.text('Balance Due:', rightColX, currentYz);
     doc.text(formatCurrencyPDF(invoice.balanceDue), valColX, currentYz, { align: 'right' });
 
-    // --- FOOTER / NOTES ---
-    doc.setTextColor(50);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
+    // --- FOOTER / NOTES (Dynamic Height Boxes) ---
+    // Calculate start Y (push below totals, but ensure minimum separation)
+    let bottomStart = finalYz;
 
-    let bottomY = finalYz + 60; // Increased spacing
-    if (bottomY < 230) bottomY = 230;
+    // If totals extend far down, use a fixed gap. If totals are short, use minimum Y (e.g. 210)
+    // We want content to be at bottom if possible, or naturally flowing if list is long.
+    // User requested "appear perfectly in the bottom left". 
+    // We'll prioritize flow to avoid overlap, but try to start lower if space permits.
 
-    if (invoice.notes) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Includes:', 20, bottomY);
-        doc.setFont('helvetica', 'normal');
-        doc.text(invoice.notes, 20, bottomY + 5);
-        bottomY += 20;
+    const minFooterY = 210;
+
+    // If the totals section pushes past minFooterY, we just add padding.
+    // If totals are high up, we jump to minFooterY.
+    let contentY = Math.max(currentYz + 20, minFooterY);
+
+    // Check if we are too close to page end (A4 height ~297mm)
+    // If so, add new page.
+    if (contentY > 270) {
+        doc.addPage();
+        contentY = 20;
     }
 
-    if (invoice.terms) {
+    // Includes Box
+    if (invoice.notes) {
+        doc.setTextColor(...DARK_GRAY); // Reset color
         doc.setFont('helvetica', 'bold');
-        doc.text('Terms & Conditions:', 20, bottomY);
+        doc.text('Includes:', 20, contentY);
+
         doc.setFont('helvetica', 'normal');
-        const splitTerms = doc.splitTextToSize(invoice.terms, 170);
-        doc.text(splitTerms, 20, bottomY + 5);
+        doc.setTextColor(50);
+
+        // Split text to fit box width (e.g., 170mm)
+        const boxWidth = 170;
+        const splitNotes = doc.splitTextToSize(invoice.notes, boxWidth);
+        const notesHeight = doc.getTextDimensions(splitNotes).h + 4; // text height + padding
+
+        // Draw Box
+        doc.setDrawColor(230); // Light gray border
+        doc.rect(20, contentY + 2, boxWidth, notesHeight + 4); // x, y, w, h
+
+        doc.text(splitNotes, 22, contentY + 7); // Padding inside box
+
+        contentY += notesHeight + 15; // Move Y down for next section
+    }
+
+    // Terms Box
+    if (invoice.terms) {
+        // Check new page again
+        if (contentY > 270) {
+            doc.addPage();
+            contentY = 20;
+        }
+
+        doc.setTextColor(...DARK_GRAY);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Terms & Conditions:', 20, contentY);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...BLUE_LINK); // Make terms text blue to look link-like if it contains URLs
+
+        const boxWidth = 170;
+        const splitTerms = doc.splitTextToSize(invoice.terms, boxWidth);
+        const termsHeight = doc.getTextDimensions(splitTerms).h + 4;
+
+        // Draw Box
+        doc.setDrawColor(230);
+        doc.rect(20, contentY + 2, boxWidth, termsHeight + 4);
+
+        doc.text(splitTerms, 22, contentY + 7);
+
+        // Attempt to auto-link simple http/https string if standard jsPDF allows, 
+        // otherwise it's just styled blue. 
+        // Note: Full auto-linking logic is complex in pure jsPDF without plugins. 
+        // Since user asked for appearance primarily ("appear as a website URL"), blue color is key.
+
+        contentY += termsHeight + 10;
     }
 
     doc.save(`${invoice.type === 'quotation' ? 'Quotation' : 'Invoice'}_${invoice.invoiceNumber}.pdf`);
