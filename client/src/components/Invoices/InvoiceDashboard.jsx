@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Plus, Search, FileText, Download, Trash2, Edit, Filter, ArrowUpRight, ArrowDownRight, IndianRupee } from 'lucide-react';
+import { Plus, Search, FileText, Download, Trash2, Edit, Filter, ArrowUpRight, ArrowDownRight, IndianRupee, Copy } from 'lucide-react';
 import { formatCurrency, formatDate } from './utils';
+import { jsPDF } from 'jspdf'; // Ensure jsPacket is imported if needed, though mostly standard utils.
 
-const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadPDF, onStatusChange }) => {
+const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate, onDownloadPDF, onStatusChange }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // all, paid, unpaid
 
@@ -176,6 +177,13 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDownloadP
                                         </td>
                                         <td className="p-4 text-right">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => onDuplicate && onDuplicate(inv)}
+                                                    className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
+                                                    title="Duplicate"
+                                                >
+                                                    <Copy className="w-4 h-4" />
+                                                </button>
                                                 <button
                                                     onClick={() => onDownloadPDF(inv)}
                                                     className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"

@@ -77,6 +77,19 @@ const Invoices = () => {
         }));
     };
 
+    const handleDuplicate = (invoice) => {
+        const newInvoice = {
+            ...invoice,
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString(),
+            date: new Date().toISOString(), // Reset date to today
+            // Keep invoiceNumber same as requested, or append copy? 
+            // User requested "exact same details", implying same number.
+            // Keeping same number.
+        };
+        setInvoices(prev => [newInvoice, ...prev]);
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-2">
@@ -90,6 +103,7 @@ const Invoices = () => {
                     onCreateNew={handleCreateNew}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onDuplicate={handleDuplicate}
                     onDownloadPDF={handleDownloadPDF}
                     onStatusChange={handleStatusChange}
                 />
