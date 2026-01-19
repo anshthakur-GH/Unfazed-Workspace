@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+
 const auth = (req, res, next) => {
     // Get token from header
     const token = req.header('Authorization');
@@ -8,30 +10,31 @@ const auth = (req, res, next) => {
     }
 
     try {
-        // Token format: "fake-jwt-token-USERNAME"
-        // OR "Bearer fake-jwt-token-USERNAME" - handling both just in case, though frontend might just send raw token
-        const cleanToken = token.replace('Bearer ', '');
+        // Handle Bearer prefix if present
+        const tokenString = token.startsWith('Bearer ') ? token.slice(7) : token;
 
-        if (!cleanToken.startsWith('fake-jwt-token-')) {
-            throw new Error('Invalid token format');
-        }
+        // Verify token
+        const decoded = jwt.verify(tokenString, process.env.JWT_SECRET || 'fallback_secret');
 
-        const username = cleanToken.replace('fake-jwt-token-', '');
+        const username = decoded.username;
 
-        // Map username to friendly name
+        // Map username to friendly name (preserving existing logic)
         let friendlyName = 'Unknown';
         if (username === 'Ansh_Unfazed') friendlyName = 'Ansh';
         else if (username === 'Navtej_unfazed') friendlyName = 'Navtej';
         else if (username === 'Ayush_Unfazed') friendlyName = 'Ayush';
         else if (username === 'AnshSaxena_Unfazed') friendlyName = 'Ansh Saxena';
+        else friendlyName = username; // Fallback to username if no mapping found
 
         req.user = {
+            id: decoded.id,
             username: username,
             name: friendlyName
         };
 
         next();
     } catch (err) {
+        console.error('Auth Middleware Error:', err.message);
         res.status(401).json({ message: 'Token is not valid' });
     }
 };

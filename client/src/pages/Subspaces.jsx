@@ -168,7 +168,10 @@ const Subspaces = () => {
                                         else setAssignedTo(assignedTo.filter(u => u !== 'Ansh'));
                                     }}
                                 />
-                                Ansh
+
+
+
+
                             </label>
                             <label className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes('Navtej') ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}>
                                 <input
