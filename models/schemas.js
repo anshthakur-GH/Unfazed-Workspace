@@ -48,5 +48,9 @@ module.exports = {
     Todo: mongoose.model('Todo', todoSchema),
     AgencyWork: mongoose.model('AgencyWork', agencyWorkSchema),
     Record: mongoose.model('Record', recordSchema),
-    DailyWork: mongoose.model('DailyWork', dailyWorkSchema)
+    DailyWork: mongoose.model('DailyWork', dailyWorkSchema),
+    User: mongoose.model('User', new mongoose.Schema({
+        username: { type: String, required: true, unique: true },
+        password: { type: String, required: true }
+    }))
 };

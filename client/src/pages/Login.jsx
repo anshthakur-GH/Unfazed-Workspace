@@ -15,6 +15,7 @@ const Login = () => {
             const res = await axios.post(`${API_URL}/api/auth/login`, { username, password });
             if (res.data.success) {
                 localStorage.setItem('token', res.data.token);
+                localStorage.setItem('username', res.data.username);
                 navigate('/dashboard/subspaces');
             }
         } catch (err) {

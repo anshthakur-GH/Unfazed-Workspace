@@ -22,8 +22,8 @@ function App() {
   };
 
   const AdminRoute = ({ children }) => {
-    const token = localStorage.getItem('token');
-    const isAdmin = token && token.includes('Ansh_Unfazed');
+    const username = localStorage.getItem('username');
+    const isAdmin = username === 'Ansh_Unfazed';
     if (!isAdmin) {
       return <Navigate to="/dashboard/subspaces" replace />;
     }

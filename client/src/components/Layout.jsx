@@ -7,11 +7,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('username');
         navigate('/');
     };
 
-    const token = localStorage.getItem('token');
-    const isAdmin = token && token.includes('Ansh_Unfazed');
+    const username = localStorage.getItem('username');
+    const isAdmin = username === 'Ansh_Unfazed';
 
     const navItems = [
         ...(isAdmin ? [{ path: '/dashboard/invoices', icon: FileText, label: 'Invoices' }] : []),
