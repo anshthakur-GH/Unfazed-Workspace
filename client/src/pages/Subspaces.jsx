@@ -157,34 +157,24 @@ const Subspaces = () => {
                                 <Plus size={20} />
                             </button>
                         </div>
-                        <div className="flex gap-2 text-xs">
-                            <label className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes('Ansh') ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}>
-                                <input
-                                    type="checkbox"
-                                    className="hidden"
-                                    checked={assignedTo.includes('Ansh')}
-                                    onChange={(e) => {
-                                        if (e.target.checked) setAssignedTo([...assignedTo, 'Ansh']);
-                                        else setAssignedTo(assignedTo.filter(u => u !== 'Ansh'));
-                                    }}
-                                />
-
-
-
-
-                            </label>
-                            <label className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes('Navtej') ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}>
-                                <input
-                                    type="checkbox"
-                                    className="hidden"
-                                    checked={assignedTo.includes('Navtej')}
-                                    onChange={(e) => {
-                                        if (e.target.checked) setAssignedTo([...assignedTo, 'Navtej']);
-                                        else setAssignedTo(assignedTo.filter(u => u !== 'Navtej'));
-                                    }}
-                                />
-                                Navtej
-                            </label>
+                        <div className="flex gap-2 text-xs flex-wrap">
+                            {['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'].map((user) => (
+                                <label
+                                    key={user}
+                                    className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes(user) ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        className="hidden"
+                                        checked={assignedTo.includes(user)}
+                                        onChange={(e) => {
+                                            if (e.target.checked) setAssignedTo([...assignedTo, user]);
+                                            else setAssignedTo(assignedTo.filter(u => u !== user));
+                                        }}
+                                    />
+                                    {user}
+                                </label>
+                            ))}
                         </div>
                     </form>
                     <div className="space-y-2 overflow-y-auto max-h-[60vh] custom-scrollbar pr-2">
