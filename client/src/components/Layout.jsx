@@ -10,8 +10,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         navigate('/');
     };
 
+    const token = localStorage.getItem('token');
+    const isAdmin = token && token.includes('Ansh_Unfazed');
+
     const navItems = [
-        { path: '/dashboard/invoices', icon: FileText, label: 'Invoices' },
+        ...(isAdmin ? [{ path: '/dashboard/invoices', icon: FileText, label: 'Invoices' }] : []),
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Subspaces' },
         { path: '/dashboard/todos', icon: CheckSquare, label: 'To-Do List' },
         { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Works' },

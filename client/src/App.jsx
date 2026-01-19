@@ -21,6 +21,15 @@ function App() {
     return children;
   };
 
+  const AdminRoute = ({ children }) => {
+    const token = localStorage.getItem('token');
+    const isAdmin = token && token.includes('Ansh_Unfazed');
+    if (!isAdmin) {
+      return <Navigate to="/dashboard/subspaces" replace />;
+    }
+    return children;
+  };
+
   return (
     <Router>
       <Routes>
@@ -34,7 +43,14 @@ function App() {
           }
         >
           <Route path="subspaces" element={<Subspaces />} />
-          <Route path="invoices" element={<Invoices />} />
+          <Route
+            path="invoices"
+            element={
+              <AdminRoute>
+                <Invoices />
+              </AdminRoute>
+            }
+          />
           <Route path="todos" element={<Todos />} />
           <Route path="agency" element={<Agency />} />
           <Route path="daily-works" element={<DailyWorks />} />
