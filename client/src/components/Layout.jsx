@@ -12,10 +12,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     };
 
     const username = localStorage.getItem('username');
-    const isAdmin = username === 'Ansh_Unfazed';
+    const allowedInvoiceUsers = ['Ansh_Unfazed', 'Ayush_Unfazed', 'AnshSaxena_Unfazed'];
+    const canViewInvoices = allowedInvoiceUsers.includes(username);
 
     const navItems = [
-        ...(isAdmin ? [{ path: '/dashboard/invoices', icon: FileText, label: 'Invoices' }] : []),
+        ...(canViewInvoices ? [{ path: '/dashboard/invoices', icon: FileText, label: 'Invoices' }] : []),
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Subspaces' },
         { path: '/dashboard/todos', icon: CheckSquare, label: 'To-Do List' },
         { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Works' },

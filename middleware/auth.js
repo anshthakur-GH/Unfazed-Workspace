@@ -22,6 +22,8 @@ const auth = (req, res, next) => {
         let friendlyName = 'Unknown';
         if (username === 'Ansh_Unfazed') friendlyName = 'Ansh';
         else if (username === 'Navtej_unfazed') friendlyName = 'Navtej';
+        else if (username === 'Ayush_Unfazed') friendlyName = 'Ayush';
+        else if (username === 'AnshSaxena_Unfazed') friendlyName = 'Ansh Saxena';
 
         req.user = {
             username: username,

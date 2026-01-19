@@ -23,8 +23,10 @@ function App() {
 
   const AdminRoute = ({ children }) => {
     const username = localStorage.getItem('username');
-    const isAdmin = username === 'Ansh_Unfazed';
-    if (!isAdmin) {
+    const allowedUsers = ['Ansh_Unfazed', 'Ayush_Unfazed', 'AnshSaxena_Unfazed'];
+    const canViewInvoices = allowedUsers.includes(username);
+
+    if (!canViewInvoices) {
       return <Navigate to="/dashboard/subspaces" replace />;
     }
     return children;
