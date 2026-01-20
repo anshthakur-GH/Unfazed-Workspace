@@ -20,6 +20,8 @@ const agencyWorkSchema = new mongoose.Schema({
     note: { type: String, required: true },
     assignedTo: { type: String, enum: ['Ansh', 'Navtej'], required: true },
     progress: { type: Number, default: 0, min: 0, max: 100 },
+    priority: { type: String, enum: ['High', 'Medium', 'Low'], default: 'Medium' },
+    deadline: { type: Date },
     createdBy: { type: String, required: true },
     timestamp: { type: Date, default: Date.now }
 });

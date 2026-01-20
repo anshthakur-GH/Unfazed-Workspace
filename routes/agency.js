@@ -44,11 +44,13 @@ router.put('/:id', auth, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to edit this work' });
         }
 
-        const { note, assignedTo, progress } = req.body;
+        const { note, assignedTo, progress, priority, deadline } = req.body;
         const updateData = {};
         if (note) updateData.note = note;
         if (assignedTo) updateData.assignedTo = assignedTo;
         if (progress !== undefined) updateData.progress = progress;
+        if (priority) updateData.priority = priority;
+        if (deadline) updateData.deadline = deadline;
 
         const work = await AgencyWork.findByIdAndUpdate(
             req.params.id,
