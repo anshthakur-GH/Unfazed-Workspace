@@ -19,6 +19,7 @@ const todoSchema = new mongoose.Schema({
 const agencyWorkSchema = new mongoose.Schema({
     note: { type: String, required: true },
     assignedTo: { type: String, enum: ['Ansh', 'Navtej'], required: true },
+    progress: { type: Number, default: 0, min: 0, max: 100 },
     createdBy: { type: String, required: true },
     timestamp: { type: Date, default: Date.now }
 });

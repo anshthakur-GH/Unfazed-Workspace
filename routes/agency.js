@@ -17,10 +17,13 @@ router.get('/', async (req, res) => {
 // Add work
 router.post('/', auth, async (req, res) => {
     try {
-        const { note, assignedTo } = req.body;
+        const { note, assignedTo, progress } = req.body;
         const work = new AgencyWork({
             note,
             assignedTo,
+            note,
+            assignedTo,
+            progress: progress || 0,
             createdBy: req.user.name
         });
         await work.save();
@@ -41,10 +44,11 @@ router.put('/:id', auth, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to edit this work' });
         }
 
-        const { note, assignedTo } = req.body;
+        const { note, assignedTo, progress } = req.body;
         const updateData = {};
         if (note) updateData.note = note;
         if (assignedTo) updateData.assignedTo = assignedTo;
+        if (progress !== undefined) updateData.progress = progress;
 
         const work = await AgencyWork.findByIdAndUpdate(
             req.params.id,

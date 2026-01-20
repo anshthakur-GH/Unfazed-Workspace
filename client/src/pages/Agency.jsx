@@ -9,6 +9,7 @@ const Agency = () => {
     const [works, setWorks] = useState([]);
     const [note, setNote] = useState('');
     const [assignedTo, setAssignedTo] = useState('Ansh'); // Default
+    const [progress, setProgress] = useState(0);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -38,9 +39,10 @@ const Agency = () => {
         if (!note.trim()) return;
         setLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/api/agency`, { note, assignedTo });
+            const res = await axios.post(`${API_URL}/api/agency`, { note, assignedTo, progress });
             setWorks([res.data, ...works]);
             setNote('');
+            setProgress(0);
             setLoading(false);
         } catch (err) {
             console.error(err);
@@ -51,22 +53,25 @@ const Agency = () => {
     // Editing Logic
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState('');
+    const [editProgress, setEditProgress] = useState(0);
     const [saving, setSaving] = useState(false);
 
     const startEditing = (work) => {
         setEditingId(work._id);
         setEditContent(work.note);
+        setEditProgress(work.progress || 0);
     };
 
     const cancelEditing = () => {
         setEditingId(null);
         setEditContent('');
+        setEditProgress(0);
     };
 
-    const saveEdit = async (id, content) => {
+    const saveEdit = async (id, content, prog) => {
         setSaving(true);
         try {
-            const res = await axios.put(`${API_URL}/api/agency/${id}`, { note: content });
+            const res = await axios.put(`${API_URL}/api/agency/${id}`, { note: content, progress: prog });
             setWorks(works.map(w => w._id === id ? res.data : w));
             setSaving(false);
         } catch (err) {
@@ -81,13 +86,13 @@ const Agency = () => {
 
         const timer = setTimeout(() => {
             const work = works.find(w => w._id === editingId);
-            if (work && editContent !== work.note) {
-                saveEdit(editingId, editContent);
+            if (work && (editContent !== work.note || editProgress !== work.progress)) {
+                saveEdit(editingId, editContent, editProgress);
             }
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [editContent, editingId]);
+    }, [editContent, editProgress, editingId]);
 
     return (
         <div className="flex flex-col md:flex-row h-full gap-8">
@@ -121,6 +126,17 @@ const Agency = () => {
                                 </select>
                                 <User className="absolute right-3 top-3 text-text-muted pointer-events-none" size={18} />
                             </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm text-text-muted mb-2">Progress: {progress}%</label>
+                            <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={progress}
+                                onChange={(e) => setProgress(Number(e.target.value))}
+                                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                            />
                         </div>
                         <button
                             type="submit"
@@ -162,6 +178,17 @@ const Agency = () => {
                                                 minHeight="80px"
                                                 className="mb-2"
                                             />
+                                            <div className="mb-2">
+                                                <label className="text-xs text-text-muted mb-1 block">Progress: {editProgress}%</label>
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="100"
+                                                    value={editProgress}
+                                                    onChange={(e) => setEditProgress(Number(e.target.value))}
+                                                    className="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                                />
+                                            </div>
                                             <div className="flex justify-end gap-2 mt-2">
                                                 <span className="text-xs text-text-muted self-center">
                                                     {saving ? 'Auto-saving...' : 'Saved'}
@@ -172,10 +199,30 @@ const Agency = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div
-                                            className="text-text leading-relaxed mt-1 flex-1 whitespace-pre-wrap prose prose-invert max-w-none prose-p:my-0 prose-headings:my-1"
-                                            dangerouslySetInnerHTML={{ __html: work.note }}
-                                        />
+                                        <div className="flex-1 flex flex-col gap-2">
+                                            <div
+                                                className="text-text leading-relaxed mt-1 whitespace-pre-wrap prose prose-invert max-w-none prose-p:my-0 prose-headings:my-1"
+                                                dangerouslySetInnerHTML={{ __html: work.note }}
+                                            />
+                                            {work.progress !== undefined && (
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <div className="w-full bg-border/30 h-1.5 rounded-full overflow-hidden">
+                                                        <div
+                                                            className="h-full bg-accent transition-all duration-500"
+                                                            style={{ width: `${work.progress}%` }}
+                                                        />
+                                                    </div>
+                                                    <span
+                                                        className="text-2xl font-bold text-accent"
+                                                        style={{
+                                                            textShadow: '0 0 10px rgba(var(--accent-rgb), 0.5), 0 0 20px rgba(var(--accent-rgb), 0.3)'
+                                                        }}
+                                                    >
+                                                        {work.progress}%
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                     <div className="flex flex-col gap-1">
                                         <button
