@@ -6,7 +6,29 @@ const auth = require('../middleware/auth');
 // Get all works
 router.get('/', async (req, res) => {
     try {
-        const works = await AgencyWork.find().sort({ timestamp: -1 });
+        const works = await AgencyWork.find();
+
+        // Custom Sorting Logic
+        works.sort((a, b) => {
+            // 1. Completion: Non-100% before 100%
+            const aDone = a.progress === 100;
+            const bDone = b.progress === 100;
+            if (aDone && !bDone) return 1;
+            if (!aDone && bDone) return -1;
+
+            // 2. Priority: High(3) > Medium(2) > Low(1)
+            const priorities = { 'High': 3, 'Medium': 2, 'Low': 1 };
+            const aPrio = priorities[a.priority] || 2; // Default to Medium
+            const bPrio = priorities[b.priority] || 2;
+            if (aPrio !== bPrio) return bPrio - aPrio;
+
+            // 3. Progress: Ascending (Low progress first) - "low progress... appear above"
+            if (a.progress !== b.progress) return a.progress - b.progress;
+
+            // 4. Timestamp: Descending (Newest first)
+            return new Date(b.timestamp) - new Date(a.timestamp);
+        });
+
         res.json(works);
     } catch (err) {
         res.status(500).json({ error: err.message });

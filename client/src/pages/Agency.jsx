@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { User, Clock, Send, Trash2, Edit2, Save, X } from 'lucide-react';
+import { User, Clock, Send, Trash2, Edit2, Save, X, Calendar, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import RichTextEditor from '../components/RichTextEditor';
 
@@ -10,6 +10,8 @@ const Agency = () => {
     const [note, setNote] = useState('');
     const [assignedTo, setAssignedTo] = useState('Ansh'); // Default
     const [progress, setProgress] = useState(0);
+    const [priority, setPriority] = useState('Medium');
+    const [deadline, setDeadline] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -39,10 +41,12 @@ const Agency = () => {
         if (!note.trim()) return;
         setLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/api/agency`, { note, assignedTo, progress });
+            const res = await axios.post(`${API_URL}/api/agency`, { note, assignedTo, progress, priority, deadline });
             setWorks([res.data, ...works]);
             setNote('');
             setProgress(0);
+            setPriority('Medium');
+            setDeadline('');
             setLoading(false);
         } catch (err) {
             console.error(err);
@@ -54,24 +58,35 @@ const Agency = () => {
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState('');
     const [editProgress, setEditProgress] = useState(0);
+    const [editPriority, setEditPriority] = useState('Medium');
+    const [editDeadline, setEditDeadline] = useState('');
     const [saving, setSaving] = useState(false);
 
     const startEditing = (work) => {
         setEditingId(work._id);
         setEditContent(work.note);
         setEditProgress(work.progress || 0);
+        setEditPriority(work.priority || 'Medium');
+        setEditDeadline(work.deadline ? work.deadline.split('T')[0] : '');
     };
 
     const cancelEditing = () => {
         setEditingId(null);
         setEditContent('');
         setEditProgress(0);
+        setEditPriority('Medium');
+        setEditDeadline('');
     };
 
-    const saveEdit = async (id, content, prog) => {
+    const saveEdit = async (id, content, prog, prio, dead) => {
         setSaving(true);
         try {
-            const res = await axios.put(`${API_URL}/api/agency/${id}`, { note: content, progress: prog });
+            const res = await axios.put(`${API_URL}/api/agency/${id}`, {
+                note: content,
+                progress: prog,
+                priority: prio,
+                deadline: dead
+            });
             setWorks(works.map(w => w._id === id ? res.data : w));
             setSaving(false);
         } catch (err) {
@@ -86,13 +101,18 @@ const Agency = () => {
 
         const timer = setTimeout(() => {
             const work = works.find(w => w._id === editingId);
-            if (work && (editContent !== work.note || editProgress !== work.progress)) {
-                saveEdit(editingId, editContent, editProgress);
+            if (work && (
+                editContent !== work.note ||
+                editProgress !== work.progress ||
+                editPriority !== work.priority ||
+                editDeadline !== (work.deadline ? work.deadline.split('T')[0] : '')
+            )) {
+                saveEdit(editingId, editContent, editProgress, editPriority, editDeadline);
             }
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [editContent, editProgress, editingId]);
+    }, [editContent, editProgress, editPriority, editDeadline, editingId]);
 
     return (
         <div className="flex flex-col md:flex-row h-full gap-8">
@@ -112,6 +132,29 @@ const Agency = () => {
                                 placeholder="What's the update?"
                                 minHeight="128px"
                             />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm text-text-muted mb-2">Priority</label>
+                                <select
+                                    className="w-full bg-background border border-border rounded-lg p-3 text-text focus:outline-none focus:border-accent"
+                                    value={priority}
+                                    onChange={(e) => setPriority(e.target.value)}
+                                >
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm text-text-muted mb-2">Deadline</label>
+                                <input
+                                    type="date"
+                                    className="w-full bg-background border border-border rounded-lg p-3 text-text focus:outline-none focus:border-accent"
+                                    value={deadline}
+                                    onChange={(e) => setDeadline(e.target.value)}
+                                />
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm text-text-muted mb-2">Assign To</label>
@@ -169,6 +212,22 @@ const Agency = () => {
                                         {format(new Date(work.timestamp), 'MMM d, HH:mm')}
                                     </span>
                                 </div>
+
+                                <div className="flex items-center gap-2 mt-1 mb-2">
+                                    <span className={`text-xs px-2 py-0.5 rounded border ${work.priority === 'High' ? 'border-red-500 text-red-500 bg-red-500/10' :
+                                            work.priority === 'Low' ? 'border-green-500 text-green-500 bg-green-500/10' :
+                                                'border-yellow-500 text-yellow-500 bg-yellow-500/10'
+                                        }`}>
+                                        {work.priority || 'Medium'}
+                                    </span>
+                                    {work.deadline && (
+                                        <span className="text-xs text-text-muted flex items-center gap-1">
+                                            <Calendar size={12} />
+                                            {format(new Date(work.deadline), 'MMM d, yyyy')}
+                                        </span>
+                                    )}
+                                </div>
+
                                 <div className="flex justify-between items-start gap-2">
                                     {editingId === work._id ? (
                                         <div className="flex-1">
@@ -178,6 +237,29 @@ const Agency = () => {
                                                 minHeight="80px"
                                                 className="mb-2"
                                             />
+                                            <div className="grid grid-cols-2 gap-2 mb-2">
+                                                <div>
+                                                    <label className="text-xs text-text-muted mb-1 block">Priority</label>
+                                                    <select
+                                                        className="w-full bg-background border border-border rounded p-2 text-text text-sm"
+                                                        value={editPriority}
+                                                        onChange={(e) => setEditPriority(e.target.value)}
+                                                    >
+                                                        <option value="High">High</option>
+                                                        <option value="Medium">Medium</option>
+                                                        <option value="Low">Low</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-text-muted mb-1 block">Deadline</label>
+                                                    <input
+                                                        type="date"
+                                                        className="w-full bg-background border border-border rounded p-2 text-text text-sm"
+                                                        value={editDeadline}
+                                                        onChange={(e) => setEditDeadline(e.target.value)}
+                                                    />
+                                                </div>
+                                            </div>
                                             <div className="mb-2">
                                                 <label className="text-xs text-text-muted mb-1 block">Progress: {editProgress}%</label>
                                                 <input
