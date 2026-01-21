@@ -22,10 +22,15 @@ router.get('/', async (req, res) => {
             const bPrio = priorities[b.priority] || 2;
             if (aPrio !== bPrio) return bPrio - aPrio;
 
-            // 3. Progress: Descending (Higher progress first)
+            // 3. Deadline: Ascending (Sooner deadline first). Items without deadline go last.
+            const aDead = a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER;
+            const bDead = b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER;
+            if (aDead !== bDead) return aDead - bDead;
+
+            // 4. Progress: Descending (Higher progress first)
             if (a.progress !== b.progress) return b.progress - a.progress;
 
-            // 4. Timestamp: Descending (Newest first)
+            // 5. Timestamp: Descending (Newest first)
             return new Date(b.timestamp) - new Date(a.timestamp);
         });
 
