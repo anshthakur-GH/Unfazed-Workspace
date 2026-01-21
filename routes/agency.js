@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
             const bPrio = priorities[b.priority] || 2;
             if (aPrio !== bPrio) return bPrio - aPrio;
 
-            // 3. Progress: Ascending (Low progress first) - "low progress... appear above"
-            if (a.progress !== b.progress) return a.progress - b.progress;
+            // 3. Progress: Descending (Higher progress first)
+            if (a.progress !== b.progress) return b.progress - a.progress;
 
             // 4. Timestamp: Descending (Newest first)
             return new Date(b.timestamp) - new Date(a.timestamp);
