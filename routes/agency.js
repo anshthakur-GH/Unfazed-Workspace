@@ -4,7 +4,8 @@ const { AgencyWork } = require('../models/schemas');
 const auth = require('../middleware/auth');
 
 // Get all works
-router.get('/', async (req, res) => {
+// Get all works
+router.get('/', auth, async (req, res) => {
     try {
         const works = await AgencyWork.find();
 

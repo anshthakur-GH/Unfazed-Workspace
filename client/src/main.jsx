@@ -18,6 +18,22 @@ axios.interceptors.request.use(
   }
 );
 
+// Add response interceptor to handle 401 errors globally
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Clear local storage and redirect to login
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      window.location.href = '/';
+    }
+    return Promise.reject(error);
+  }
+);
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
