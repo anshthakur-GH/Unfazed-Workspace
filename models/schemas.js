@@ -13,7 +13,8 @@ const todoSchema = new mongoose.Schema({
     date: { type: Date },
     author: { type: String, required: true },
     tags: { type: [String], default: [] },
-    isCompleted: { type: Boolean, default: false }
+    isCompleted: { type: Boolean, default: false },
+    agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' }
 });
 
 const agencyWorkSchema = new mongoose.Schema({

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { User, Clock, Send, Trash2, Edit2, Save, X, Calendar, AlertCircle } from 'lucide-react';
+import { User, Clock, Send, Trash2, Edit2, Save, X, Calendar, AlertCircle, CheckSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import RichTextEditor from '../components/RichTextEditor';
+import TodoList from '../components/TodoList';
 
 const Agency = () => {
     const [works, setWorks] = useState([]);
@@ -13,6 +14,7 @@ const Agency = () => {
     const [priority, setPriority] = useState('Medium');
     const [deadline, setDeadline] = useState('');
     const [loading, setLoading] = useState(false);
+    const [activeTodoWorkId, setActiveTodoWorkId] = useState(null);
 
     useEffect(() => {
         fetchWorks();
@@ -215,8 +217,8 @@ const Agency = () => {
 
                                 <div className="flex items-center gap-2 mt-1 mb-2">
                                     <span className={`text-xs px-2 py-0.5 rounded border ${work.priority === 'High' ? 'border-red-500 text-red-500 bg-red-500/10' :
-                                            work.priority === 'Low' ? 'border-green-500 text-green-500 bg-green-500/10' :
-                                                'border-yellow-500 text-yellow-500 bg-yellow-500/10'
+                                        work.priority === 'Low' ? 'border-green-500 text-green-500 bg-green-500/10' :
+                                            'border-yellow-500 text-yellow-500 bg-yellow-500/10'
                                         }`}>
                                         {work.priority || 'Medium'}
                                     </span>
@@ -314,6 +316,13 @@ const Agency = () => {
                                             {editingId === work._id ? <X size={16} /> : <Edit2 size={16} />}
                                         </button>
                                         <button
+                                            onClick={() => setActiveTodoWorkId(work._id)}
+                                            className="text-text-muted hover:text-accent transition-colors p-1"
+                                            title="To-Do List"
+                                        >
+                                            <CheckSquare size={16} />
+                                        </button>
+                                        <button
                                             onClick={() => deleteWork(work._id)}
                                             className="text-text-muted hover:text-red-500 transition-colors p-1"
                                         >
@@ -326,6 +335,24 @@ const Agency = () => {
                     )}
                 </div>
             </div>
+            {/* Todo List Modal */}
+            {activeTodoWorkId && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-card w-full max-w-4xl h-[90vh] rounded-xl overflow-hidden relative border border-border shadow-2xl flex flex-col">
+                        <div className="absolute top-4 right-4 z-10">
+                            <button
+                                onClick={() => setActiveTodoWorkId(null)}
+                                className="bg-background/80 hover:bg-red-500 text-text-muted hover:text-white rounded-full p-2 transition-all border border-border hover:border-red-500"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 p-2 h-full">
+                            <TodoList agencyWorkId={activeTodoWorkId} title="Work Tasks" />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

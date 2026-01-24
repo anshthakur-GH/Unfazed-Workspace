@@ -6,7 +6,17 @@ const auth = require('../middleware/auth');
 // Get all todos
 router.get('/', async (req, res) => {
     try {
-        const todos = await Todo.find().sort({ date: 1 });
+        const { agencyWorkId } = req.query;
+        let query = {};
+
+        if (agencyWorkId) {
+            query.agencyWork = agencyWorkId;
+        } else {
+            // If no agencyWorkId provided, return global todos (where agencyWork is not set)
+            query.agencyWork = { $exists: false };
+        }
+
+        const todos = await Todo.find(query).sort({ date: 1 });
         res.json(todos);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -17,14 +27,20 @@ router.get('/', async (req, res) => {
 // Create a todo
 router.post('/', auth, async (req, res) => {
     try {
-        const { task, date, tags } = req.body;
+        const { task, date, tags, agencyWorkId } = req.body;
         // Enforce author as current user
-        const todo = new Todo({
+        const todoData = {
             task,
             date,
             author: req.user.name,
             tags
-        });
+        };
+
+        if (agencyWorkId) {
+            todoData.agencyWork = agencyWorkId;
+        }
+
+        const todo = new Todo(todoData);
         await todo.save();
         res.json(todo);
     } catch (err) {
