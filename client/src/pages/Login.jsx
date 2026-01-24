@@ -24,7 +24,15 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center h-screen bg-background">
+        <div className="flex flex-col items-center justify-start pt-32 h-screen" style={{ backgroundColor: '#080508' }}>
+            <div className="mb-8">
+                <img
+                    src="/Logo GIF.gif"
+                    alt="Unfazed Logo"
+                    className="w-48 md:w-64 object-contain"
+                    style={{ clipPath: 'inset(0 10% 0 10%)' }}
+                />
+            </div>
             <div className="w-full max-w-md p-8 bg-card rounded-xl border border-border shadow-lg">
                 <h2 className="text-3xl font-bold text-accent mb-6 text-center">Unfazed Workspace</h2>
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
