@@ -7,10 +7,19 @@ const auth = require('../middleware/auth');
 // Get all works
 router.get('/', auth, async (req, res) => {
     try {
-        const works = await AgencyWork.find();
+        const works = await AgencyWork.find().lean(); // Use lean() for better performance and easier modification
+
+        // Attach hasTodos flag
+        const worksWithTodosStatus = await Promise.all(works.map(async (work) => {
+            const todoCount = await require('../models/schemas').Todo.countDocuments({ agencyWork: work._id });
+            return { ...work, hasTodos: todoCount > 0 };
+        }));
+
+        // Helper for sorting
+        const getVal = (w) => w;
 
         // Custom Sorting Logic
-        works.sort((a, b) => {
+        worksWithTodosStatus.sort((a, b) => {
             // 1. Completion: Non-100% before 100%
             const aDone = a.progress === 100;
             const bDone = b.progress === 100;
@@ -35,7 +44,7 @@ router.get('/', auth, async (req, res) => {
             return new Date(b.timestamp) - new Date(a.timestamp);
         });
 
-        res.json(works);
+        res.json(worksWithTodosStatus);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

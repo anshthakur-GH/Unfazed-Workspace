@@ -263,14 +263,18 @@ const Agency = () => {
                                                 </div>
                                             </div>
                                             <div className="mb-2">
-                                                <label className="text-xs text-text-muted mb-1 block">Progress: {editProgress}%</label>
+                                                <label className="text-xs text-text-muted mb-1 block">
+                                                    Progress: {editProgress}%
+                                                    {work.hasTodos && <span className="ml-2 text-accent italic">(Auto-calculated from Tasks)</span>}
+                                                </label>
                                                 <input
                                                     type="range"
                                                     min="0"
                                                     max="100"
                                                     value={editProgress}
                                                     onChange={(e) => setEditProgress(Number(e.target.value))}
-                                                    className="w-full h-1 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                                    disabled={work.hasTodos}
+                                                    className={`w-full h-1 bg-border rounded-lg appearance-none ${work.hasTodos ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} accent-accent`}
                                                 />
                                             </div>
                                             <div className="flex justify-end gap-2 mt-2">
@@ -304,6 +308,11 @@ const Agency = () => {
                                                     >
                                                         {work.progress}%
                                                     </span>
+                                                    {work.hasTodos && (
+                                                        <span className="text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">
+                                                            AUTO
+                                                        </span>
+                                                    )}
                                                 </div>
                                             )}
                                         </div>
@@ -348,7 +357,11 @@ const Agency = () => {
                             </button>
                         </div>
                         <div className="flex-1 p-2 h-full">
-                            <TodoList agencyWorkId={activeTodoWorkId} title="Work Tasks" />
+                            <TodoList
+                                agencyWorkId={activeTodoWorkId}
+                                title="Work Tasks"
+                                onUpdate={fetchWorks}
+                            />
                         </div>
                     </div>
                 </div>

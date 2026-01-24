@@ -1,7 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const { Todo } = require('../models/schemas');
+const { Todo, AgencyWork } = require('../models/schemas');
 const auth = require('../middleware/auth');
+
+// Helper to update Agency Work progress
+const updateAgencyWorkProgress = async (agencyWorkId) => {
+    try {
+        if (!agencyWorkId) return;
+        
+        const todos = await Todo.find({ agencyWork: agencyWorkId });
+        const total = todos.length;
+        
+        if (total === 0) {
+            // If no todos, we don't reset progress to 0 automatically because 
+            // the user might want to switch back to manual mode with their previous value,
+            // OR per requirement: "if that To Do List is created and not any work is completed... progress will be zero"
+            // AND "if any work does not contain any To Do List then the user can manually maintain"
+            // The requirement says: "if that To Do List is created and not any work is completed... progress will be zero".
+            // It implies if there ARE todos, progress is calculated. If there are NO todos, it's manual.
+            // So if total === 0, we do NOTHING to the progress, leaving it as manual.
+            return; 
+        }
+
+        const completed = todos.filter(t => t.isCompleted).length;
+        const progress = Math.round((completed / total) * 100);
+
+        await AgencyWork.findByIdAndUpdate(agencyWorkId, { progress });
+    } catch (err) {
+        console.error('Error updating agency work progress:', err);
+    }
+};
 
 // Get all todos
 router.get('/', async (req, res) => {
@@ -24,7 +52,6 @@ router.get('/', async (req, res) => {
 });
 
 // Create a todo
-// Create a todo
 router.post('/', auth, async (req, res) => {
     try {
         const { task, date, tags, agencyWorkId } = req.body;
@@ -42,13 +69,17 @@ router.post('/', auth, async (req, res) => {
 
         const todo = new Todo(todoData);
         await todo.save();
+
+        if (agencyWorkId) {
+            await updateAgencyWorkProgress(agencyWorkId);
+        }
+
         res.json(todo);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Toggle completion
 // Toggle completion
 router.put('/:id', auth, async (req, res) => {
     try {
@@ -71,13 +102,17 @@ router.put('/:id', auth, async (req, res) => {
             updateData,
             { new: true }
         );
+
+        if (todo.agencyWork) {
+            await updateAgencyWorkProgress(todo.agencyWork);
+        }
+
         res.json(todo);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Delete todo
 // Delete todo
 router.delete('/:id', auth, async (req, res) => {
     try {
@@ -88,7 +123,14 @@ router.delete('/:id', auth, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to delete this todo' });
         }
 
+        const agencyWorkId = todoToCheck.agencyWork; // Capture ID before deletion
+
         await Todo.findByIdAndDelete(req.params.id);
+
+        if (agencyWorkId) {
+            await updateAgencyWorkProgress(agencyWorkId);
+        }
+
         res.json({ message: 'Todo deleted' });
     } catch (err) {
         res.status(500).json({ error: err.message });

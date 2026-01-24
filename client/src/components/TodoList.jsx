@@ -7,7 +7,7 @@ import CustomCalendar from './CustomCalendar';
 
 const AVAILABLE_TAGS = ['CC', 'SEO', 'Website', 'Lead', 'Meet', 'Outreach', 'Personal'];
 
-const TodoList = ({ agencyWorkId, title = "To-Do List" }) => {
+const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
     const [todos, setTodos] = useState([]);
     const [view, setView] = useState('today'); // 'today', 'future', 'previous'
     const [newTask, setNewTask] = useState('');
@@ -60,6 +60,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List" }) => {
             setTodos([...todos, res.data]);
             setNewTask('');
             setSelectedTags([]);
+            if (onUpdate) onUpdate();
         } catch (err) {
             console.error(err);
         }
@@ -71,6 +72,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List" }) => {
                 isCompleted: !currentStatus
             });
             setTodos(todos.map(t => t._id === id ? res.data : t));
+            if (onUpdate) onUpdate();
         } catch (err) {
             console.error(err);
         }
@@ -83,6 +85,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List" }) => {
             });
             setTodos(todos.map(t => t._id === id ? res.data : t));
             setReschedulingId(null);
+            if (onUpdate) onUpdate();
         } catch (err) {
             console.error(err);
         }
@@ -104,6 +107,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List" }) => {
             });
             setTodos(todos.map(t => t._id === editingTodoId ? res.data : t));
             setEditingTodoId(null);
+            if (onUpdate) onUpdate();
         } catch (err) {
             console.error(err);
         }
@@ -113,6 +117,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List" }) => {
         try {
             await axios.delete(`${API_URL}/api/todos/${id}`);
             setTodos(todos.filter(t => t._id !== id));
+            if (onUpdate) onUpdate();
         } catch (err) {
             console.error(err);
         }
