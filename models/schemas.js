@@ -50,10 +50,8 @@ const dailyWorkSchema = new mongoose.Schema({
 
 const goalSchema = new mongoose.Schema({
     title: { type: String, required: true },
-    description: { type: String },
     targetDate: { type: Date },
-    type: { type: String, enum: ['Monthly', 'Date-wise'], required: true },
-    assignedTo: { type: String, enum: ['Ansh Thakur', 'Navtej', 'Ansh Saxena', 'Ayush'], required: true },
+    assignedTo: { type: String, required: true },
     createdBy: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
