@@ -233,7 +233,7 @@ const Records = () => {
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-auto custom-scrollbar p-1">
+                        <div className="flex-1 overflow-auto overflow-x-auto custom-scrollbar p-1">
                             <div className="inline-block min-w-full">
                                 <table className="w-full border-collapse">
                                     <thead>

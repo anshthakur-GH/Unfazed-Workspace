@@ -144,7 +144,7 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
             {/* Invoices Table */}
             <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full min-w-[800px] text-left border-collapse">
                         <thead>
                             <tr className="bg-background/50 border-b border-border">
                                 <th className="p-4 text-xs font-semibold text-text-muted uppercase tracking-wider">Invoice #</th>

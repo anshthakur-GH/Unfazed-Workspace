@@ -135,7 +135,7 @@ const Agency = () => {
                                 minHeight="128px"
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm text-text-muted mb-2">Priority</label>
                                 <select
@@ -239,7 +239,7 @@ const Agency = () => {
                                                 minHeight="80px"
                                                 className="mb-2"
                                             />
-                                            <div className="grid grid-cols-2 gap-2 mb-2">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
                                                 <div>
                                                     <label className="text-xs text-text-muted mb-1 block">Priority</label>
                                                     <select

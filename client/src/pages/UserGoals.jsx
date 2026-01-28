@@ -95,8 +95,8 @@ const UserGoals = () => {
     };
 
     return (
-        <div className="h-full flex flex-col p-8 overflow-y-auto custom-scrollbar">
-            <div className="flex justify-between items-center mb-8">
+        <div className="h-full flex flex-col p-4 md:p-8 overflow-y-auto custom-scrollbar">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4 md:gap-0">
                 <div>
                     <button
                         onClick={() => navigate('/dashboard/goals')}
@@ -104,13 +104,13 @@ const UserGoals = () => {
                     >
                         ← Back to Team
                     </button>
-                    <h1 className="text-3xl font-bold text-text">
+                    <h1 className="text-2xl md:text-3xl font-bold text-text">
                         {userName}'s Goals
                     </h1>
                 </div>
                 <button
                     onClick={() => setShowCreateModal(true)}
-                    className="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors"
+                    className="w-full md:w-auto bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"
                 >
                     <Plus size={20} />
                     New Goal

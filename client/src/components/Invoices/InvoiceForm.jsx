@@ -91,7 +91,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
 
     return (
         <div className="bg-card border border-border rounded-xl p-6 md:p-8 animate-in slide-in-from-bottom-5 duration-500">
-            <div className="flex justify-between items-start mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-6 md:gap-0">
                 {/* Left Side: Logo & Company Info */}
                 <div className="flex flex-col gap-4">
                     <img src="/Logo.png" alt="Unfazed AI" className="h-16 w-auto object-contain self-start" />
@@ -105,7 +105,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                 </div>
 
                 {/* Right Side: Invoice/Quotation Toggle */}
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-start md:items-end w-full md:w-auto">
                     <h2 className="text-3xl font-bold text-text cursor-pointer select-none text-right" onClick={() => setFormData(prev => ({ ...prev, type: prev.type === 'invoice' ? 'quotation' : 'invoice' }))}>
                         {formData.type === 'invoice' ? 'INVOICE' : 'QUOTATION'}
                     </h2>
@@ -209,8 +209,8 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                 </div>
 
                 {/* Line Items */}
-                <div>
-                    <table className="w-full">
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[600px]">
                         <thead>
                             <tr className="border-b border-border text-left">
                                 <th className="py-2 text-xs font-semibold text-text-muted uppercase w-[45%]">Item Details</th>

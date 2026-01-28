@@ -12,7 +12,7 @@ const Goals = () => {
     ];
 
     return (
-        <div className="h-full flex flex-col p-8 overflow-y-auto custom-scrollbar">
+        <div className="h-full flex flex-col p-4 md:p-8 overflow-y-auto custom-scrollbar">
             <div className="mb-10">
                 <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-accent to-purple-400 mb-2">
                     Team Goals
