@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Target } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     const navigate = useNavigate();
@@ -22,6 +22,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Works' },
         { path: '/dashboard/agency', icon: Briefcase, label: 'Agency Work' },
         { path: '/dashboard/records', icon: Table, label: 'Records' },
+        { path: '/dashboard/goals', icon: Target, label: 'Goals' },
     ];
 
     return (

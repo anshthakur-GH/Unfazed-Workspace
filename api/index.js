@@ -22,7 +22,9 @@ const subspaceRoutes = require('../routes/subspaces');
 const todoRoutes = require('../routes/todos');
 const agencyRoutes = require('../routes/agency');
 const recordRoutes = require('../routes/records');
+const recordRoutes = require('../routes/records');
 const dailyWorkRoutes = require('../routes/dailyWorks');
+const goalRoutes = require('../routes/goals');
 
 app.use('/api/subspaces', subspaceRoutes);
 app.use('/api/todos', todoRoutes);
@@ -30,6 +32,7 @@ app.use('/api/agency', agencyRoutes);
 app.use('/api/agency', agencyRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/daily-works', dailyWorkRoutes);
+app.use('/api/goals', goalRoutes);
 
 // Auth Route (Hardcoded)
 const bcrypt = require('bcryptjs');

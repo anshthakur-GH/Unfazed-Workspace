@@ -14,7 +14,8 @@ const todoSchema = new mongoose.Schema({
     author: { type: String, required: true },
     tags: { type: [String], default: [] },
     isCompleted: { type: Boolean, default: false },
-    agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' }
+    agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' },
+    goal: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }
 });
 
 const agencyWorkSchema = new mongoose.Schema({
@@ -47,12 +48,23 @@ const dailyWorkSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+const goalSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    description: { type: String },
+    targetDate: { type: Date },
+    type: { type: String, enum: ['Monthly', 'Date-wise'], required: true },
+    assignedTo: { type: String, enum: ['Ansh Thakur', 'Navtej', 'Ansh Saxena', 'Ayush'], required: true },
+    createdBy: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
 module.exports = {
     Subspace: mongoose.model('Subspace', subspaceSchema),
     Todo: mongoose.model('Todo', todoSchema),
     AgencyWork: mongoose.model('AgencyWork', agencyWorkSchema),
     Record: mongoose.model('Record', recordSchema),
     DailyWork: mongoose.model('DailyWork', dailyWorkSchema),
+    Goal: mongoose.model('Goal', goalSchema),
     User: mongoose.model('User', new mongoose.Schema({
         username: { type: String, required: true, unique: true },
         password: { type: String, required: true }

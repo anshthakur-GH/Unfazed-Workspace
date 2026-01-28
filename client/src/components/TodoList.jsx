@@ -7,7 +7,7 @@ import CustomCalendar from './CustomCalendar';
 
 const AVAILABLE_TAGS = ['CC', 'SEO', 'Website', 'Lead', 'Meet', 'Outreach', 'Personal'];
 
-const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
+const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOnly = false }) => {
     const [todos, setTodos] = useState([]);
     const [view, setView] = useState('today'); // 'today', 'future', 'previous'
     const [newTask, setNewTask] = useState('');
@@ -20,13 +20,15 @@ const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
 
     useEffect(() => {
         fetchTodos();
-    }, [agencyWorkId]);
+    }, [agencyWorkId, goalId]);
 
     const fetchTodos = async () => {
         try {
             const params = {};
             if (agencyWorkId) {
                 params.agencyWorkId = agencyWorkId;
+            } else if (goalId) {
+                params.goalId = goalId;
             }
             const res = await axios.get(`${API_URL}/api/todos`, { params });
             if (Array.isArray(res.data)) {
@@ -55,7 +57,9 @@ const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
                 date: newDate,
                 author,
                 tags: selectedTags,
-                agencyWorkId: agencyWorkId || undefined
+                tags: selectedTags,
+                agencyWorkId: agencyWorkId || undefined,
+                goalId: goalId || undefined
             });
             setTodos([...todos, res.data]);
             setNewTask('');
@@ -185,61 +189,63 @@ const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
             </div>
 
 
-            <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <input
-                        type="text"
-                        placeholder="Add a new task..."
-                        className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent"
-                        value={newTask}
-                        onChange={(e) => setNewTask(e.target.value)}
-                    />
-                    <div className="relative">
-                        <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
-                            <Calendar size={20} className="text-accent" />
-                            <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
+            {!readOnly && (
+                <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <input
+                            type="text"
+                            placeholder="Add a new task..."
+                            className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent"
+                            value={newTask}
+                            onChange={(e) => setNewTask(e.target.value)}
+                        />
+                        <div className="relative">
+                            <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
+                                <Calendar size={20} className="text-accent" />
+                                <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
+                            </button>
+                            {showCalendar && (
+                                <div className="absolute top-full left-0 mt-2 z-50">
+                                    <CustomCalendar
+                                        selectedDate={newDate}
+                                        onChange={(date) => {
+                                            setNewDate(date);
+                                            setShowCalendar(false);
+                                        }}
+                                        onClose={() => setShowCalendar(false)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
+                            Add Task
                         </button>
-                        {showCalendar && (
-                            <div className="absolute top-full left-0 mt-2 z-50">
-                                <CustomCalendar
-                                    selectedDate={newDate}
-                                    onChange={(date) => {
-                                        setNewDate(date);
-                                        setShowCalendar(false);
-                                    }}
-                                    onClose={() => setShowCalendar(false)}
-                                />
-                            </div>
-                        )}
                     </div>
-                    <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
-                        Add Task
-                    </button>
-                </div>
 
-                {/* Tags Selection */}
-                <div className="flex flex-wrap gap-2">
-                    {AVAILABLE_TAGS.map(tag => (
-                        <button
-                            key={tag}
-                            type="button"
-                            onClick={() => {
-                                if (selectedTags.includes(tag)) {
-                                    setSelectedTags(selectedTags.filter(t => t !== tag));
-                                } else {
-                                    setSelectedTags([...selectedTags, tag]);
-                                }
-                            }}
-                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${selectedTags.includes(tag)
-                                ? 'bg-accent text-white border-accent'
-                                : 'bg-background text-text-muted border-border hover:border-accent'
-                                }`}
-                        >
-                            {tag}
-                        </button>
-                    ))}
-                </div>
-            </form>
+                    {/* Tags Selection */}
+                    <div className="flex flex-wrap gap-2">
+                        {AVAILABLE_TAGS.map(tag => (
+                            <button
+                                key={tag}
+                                type="button"
+                                onClick={() => {
+                                    if (selectedTags.includes(tag)) {
+                                        setSelectedTags(selectedTags.filter(t => t !== tag));
+                                    } else {
+                                        setSelectedTags([...selectedTags, tag]);
+                                    }
+                                }}
+                                className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${selectedTags.includes(tag)
+                                    ? 'bg-accent text-white border-accent'
+                                    : 'bg-background text-text-muted border-border hover:border-accent'
+                                    }`}
+                            >
+                                {tag}
+                            </button>
+                        ))}
+                    </div>
+                </form>
+            )}
 
             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
                 {filteredTodos.length === 0 ? (
@@ -272,7 +278,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
                                     <span
                                         className={`text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
                                         onDoubleClick={() => startEditing(todo)}
-                                        title="Double click to edit"
+                                        title={readOnly ? "" : "Double click to edit"}
                                     >
                                         {todo.task}
                                     </span>
@@ -327,6 +333,7 @@ const TodoList = ({ agencyWorkId, title = "To-Do List", onUpdate }) => {
                                 >
                                     <Trash2 size={18} />
                                 </button>
+                            )}
                             </div>
                         </div>
                     ))

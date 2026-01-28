@@ -7,10 +7,10 @@ const auth = require('../middleware/auth');
 const updateAgencyWorkProgress = async (agencyWorkId) => {
     try {
         if (!agencyWorkId) return;
-        
+
         const todos = await Todo.find({ agencyWork: agencyWorkId });
         const total = todos.length;
-        
+
         if (total === 0) {
             // If no todos, we don't reset progress to 0 automatically because 
             // the user might want to switch back to manual mode with their previous value,
@@ -19,7 +19,7 @@ const updateAgencyWorkProgress = async (agencyWorkId) => {
             // The requirement says: "if that To Do List is created and not any work is completed... progress will be zero".
             // It implies if there ARE todos, progress is calculated. If there are NO todos, it's manual.
             // So if total === 0, we do NOTHING to the progress, leaving it as manual.
-            return; 
+            return;
         }
 
         const completed = todos.filter(t => t.isCompleted).length;
@@ -39,9 +39,12 @@ router.get('/', async (req, res) => {
 
         if (agencyWorkId) {
             query.agencyWork = agencyWorkId;
+        } else if (req.query.goalId) {
+            query.goal = req.query.goalId;
         } else {
-            // If no agencyWorkId provided, return global todos (where agencyWork is not set)
+            // If no agencyWorkId and no goalId provided, return global todos
             query.agencyWork = { $exists: false };
+            query.goal = { $exists: false };
         }
 
         const todos = await Todo.find(query).sort({ date: 1 });
@@ -65,6 +68,10 @@ router.post('/', auth, async (req, res) => {
 
         if (agencyWorkId) {
             todoData.agencyWork = agencyWorkId;
+        }
+
+        if (req.body.goalId) {
+            todoData.goal = req.body.goalId;
         }
 
         const todo = new Todo(todoData);
