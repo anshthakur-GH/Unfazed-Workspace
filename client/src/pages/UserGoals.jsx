@@ -17,6 +17,7 @@ const UserGoals = () => {
     // New Goal State
     const [newGoal, setNewGoal] = useState({
         title: '',
+        description: '',
         targetDate: format(new Date(), 'yyyy-MM-dd')
     });
 
@@ -54,6 +55,7 @@ const UserGoals = () => {
             setShowCreateModal(false);
             setNewGoal({
                 title: '',
+                description: '',
                 targetDate: format(new Date(), 'yyyy-MM-dd')
             });
             fetchGoals();
@@ -211,7 +213,7 @@ const UserGoals = () => {
                                         onChange={e => setNewGoal({ ...newGoal, description: e.target.value })}
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-text-muted mb-1">Target Date</label>
                                         <input
@@ -221,17 +223,6 @@ const UserGoals = () => {
                                             value={newGoal.targetDate}
                                             onChange={e => setNewGoal({ ...newGoal, targetDate: e.target.value })}
                                         />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-text-muted mb-1">Type</label>
-                                        <select
-                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                            value={newGoal.type}
-                                            onChange={e => setNewGoal({ ...newGoal, type: e.target.value })}
-                                        >
-                                            <option value="Monthly">Monthly</option>
-                                            <option value="Date-wise">Date-wise</option>
-                                        </select>
                                     </div>
                                 </div>
                                 <div className="flex justify-end gap-3 mt-4">
@@ -281,7 +272,7 @@ const UserGoals = () => {
                                         onChange={e => setEditingGoal({ ...editingGoal, description: e.target.value })}
                                     />
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-text-muted mb-1">Target Date</label>
                                         <input
@@ -291,17 +282,6 @@ const UserGoals = () => {
                                             value={format(parseISO(editingGoal.targetDate), 'yyyy-MM-dd')}
                                             onChange={e => setEditingGoal({ ...editingGoal, targetDate: e.target.value })}
                                         />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-text-muted mb-1">Type</label>
-                                        <select
-                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                            value={editingGoal.type}
-                                            onChange={e => setEditingGoal({ ...editingGoal, type: e.target.value })}
-                                        >
-                                            <option value="Monthly">Monthly</option>
-                                            <option value="Date-wise">Date-wise</option>
-                                        </select>
                                     </div>
                                 </div>
                                 <div className="flex justify-end gap-3 mt-4">
