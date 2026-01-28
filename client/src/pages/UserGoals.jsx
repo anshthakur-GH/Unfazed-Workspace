@@ -129,204 +129,201 @@ const UserGoals = () => {
                                             Created by <span className="font-bold text-accent">{goal.createdBy}</span>
                                         </span>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-4 text-sm text-text-muted">
-                                    <span className="bg-background px-3 py-1 rounded-md border border-border">
-                                        Target: {format(parseISO(goal.targetDate), 'MMM d, yyyy')}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                {isCreator && (
-                                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                        <button
-                                            onClick={() => setEditingGoal(goal)}
-                                            className="p-2 text-text-muted hover:text-text hover:bg-background rounded-lg transition-all"
-                                        >
-                                            <Edit2 size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteGoal(goal._id)}
-                                            className="p-2 text-text-muted hover:text-red-500 hover:bg-background rounded-lg transition-all"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                                    <div className="flex items-center gap-4 text-sm text-text-muted">
+                                        <span className="bg-background px-3 py-1 rounded-md border border-border">
+                                            Target: {format(parseISO(goal.targetDate), 'MMM d, yyyy')}
+                                        </span>
                                     </div>
-                                )}
-                                <div className="p-2 text-text-muted">
-                                    {expandedGoalId === goal._id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                                 </div>
-                            </div>
-                        </div>
 
-                            {/* Expanded Section (Sub Goals) */ }
-                    {
-                        expandedGoalId === goal._id && (
-                            <div className="border-t border-border bg-background/30 p-6">
-                                <h4 className="text-lg font-bold text-text mb-4">Sub Goals</h4>
-                                <div className="h-[400px]">
-                                    <TodoList
-                                        goalId={goal._id}
-                                        title=""
-                                        readOnly={!isCreator}
-                                    />
+                                <div className="flex items-center gap-4">
+                                    {isCreator && (
+                                        <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                            <button
+                                                onClick={() => setEditingGoal(goal)}
+                                                className="p-2 text-text-muted hover:text-text hover:bg-background rounded-lg transition-all"
+                                            >
+                                                <Edit2 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteGoal(goal._id)}
+                                                className="p-2 text-text-muted hover:text-red-500 hover:bg-background rounded-lg transition-all"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    )}
+                                    <div className="p-2 text-text-muted">
+                                        {expandedGoalId === goal._id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                    </div>
                                 </div>
                             </div>
-                        )
-                    }
+
+                            {/* Expanded Section (Sub Goals) */}
+                            {expandedGoalId === goal._id && (
+                                <div className="border-t border-border bg-background/30 p-6">
+                                    <h4 className="text-lg font-bold text-text mb-4">Sub Goals</h4>
+                                    <div className="h-[400px]">
+                                        <TodoList
+                                            goalId={goal._id}
+                                            title=""
+                                            readOnly={!isCreator}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
-            );
+                    );
                 })}
 
-            {goals.length === 0 && (
-                <div className="text-center py-20 text-text-muted border-2 border-dashed border-border rounded-xl">
-                    <p>No goals found for {userName}.</p>
-                    <button onClick={() => setShowCreateModal(true)} className="text-accent hover:underline mt-2">
-                        Create the first one
-                    </button>
-                </div>
-            )}
-        </div>
-
-            {/* Create Modal */ }
-    {
-        showCreateModal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-card w-full max-w-md rounded-xl border border-border p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
-                    <h2 className="text-2xl font-bold text-white mb-6">Create New Goal</h2>
-                    <form onSubmit={handleCreateGoal} className="flex flex-col gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-text-muted mb-1">Goal Title</label>
-                            <input
-                                type="text"
-                                required
-                                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                value={newGoal.title}
-                                onChange={e => setNewGoal({ ...newGoal, title: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-text-muted mb-1">Description</label>
-                            <textarea
-                                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none h-24 resize-none"
-                                value={newGoal.description}
-                                onChange={e => setNewGoal({ ...newGoal, description: e.target.value })}
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-muted mb-1">Target Date</label>
-                                <input
-                                    type="date"
-                                    required
-                                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                    value={newGoal.targetDate}
-                                    onChange={e => setNewGoal({ ...newGoal, targetDate: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-muted mb-1">Type</label>
-                                <select
-                                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                    value={newGoal.type}
-                                    onChange={e => setNewGoal({ ...newGoal, type: e.target.value })}
-                                >
-                                    <option value="Monthly">Monthly</option>
-                                    <option value="Date-wise">Date-wise</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-4">
-                            <button
-                                type="button"
-                                onClick={() => setShowCreateModal(false)}
-                                className="px-4 py-2 rounded-lg text-text-muted hover:text-text transition-colors"
-                                disabled={false}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-6 py-2 rounded-lg bg-accent text-white font-bold hover:bg-accent-hover transition-colors"
-                            >
-                                Create Goal
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                {goals.length === 0 && (
+                    <div className="text-center py-20 text-text-muted border-2 border-dashed border-border rounded-xl">
+                        <p>No goals found for {userName}.</p>
+                        <button onClick={() => setShowCreateModal(true)} className="text-accent hover:underline mt-2">
+                            Create the first one
+                        </button>
+                    </div>
+                )}
             </div>
-        )
-    }
 
-    {/* Edit Modal (Reuse similar structure or create generic modal component in future) */ }
-    {
-        editingGoal && (
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                <div className="bg-card w-full max-w-md rounded-xl border border-border p-6 shadow-2xl">
-                    <h2 className="text-2xl font-bold text-white mb-6">Edit Goal</h2>
-                    <form onSubmit={handleUpdateGoal} className="flex flex-col gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-text-muted mb-1">Goal Title</label>
-                            <input
-                                type="text"
-                                required
-                                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                value={editingGoal.title}
-                                onChange={e => setEditingGoal({ ...editingGoal, title: e.target.value })}
-                            />
+            {/* Create Modal */}
+            {
+                showCreateModal && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div className="bg-card w-full max-w-md rounded-xl border border-border p-6 shadow-2xl animate-in fade-in zoom-in duration-200">
+                            <h2 className="text-2xl font-bold text-white mb-6">Create New Goal</h2>
+                            <form onSubmit={handleCreateGoal} className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">Goal Title</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
+                                        value={newGoal.title}
+                                        onChange={e => setNewGoal({ ...newGoal, title: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">Description</label>
+                                    <textarea
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none h-24 resize-none"
+                                        value={newGoal.description}
+                                        onChange={e => setNewGoal({ ...newGoal, description: e.target.value })}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-muted mb-1">Target Date</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
+                                            value={newGoal.targetDate}
+                                            onChange={e => setNewGoal({ ...newGoal, targetDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-muted mb-1">Type</label>
+                                        <select
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
+                                            value={newGoal.type}
+                                            onChange={e => setNewGoal({ ...newGoal, type: e.target.value })}
+                                        >
+                                            <option value="Monthly">Monthly</option>
+                                            <option value="Date-wise">Date-wise</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCreateModal(false)}
+                                        className="px-4 py-2 rounded-lg text-text-muted hover:text-text transition-colors"
+                                        disabled={false}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-6 py-2 rounded-lg bg-accent text-white font-bold hover:bg-accent-hover transition-colors"
+                                    >
+                                        Create Goal
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-text-muted mb-1">Description</label>
-                            <textarea
-                                className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none h-24 resize-none"
-                                value={editingGoal.description}
-                                onChange={e => setEditingGoal({ ...editingGoal, description: e.target.value })}
-                            />
+                    </div>
+                )
+            }
+
+            {/* Edit Modal (Reuse similar structure or create generic modal component in future) */}
+            {
+                editingGoal && (
+                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div className="bg-card w-full max-w-md rounded-xl border border-border p-6 shadow-2xl">
+                            <h2 className="text-2xl font-bold text-white mb-6">Edit Goal</h2>
+                            <form onSubmit={handleUpdateGoal} className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">Goal Title</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
+                                        value={editingGoal.title}
+                                        onChange={e => setEditingGoal({ ...editingGoal, title: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">Description</label>
+                                    <textarea
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none h-24 resize-none"
+                                        value={editingGoal.description}
+                                        onChange={e => setEditingGoal({ ...editingGoal, description: e.target.value })}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-muted mb-1">Target Date</label>
+                                        <input
+                                            type="date"
+                                            required
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
+                                            value={format(parseISO(editingGoal.targetDate), 'yyyy-MM-dd')}
+                                            onChange={e => setEditingGoal({ ...editingGoal, targetDate: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-muted mb-1">Type</label>
+                                        <select
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
+                                            value={editingGoal.type}
+                                            onChange={e => setEditingGoal({ ...editingGoal, type: e.target.value })}
+                                        >
+                                            <option value="Monthly">Monthly</option>
+                                            <option value="Date-wise">Date-wise</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setEditingGoal(null)}
+                                        className="px-4 py-2 rounded-lg text-text-muted hover:text-text transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-6 py-2 rounded-lg bg-accent text-white font-bold hover:bg-accent-hover transition-colors"
+                                    >
+                                        Update Goal
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-text-muted mb-1">Target Date</label>
-                                <input
-                                    type="date"
-                                    required
-                                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                    value={format(parseISO(editingGoal.targetDate), 'yyyy-MM-dd')}
-                                    onChange={e => setEditingGoal({ ...editingGoal, targetDate: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-text-muted mb-1">Type</label>
-                                <select
-                                    className="w-full bg-background border border-border rounded-lg px-4 py-2 text-text focus:border-accent focus:outline-none"
-                                    value={editingGoal.type}
-                                    onChange={e => setEditingGoal({ ...editingGoal, type: e.target.value })}
-                                >
-                                    <option value="Monthly">Monthly</option>
-                                    <option value="Date-wise">Date-wise</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-4">
-                            <button
-                                type="button"
-                                onClick={() => setEditingGoal(null)}
-                                className="px-4 py-2 rounded-lg text-text-muted hover:text-text transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-6 py-2 rounded-lg bg-accent text-white font-bold hover:bg-accent-hover transition-colors"
-                            >
-                                Update Goal
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        )
-    }
+                    </div>
+                )
+            }
         </div >
     );
 };
