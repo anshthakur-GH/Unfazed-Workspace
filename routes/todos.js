@@ -57,13 +57,14 @@ router.get('/', async (req, res) => {
 // Create a todo
 router.post('/', auth, async (req, res) => {
     try {
-        const { task, date, tags, agencyWorkId } = req.body;
+        const { task, date, tags, priority, agencyWorkId } = req.body;
         // Enforce author as current user
         const todoData = {
             task,
             date,
             author: req.user.name,
-            tags
+            tags,
+            priority
         };
 
         if (agencyWorkId) {
@@ -97,12 +98,13 @@ router.put('/:id', auth, async (req, res) => {
             return res.status(403).json({ message: 'Not authorized to edit this todo' });
         }
 
-        const { isCompleted, date, task, tags } = req.body;
+        const { isCompleted, date, task, tags, priority } = req.body;
         const updateData = {};
         if (isCompleted !== undefined) updateData.isCompleted = isCompleted;
         if (date !== undefined) updateData.date = date;
         if (task !== undefined) updateData.task = task;
         if (tags !== undefined) updateData.tags = tags;
+        if (priority !== undefined) updateData.priority = priority;
 
         const todo = await Todo.findByIdAndUpdate(
             req.params.id,

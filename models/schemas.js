@@ -13,6 +13,7 @@ const todoSchema = new mongoose.Schema({
     date: { type: Date },
     author: { type: String, required: true },
     tags: { type: [String], default: [] },
+    priority: { type: String, enum: ['High', 'Medium', 'Low'], required: true, default: 'Medium' },
     isCompleted: { type: Boolean, default: false },
     agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' },
     goal: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }
