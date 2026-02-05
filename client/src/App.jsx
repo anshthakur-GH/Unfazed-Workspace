@@ -8,8 +8,7 @@ import Agency from './pages/Agency';
 import Records from './pages/Records';
 import DailyWorks from './pages/DailyWorks';
 import Invoices from './pages/Invoices';
-import Goals from './pages/Goals';
-import UserGoals from './pages/UserGoals';
+
 
 function App() {
   const isAuthenticated = () => {
@@ -60,8 +59,7 @@ function App() {
           <Route path="daily-works" element={<DailyWorks />} />
           <Route path="daily-works" element={<DailyWorks />} />
           <Route path="records" element={<Records />} />
-          <Route path="goals" element={<Goals />} />
-          <Route path="goals/:userName" element={<UserGoals />} />
+
           <Route path="" element={<Navigate to="subspaces" replace />} />
         </Route>
       </Routes>

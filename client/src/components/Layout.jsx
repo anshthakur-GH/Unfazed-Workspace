@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Target, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
     const navigate = useNavigate();
@@ -37,7 +37,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
         { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Works' },
         { path: '/dashboard/agency', icon: Briefcase, label: 'Agency Work' },
         { path: '/dashboard/records', icon: Table, label: 'Records' },
-        { path: '/dashboard/goals', icon: Target, label: 'Goals' },
+
     ];
 
     return (
