@@ -164,237 +164,234 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
             if (isOverdueA && !isOverdueB) return -1;
             if (!isOverdueA && isOverdueB) return 1;
         }
-        // Then sort by time
-        if (isOverdueA && !isOverdueB) return -1;
-        if (!isOverdueA && isOverdueB) return 1;
-    }
+
 
         // Priority Sorting Map
         const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
-    const priorityA = priorityMap[a.priority] || 0; // Default to 0 if undefined
-    const priorityB = priorityMap[b.priority] || 0;
+        const priorityA = priorityMap[a.priority] || 0; // Default to 0 if undefined
+        const priorityB = priorityMap[b.priority] || 0;
 
-    if (priorityA !== priorityB) {
-        return priorityB - priorityA; // Descending order (High > Medium > Low)
-    }
+        if (priorityA !== priorityB) {
+            return priorityB - priorityA; // Descending order (High > Medium > Low)
+        }
 
-    // Then sort by date
-    return new Date(a.date) - new Date(b.date);
-});
+        // Then sort by date
+        return new Date(a.date) - new Date(b.date);
+    });
 
-return (
-    <div className="bg-card rounded-xl border border-border p-6 h-full flex flex-col">
-        <div className="flex justify-between items-center mb-8">
-            <h2 className="text-xl font-bold text-white">{title}</h2>
-            <div className="flex bg-background rounded-lg p-1 border border-border">
-                <button
-                    onClick={() => setView('previous')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === 'previous' ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text'
-                        }`}
-                >
-                    Previous
-                </button>
-                <button
-                    onClick={() => setView('today')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === 'today' ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text'
-                        }`}
-                >
-                    Today
-                </button>
-                <button
-                    onClick={() => setView('future')}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === 'future' ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text'
-                        }`}
-                >
-                    Upcoming
-                </button>
+    return (
+        <div className="bg-card rounded-xl border border-border p-6 h-full flex flex-col">
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-xl font-bold text-white">{title}</h2>
+                <div className="flex bg-background rounded-lg p-1 border border-border">
+                    <button
+                        onClick={() => setView('previous')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === 'previous' ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text'
+                            }`}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => setView('today')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === 'today' ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text'
+                            }`}
+                    >
+                        Today
+                    </button>
+                    <button
+                        onClick={() => setView('future')}
+                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${view === 'future' ? 'bg-accent text-white shadow-lg' : 'text-text-muted hover:text-text'
+                            }`}
+                    >
+                        Upcoming
+                    </button>
+                </div>
             </div>
-        </div>
 
 
-        {!readOnly && (
-            <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
-                <div className="flex flex-col md:flex-row gap-4">
-                    <input
-                        type="text"
-                        placeholder="Add a new task..."
-                        className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent"
-                        value={newTask}
-                        onChange={(e) => setNewTask(e.target.value)}
-                    />
-                    <div className="relative">
-                        <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
-                            <Calendar size={20} className="text-accent" />
-                            <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
+            {!readOnly && (
+                <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
+                    <div className="flex flex-col md:flex-row gap-4">
+                        <input
+                            type="text"
+                            placeholder="Add a new task..."
+                            className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent"
+                            value={newTask}
+                            onChange={(e) => setNewTask(e.target.value)}
+                        />
+                        <div className="relative">
+                            <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
+                                <Calendar size={20} className="text-accent" />
+                                <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
+                            </button>
+                            {showCalendar && (
+                                <div className="absolute top-full left-0 mt-2 z-50">
+                                    <CustomCalendar
+                                        selectedDate={newDate}
+                                        onChange={(date) => {
+                                            setNewDate(date);
+                                            setShowCalendar(false);
+                                        }}
+                                        onClose={() => setShowCalendar(false)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Priority Selection */}
+                        <div className="flex gap-2 bg-background border border-border rounded-lg p-1">
+                            {['High', 'Medium', 'Low'].map((p) => (
+                                <button
+                                    key={p}
+                                    type="button"
+                                    onClick={() => setPriority(p)}
+                                    className={`px-3 py-2 rounded-md text-xs font-bold transition-all ${priority === p
+                                        ? (p === 'High' ? 'bg-red-500/20 text-red-500 border border-red-500/50' :
+                                            p === 'Medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' :
+                                                'bg-green-500/20 text-green-500 border border-green-500/50')
+                                        : 'text-text-muted hover:text-text'
+                                        }`}
+                                >
+                                    {p}
+                                </button>
+                            ))}
+                        </div>
+
+                        <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
+                            Add Task
                         </button>
-                        {showCalendar && (
-                            <div className="absolute top-full left-0 mt-2 z-50">
-                                <CustomCalendar
-                                    selectedDate={newDate}
-                                    onChange={(date) => {
-                                        setNewDate(date);
-                                        setShowCalendar(false);
-                                    }}
-                                    onClose={() => setShowCalendar(false)}
-                                />
-                            </div>
-                        )}
                     </div>
 
-                    {/* Priority Selection */}
-                    <div className="flex gap-2 bg-background border border-border rounded-lg p-1">
-                        {['High', 'Medium', 'Low'].map((p) => (
+                    {/* Tags Selection */}
+                    <div className="flex flex-wrap gap-2">
+                        {AVAILABLE_TAGS.map(tag => (
                             <button
-                                key={p}
+                                key={tag}
                                 type="button"
-                                onClick={() => setPriority(p)}
-                                className={`px-3 py-2 rounded-md text-xs font-bold transition-all ${priority === p
-                                    ? (p === 'High' ? 'bg-red-500/20 text-red-500 border border-red-500/50' :
-                                        p === 'Medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' :
-                                            'bg-green-500/20 text-green-500 border border-green-500/50')
-                                    : 'text-text-muted hover:text-text'
+                                onClick={() => {
+                                    if (selectedTags.includes(tag)) {
+                                        setSelectedTags(selectedTags.filter(t => t !== tag));
+                                    } else {
+                                        setSelectedTags([...selectedTags, tag]);
+                                    }
+                                }}
+                                className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${selectedTags.includes(tag)
+                                    ? 'bg-accent text-white border-accent'
+                                    : 'bg-background text-text-muted border-border hover:border-accent'
                                     }`}
                             >
-                                {p}
+                                {tag}
                             </button>
                         ))}
                     </div>
+                </form>
+            )}
 
-                    <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
-                        Add Task
-                    </button>
-                </div>
-
-                {/* Tags Selection */}
-                <div className="flex flex-wrap gap-2">
-                    {AVAILABLE_TAGS.map(tag => (
-                        <button
-                            key={tag}
-                            type="button"
-                            onClick={() => {
-                                if (selectedTags.includes(tag)) {
-                                    setSelectedTags(selectedTags.filter(t => t !== tag));
-                                } else {
-                                    setSelectedTags([...selectedTags, tag]);
-                                }
-                            }}
-                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${selectedTags.includes(tag)
-                                ? 'bg-accent text-white border-accent'
-                                : 'bg-background text-text-muted border-border hover:border-accent'
+            <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+                {filteredTodos.length === 0 ? (
+                    <div className="text-center text-text-muted opacity-50 py-10">No tasks found for this view.</div>
+                ) : (
+                    filteredTodos.map(todo => (
+                        <div
+                            key={todo._id}
+                            className={`flex items-center justify-between p-4 rounded-lg border transition-all ${todo.isCompleted ? 'bg-background/50 border-border opacity-60' : 'bg-background border-border hover:border-accent/50'
                                 }`}
                         >
-                            {tag}
-                        </button>
-                    ))}
-                </div>
-            </form>
-        )}
-
-        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
-            {filteredTodos.length === 0 ? (
-                <div className="text-center text-text-muted opacity-50 py-10">No tasks found for this view.</div>
-            ) : (
-                filteredTodos.map(todo => (
-                    <div
-                        key={todo._id}
-                        className={`flex items-center justify-between p-4 rounded-lg border transition-all ${todo.isCompleted ? 'bg-background/50 border-border opacity-60' : 'bg-background border-border hover:border-accent/50'
-                            }`}
-                    >
-                        <div className="flex items-center gap-4">
-                            <button
-                                onClick={() => toggleTodo(todo._id, todo.isCompleted)}
-                                className={`text-accent transition-transform hover:scale-110`}
-                            >
-                                {todo.isCompleted ? <CheckCircle2 size={24} /> : <Circle size={24} />}
-                            </button>
-                            {editingTodoId === todo._id ? (
-                                <input
-                                    type="text"
-                                    value={editingText}
-                                    onChange={(e) => setEditingText(e.target.value)}
-                                    onBlur={updateTodoTask}
-                                    onKeyDown={(e) => e.key === 'Enter' && updateTodoTask()}
-                                    autoFocus
-                                    className="text-lg bg-transparent border-b border-accent focus:outline-none flex-1 min-w-[200px]"
-                                />
-                            ) : (
-                                <span
-                                    className={`text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
-                                    onDoubleClick={() => startEditing(todo)}
-                                    title={readOnly ? "" : "Double click to edit"}
+                            <div className="flex items-center gap-4">
+                                <button
+                                    onClick={() => toggleTodo(todo._id, todo.isCompleted)}
+                                    className={`text-accent transition-transform hover:scale-110`}
                                 >
-                                    {todo.task}
-                                </span>
-                            )}
-                            {todo.author && (
-                                <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2">
-                                    {todo.author}
-                                </span>
-                            )}
-                            {todo.priority && (
-                                <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2 border ${todo.priority === 'High' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                                    {todo.isCompleted ? <CheckCircle2 size={24} /> : <Circle size={24} />}
+                                </button>
+                                {editingTodoId === todo._id ? (
+                                    <input
+                                        type="text"
+                                        value={editingText}
+                                        onChange={(e) => setEditingText(e.target.value)}
+                                        onBlur={updateTodoTask}
+                                        onKeyDown={(e) => e.key === 'Enter' && updateTodoTask()}
+                                        autoFocus
+                                        className="text-lg bg-transparent border-b border-accent focus:outline-none flex-1 min-w-[200px]"
+                                    />
+                                ) : (
+                                    <span
+                                        className={`text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
+                                        onDoubleClick={() => startEditing(todo)}
+                                        title={readOnly ? "" : "Double click to edit"}
+                                    >
+                                        {todo.task}
+                                    </span>
+                                )}
+                                {todo.author && (
+                                    <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2">
+                                        {todo.author}
+                                    </span>
+                                )}
+                                {todo.priority && (
+                                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2 border ${todo.priority === 'High' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
                                         todo.priority === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
                                             'bg-green-500/10 text-green-500 border-green-500/20'
-                                    }`}>
-                                    {todo.priority}
-                                </span>
-                            )}
-                            {todo.tags && todo.tags.length > 0 && (
-                                <div className="flex gap-1 ml-2">
-                                    {todo.tags.map(tag => (
-                                        <span key={tag} className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full border border-border">
-                                            {tag}
-                                        </span>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2">
-                                {view === 'today' && parseISO(todo.date) < new Date().setHours(0, 0, 0, 0) && !todo.isCompleted && (
-                                    <span className="text-xs text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded-full border border-red-500/20">Overdue</span>
+                                        }`}>
+                                        {todo.priority}
+                                    </span>
                                 )}
-                                <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border flex items-center gap-2">
-                                    {format(parseISO(todo.date), 'MMM d, yyyy')}
-                                </div>
-
-                                {!readOnly && (
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
-                                            className="text-text-muted hover:text-accent transition-colors p-1"
-                                            title="Reschedule"
-                                        >
-                                            <CalendarClock size={16} />
-                                        </button>
-                                        {reschedulingId === todo._id && (
-                                            <div className="absolute top-full right-0 mt-2 z-50">
-                                                <CustomCalendar
-                                                    selectedDate={todo.date}
-                                                    onChange={(date) => rescheduleTodo(todo._id, date)}
-                                                    onClose={() => setReschedulingId(null)}
-                                                />
-                                            </div>
-                                        )}
+                                {todo.tags && todo.tags.length > 0 && (
+                                    <div className="flex gap-1 ml-2">
+                                        {todo.tags.map(tag => (
+                                            <span key={tag} className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full border border-border">
+                                                {tag}
+                                            </span>
+                                        ))}
                                     </div>
                                 )}
                             </div>
-                            {!readOnly && (
-                                <button
-                                    onClick={() => deleteTodo(todo._id)}
-                                    className="text-text-muted hover:text-red-500 transition-colors p-2"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            )}
+
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                    {view === 'today' && parseISO(todo.date) < new Date().setHours(0, 0, 0, 0) && !todo.isCompleted && (
+                                        <span className="text-xs text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded-full border border-red-500/20">Overdue</span>
+                                    )}
+                                    <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border flex items-center gap-2">
+                                        {format(parseISO(todo.date), 'MMM d, yyyy')}
+                                    </div>
+
+                                    {!readOnly && (
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
+                                                className="text-text-muted hover:text-accent transition-colors p-1"
+                                                title="Reschedule"
+                                            >
+                                                <CalendarClock size={16} />
+                                            </button>
+                                            {reschedulingId === todo._id && (
+                                                <div className="absolute top-full right-0 mt-2 z-50">
+                                                    <CustomCalendar
+                                                        selectedDate={todo.date}
+                                                        onChange={(date) => rescheduleTodo(todo._id, date)}
+                                                        onClose={() => setReschedulingId(null)}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                {!readOnly && (
+                                    <button
+                                        onClick={() => deleteTodo(todo._id)}
+                                        className="text-text-muted hover:text-red-500 transition-colors p-2"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))
-            )}
-        </div>
-    </div >
-);
+                    ))
+                )}
+            </div>
+        </div >
+    );
 };
 
 export default TodoList;
