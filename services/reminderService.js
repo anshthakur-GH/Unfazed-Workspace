@@ -3,12 +3,17 @@ const nodemailer = require('nodemailer');
 const { Todo, User } = require('../models/schemas');
 
 // Initialize Transporter
+// Initialize Transporter
 const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_SERVICE, // e.g., 'gmail'
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    family: 4 // Force IPv4
 });
 
 // Helper to send email
