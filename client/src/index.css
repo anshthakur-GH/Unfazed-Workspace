@@ -6,28 +6,32 @@
   body {
     @apply bg-background text-text font-sans antialiased;
   }
+
   img {
-    @apply max-w-full height-auto;
+    @apply max-w-full h-auto;
   }
 }
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: #333;
   border-radius: 20px;
 }
 
 /* Remove spin buttons from number inputs */
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
+
 input[type=number] {
   -moz-appearance: textfield;
 }
