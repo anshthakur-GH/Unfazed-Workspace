@@ -112,7 +112,8 @@ const initReminderService = () => {
                     // BUT, for the 'Ansh' user, I'll try to find a hack or just use a placeholder.
                     // actually, I'll send to the configured EMAIL_USER as a fallback for testing purposes 
                     // so the user can see it works.
-                    recipientEmail = process.env.EMAIL_USER;
+                    // recipientEmail = process.env.EMAIL_USER;
+                    recipientEmail = 'mailtoanshthakur@gmail.com';
                 }
 
                 if (recipientEmail) {
