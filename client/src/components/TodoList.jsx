@@ -13,6 +13,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const [newTask, setNewTask] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
     const [newDate, setNewDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+    const [newTime, setNewTime] = useState('12:00');
     const [reschedulingId, setReschedulingId] = useState(null);
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [editingText, setEditingText] = useState('');
@@ -52,11 +53,13 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
         const author = token ? token.replace('fake-jwt-token-', '') : 'Unknown';
 
         try {
+            // Combine date and time
+            const combinedDate = new Date(`${newDate}T${newTime}`);
+
             const res = await axios.post(`${API_URL}/api/todos`, {
                 task: newTask,
-                date: newDate,
+                date: combinedDate.toISOString(),
                 author,
-                tags: selectedTags,
                 tags: selectedTags,
                 agencyWorkId: agencyWorkId || undefined,
                 goalId: goalId || undefined
@@ -96,6 +99,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     };
 
     const startEditing = (todo) => {
+        if (readOnly) return;
         setEditingTodoId(todo._id);
         setEditingText(todo.task);
     };
@@ -156,7 +160,8 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
             if (isOverdueA && !isOverdueB) return -1;
             if (!isOverdueA && isOverdueB) return 1;
         }
-        return 0; // Keep original order otherwise (or add date sorting if needed)
+        // Then sort by time
+        return new Date(a.date) - new Date(b.date);
     });
 
     return (
@@ -217,6 +222,12 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                 </div>
                             )}
                         </div>
+                        <input
+                            type="time"
+                            value={newTime}
+                            onChange={(e) => setNewTime(e.target.value)}
+                            className="bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent w-full md:w-auto"
+                        />
                         <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
                             Add Task
                         </button>
@@ -304,36 +315,42 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                     {view === 'today' && parseISO(todo.date) < new Date().setHours(0, 0, 0, 0) && !todo.isCompleted && (
                                         <span className="text-xs text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded-full border border-red-500/20">Overdue</span>
                                     )}
-                                    <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border">
+                                    <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border flex items-center gap-2">
                                         {format(parseISO(todo.date), 'MMM d, yyyy')}
+                                        <span className="text-xs opacity-70 border-l border-border pl-2">
+                                            {format(parseISO(todo.date), 'h:mm a')}
+                                        </span>
                                     </div>
 
-                                    <div className="relative">
-                                        <button
-                                            onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
-                                            className="text-text-muted hover:text-accent transition-colors p-1"
-                                            title="Reschedule"
-                                        >
-                                            <CalendarClock size={16} />
-                                        </button>
-                                        {reschedulingId === todo._id && (
-                                            <div className="absolute top-full right-0 mt-2 z-50">
-                                                <CustomCalendar
-                                                    selectedDate={todo.date}
-                                                    onChange={(date) => rescheduleTodo(todo._id, date)}
-                                                    onClose={() => setReschedulingId(null)}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
+                                    {!readOnly && (
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
+                                                className="text-text-muted hover:text-accent transition-colors p-1"
+                                                title="Reschedule"
+                                            >
+                                                <CalendarClock size={16} />
+                                            </button>
+                                            {reschedulingId === todo._id && (
+                                                <div className="absolute top-full right-0 mt-2 z-50">
+                                                    <CustomCalendar
+                                                        selectedDate={todo.date}
+                                                        onChange={(date) => rescheduleTodo(todo._id, date)}
+                                                        onClose={() => setReschedulingId(null)}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                                <button
-                                    onClick={() => deleteTodo(todo._id)}
-                                    className="text-text-muted hover:text-red-500 transition-colors p-2"
-                                >
-                                    <Trash2 size={18} />
-                                </button>
-                            )}
+                                {!readOnly && (
+                                    <button
+                                        onClick={() => deleteTodo(todo._id)}
+                                        className="text-text-muted hover:text-red-500 transition-colors p-2"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ))
