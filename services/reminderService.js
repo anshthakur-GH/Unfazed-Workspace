@@ -3,20 +3,40 @@ const nodemailer = require('nodemailer');
 const { Todo, User } = require('../models/schemas');
 
 // Initialize Transporter
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        ciphers: 'SSLv3'
-    },
-    family: 4 // Force IPv4
-});
+// Initialize Transporter with manual IPv4 resolution for Render
+let transporter;
+
+const setupTransporter = async () => {
+    const dns = require('dns');
+    const util = require('util');
+    const resolve4 = util.promisify(dns.resolve4);
+
+    try {
+        const addresses = await resolve4('smtp.gmail.com');
+        const ip = addresses[0];
+        console.log(`Resolved smtp.gmail.com to IPv4: ${ip}`);
+
+        transporter = nodemailer.createTransport({
+            host: ip, // Use the IP directly
+            port: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            },
+            tls: {
+                servername: 'smtp.gmail.com', // Necessary when using IP
+                ciphers: 'SSLv3'
+            }
+        });
+    } catch (err) {
+        console.error('Failed to resolve DNS for email service:', err);
+    }
+};
+
+// Call setup immediately
+setupTransporter();
 
 // Helper to send email
 const sendReminderEmail = async (to, todo) => {
@@ -40,6 +60,15 @@ const sendReminderEmail = async (to, todo) => {
     };
 
     try {
+        if (!transporter) {
+            console.log('Transporter not yet initialized, retrying setup...');
+            await setupTransporter();
+        }
+        if (!transporter) {
+            console.error('Email transporter initialization failed.');
+            return false;
+        }
+
         await transporter.sendMail(mailOptions);
         console.log(`Email sent to ${to} for task: ${todo.task}`);
         return true;
