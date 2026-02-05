@@ -2,15 +2,11 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('../config/db');
-const initReminderService = require('../services/reminderService');
 
 const app = express();
 
 // Connect to Database
 connectDB();
-
-// Initialize Reminder Service
-initReminderService();
 
 // Middleware
 app.use(express.json());

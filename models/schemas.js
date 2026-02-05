@@ -14,7 +14,6 @@ const todoSchema = new mongoose.Schema({
     author: { type: String, required: true },
     tags: { type: [String], default: [] },
     isCompleted: { type: Boolean, default: false },
-    reminderSent: { type: Boolean, default: false },
     agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' },
     goal: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }
 });
