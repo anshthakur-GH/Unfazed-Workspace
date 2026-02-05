@@ -11,7 +11,8 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    family: 4 // Force IPv4
+    family: 4, // Force IPv4
+    localAddress: '0.0.0.0' // Force local binding to IPv4 interface
 });
 
 // Helper to send email
