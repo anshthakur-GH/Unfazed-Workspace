@@ -57,6 +57,33 @@ const goalSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+const invoiceSchema = new mongoose.Schema({
+    invoiceNumber: { type: String, required: true },
+    billTo: {
+        name: { type: String, required: true },
+        address: { type: String },
+        email: { type: String }
+    },
+    date: { type: Date, default: Date.now },
+    dueDate: { type: Date },
+    items: [{
+        description: { type: String },
+        quantity: { type: Number },
+        rate: { type: Number },
+        amount: { type: Number }
+    }],
+    notes: { type: String },
+    subtotal: { type: Number, default: 0 },
+    tax: { type: Number, default: 0 },
+    discount: { type: Number, default: 0 },
+    total: { type: Number, required: true },
+    amountPaid: { type: Number, default: 0 },
+    balanceDue: { type: Number, default: 0 },
+    status: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' },
+    createdBy: { type: String },
+    createdAt: { type: Date, default: Date.now }
+});
+
 module.exports = {
     Subspace: mongoose.model('Subspace', subspaceSchema),
     Todo: mongoose.model('Todo', todoSchema),
@@ -64,6 +91,7 @@ module.exports = {
     Record: mongoose.model('Record', recordSchema),
     DailyWork: mongoose.model('DailyWork', dailyWorkSchema),
     Goal: mongoose.model('Goal', goalSchema),
+    Invoice: mongoose.model('Invoice', invoiceSchema),
     User: mongoose.model('User', new mongoose.Schema({
         username: { type: String, required: true, unique: true },
         password: { type: String, required: true }

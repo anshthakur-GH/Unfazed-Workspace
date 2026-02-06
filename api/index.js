@@ -30,6 +30,7 @@ app.use('/api/todos', todoRoutes);
 app.use('/api/agency', agencyRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/daily-works', dailyWorkRoutes);
+app.use('/api/invoices', require('../routes/invoices'));
 
 
 // Auth Route (Hardcoded)
