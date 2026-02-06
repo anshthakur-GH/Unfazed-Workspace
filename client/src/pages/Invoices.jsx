@@ -11,6 +11,19 @@ const Invoices = () => {
     const [activeInvoice, setActiveInvoice] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [localInvoicesCount, setLocalInvoicesCount] = useState(0);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('unfazed_invoices');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    setLocalInvoicesCount(parsed.length);
+                }
+            } catch (e) { console.error(e); }
+        }
+    }, []);
 
     // Fetch invoices from API
     const fetchInvoices = async () => {
@@ -148,6 +161,46 @@ const Invoices = () => {
         }
     };
 
+    // Migration Logic
+    const handleMigrateLocalData = async () => {
+        if (!window.confirm(`Found ${localInvoicesCount} invoices in Local Storage. Do you want to upload them to the database? This may create duplicates if they already exist.`)) return;
+
+        try {
+            setLoading(true);
+            const saved = localStorage.getItem('unfazed_invoices');
+            const localInvoices = JSON.parse(saved);
+            const token = localStorage.getItem('token');
+
+            let successCount = 0;
+            for (const inv of localInvoices) {
+                // Ensure no ID conflict, let backend/schema handle _id
+                const { id, _id, ...safeData } = inv;
+                // Restore formatted fields if needed, or pass as is. 
+                // Schema expects strict fields, extra fields are ignored by Mongoose (mostly).
+
+                // Fix date formats if they are strings
+                if (safeData.date) safeData.date = new Date(safeData.date);
+                if (safeData.dueDate) safeData.dueDate = new Date(safeData.dueDate);
+                if (safeData.createdAt) safeData.createdAt = new Date(safeData.createdAt);
+
+                await axios.post(`${API_URL}/api/invoices`, safeData, {
+                    headers: { Authorization: token }
+                });
+                successCount++;
+            }
+
+            alert(`Successfully migrated ${successCount} invoices!`);
+            localStorage.removeItem('unfazed_invoices');
+            setLocalInvoicesCount(0);
+            fetchInvoices(); // Refresh list
+        } catch (err) {
+            console.error(err);
+            alert("Migration partially failed. Check console.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (loading) {
         return <div className="p-8 text-center text-text-muted">Loading invoices...</div>;
     }
@@ -159,8 +212,20 @@ const Invoices = () => {
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold text-text">Invoice Management</h1>
-                <p className="text-text-muted">Create, manage, and track invoices for Unfazed AI.</p>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-3xl font-bold text-text">Invoice Management</h1>
+                        <p className="text-text-muted">Create, manage, and track invoices for Unfazed AI.</p>
+                    </div>
+                    {localInvoicesCount > 0 && (
+                        <button
+                            onClick={handleMigrateLocalData}
+                            className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 px-4 py-2 rounded-lg text-sm font-medium border border-yellow-500/20 transition-colors animate-pulse"
+                        >
+                            Sync {localInvoicesCount} Local Invoices
+                        </button>
+                    )}
+                </div>
             </div>
 
             {view === 'dashboard' && (
