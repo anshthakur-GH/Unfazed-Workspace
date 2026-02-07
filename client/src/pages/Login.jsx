@@ -34,7 +34,10 @@ const Login = () => {
                 />
             </div>
             <div className="w-full max-w-md p-8 bg-card rounded-xl border border-border shadow-lg">
-                <h2 className="text-3xl font-bold text-accent mb-6 text-center">Unfazed Workspace</h2>
+                <div className="flex flex-col items-center mb-6">
+                    <h1 className="text-4xl font-bold text-accent leading-none">Unfazed</h1>
+                    <span className="text-sm text-white font-normal leading-none opacity-80">Workspace</span>
+                </div>
                 {error && <p className="text-red-500 text-center mb-4">{error}</p>}
                 <form onSubmit={handleLogin} className="space-y-4">
                     <div>
