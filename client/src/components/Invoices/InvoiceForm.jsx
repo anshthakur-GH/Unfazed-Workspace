@@ -23,7 +23,15 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
 
     useEffect(() => {
         if (existingInvoice) {
-            setFormData(existingInvoice);
+            // Merge existing data with defaults to ensure nested objects exist
+            setFormData(prev => ({
+                ...prev,
+                ...existingInvoice,
+                billTo: { ...prev.billTo, ...(existingInvoice.billTo || {}) },
+                shipTo: { ...prev.shipTo, ...(existingInvoice.shipTo || {}) },
+                // Ensure items is an array
+                items: Array.isArray(existingInvoice.items) ? existingInvoice.items : prev.items
+            }));
         } else {
             // Generate a random invoice number if new (in real app, fetch next from DB)
             setFormData(prev => ({ ...prev, invoiceNumber: Math.floor(1000 + Math.random() * 9000) }));

@@ -74,8 +74,12 @@ export const generateInvoicePDF = (invoice) => {
 
     doc.setFontSize(10);
     doc.setTextColor(80);
-    doc.text(invoice.billTo.name, 20, yAddress + 6);
-    if (invoice.billTo.address) {
+    doc.setTextColor(80);
+    // Safe access for billTo
+    const billToName = invoice.billTo?.name || 'Unknown Client';
+    doc.text(billToName, 20, yAddress + 6);
+
+    if (invoice.billTo?.address) {
         const splitAddress = doc.splitTextToSize(invoice.billTo.address, 80);
         doc.text(splitAddress, 20, yAddress + 11);
     }
