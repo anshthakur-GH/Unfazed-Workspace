@@ -12,7 +12,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         poNumber: '',
         billTo: { name: '', address: '' },
         shipTo: { address: '' },
-        items: [{ id: 1, description: '', quantity: 1, rate: 0, amount: 0 }],
+        items: [{ id: crypto.randomUUID(), description: '', quantity: 1, rate: 0, amount: 0 }],
         discount: { type: 'percentage', value: 0 },
         tax: { type: 'percentage', value: 0 },
         shipping: 0,
@@ -30,7 +30,15 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                 billTo: { ...prev.billTo, ...(existingInvoice.billTo || {}) },
                 shipTo: { ...prev.shipTo, ...(existingInvoice.shipTo || {}) },
                 // Ensure items is an array
-                items: Array.isArray(existingInvoice.items) ? existingInvoice.items : prev.items
+                items: Array.isArray(existingInvoice.items)
+                    ? existingInvoice.items.map(item => ({
+                        ...item,
+                        id: item.id || item._id || crypto.randomUUID() // Ensure every item has a unique frontend ID
+                    }))
+                    : prev.items,
+                // Deep merge discount and tax to ensure structure
+                discount: { ...prev.discount, ...(existingInvoice.discount || {}) },
+                tax: { ...prev.tax, ...(existingInvoice.tax || {}) }
             }));
         } else {
             // Generate a random invoice number if new (in real app, fetch next from DB)
@@ -74,7 +82,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
     const addItem = () => {
         setFormData(prev => ({
             ...prev,
-            items: [...prev.items, { id: Date.now(), description: '', quantity: 1, rate: 0, amount: 0 }]
+            items: [...prev.items, { id: crypto.randomUUID(), description: '', quantity: 1, rate: 0, amount: 0 }]
         }));
     };
 
@@ -405,7 +413,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             ...prev,
                             type: 'invoice', invoiceNumber: '', date: new Date().toISOString().split('T')[0], dueDate: '',
                             billTo: { name: '', address: '' }, shipTo: { address: '' },
-                            items: [{ id: Date.now(), description: '', quantity: 1, rate: 0, amount: 0 }],
+                            items: [{ id: crypto.randomUUID(), description: '', quantity: 1, rate: 0, amount: 0 }],
                             discount: { type: 'percentage', value: 0 }, tax: { type: 'percentage', value: 0 },
                             shipping: 0, amountPaid: 0, notes: '', terms: ''
                         }))}

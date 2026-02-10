@@ -140,47 +140,45 @@ export const generateInvoicePDF = (invoice) => {
         },
     });
 
-    // --- TOTALS ---
-    const finalYz = doc.lastAutoTable.finalY + 10;
-    let currentYz = finalYz;
-    const rightColX = 140;
-    const valColX = 190;
+    // Totals & Adjustments
+    const safeDiscount = invoice.discount || { type: 'percentage', value: 0 };
+    const safeTax = invoice.tax || { type: 'percentage', value: 0 };
 
     // Subtotal
     doc.text('Subtotal:', rightColX, currentYz);
-    doc.text(formatCurrencyPDF(invoice.subtotal), valColX, currentYz, { align: 'right' });
+    doc.text(formatCurrencyPDF(invoice.subtotal || 0), valColX, currentYz, { align: 'right' });
     currentYz += 6;
 
     // Discount
-    if (invoice.discount.value > 0) {
-        doc.text(`Discount (${invoice.discount.type === 'percentage' ? invoice.discount.value + '%' : 'Fixed'}):`, rightColX, currentYz);
-        const discountAmount = invoice.discount.type === 'percentage'
-            ? (invoice.subtotal * invoice.discount.value / 100)
-            : invoice.discount.value;
+    if (safeDiscount.value > 0) {
+        doc.text(`Discount (${safeDiscount.type === 'percentage' ? safeDiscount.value + '%' : 'Fixed'}):`, rightColX, currentYz);
+        const discountAmount = safeDiscount.type === 'percentage'
+            ? ((invoice.subtotal || 0) * safeDiscount.value / 100)
+            : safeDiscount.value;
         doc.text(`- ${formatCurrencyPDF(discountAmount)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 
     // Tax
-    if (invoice.tax.value > 0) {
-        doc.text(`Tax (${invoice.tax.value}%):`, rightColX, currentYz);
+    if (safeTax.value > 0) {
+        doc.text(`Tax (${safeTax.value}%):`, rightColX, currentYz);
 
-        let taxable = invoice.subtotal;
-        if (invoice.discount.value > 0) {
-            taxable -= (invoice.discount.type === 'percentage'
-                ? (invoice.subtotal * invoice.discount.value / 100)
-                : invoice.discount.value);
+        let taxable = (invoice.subtotal || 0);
+        if (safeDiscount.value > 0) {
+            taxable -= (safeDiscount.type === 'percentage'
+                ? ((invoice.subtotal || 0) * safeDiscount.value / 100)
+                : safeDiscount.value);
         }
-        const taxAmount = taxable * (invoice.tax.value / 100);
+        const taxAmount = taxable * (safeTax.value / 100);
 
         doc.text(`+ ${formatCurrencyPDF(taxAmount)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 
     // Shipping
-    if (invoice.shipping > 0) {
+    if ((invoice.shipping || 0) > 0) {
         doc.text('Shipping:', rightColX, currentYz);
-        doc.text(`+ ${formatCurrencyPDF(invoice.shipping)}`, valColX, currentYz, { align: 'right' });
+        doc.text(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, valColX, currentYz, { align: 'right' });
         currentYz += 6;
     }
 

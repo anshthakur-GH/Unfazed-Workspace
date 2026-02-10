@@ -24,7 +24,7 @@ function App() {
 
   const AdminRoute = ({ children }) => {
     const username = localStorage.getItem('username');
-    const allowedUsers = ['Ansh_Unfazed', 'Ayush_Unfazed', 'AnshSaxena_Unfazed'];
+    const allowedUsers = ['Ansh_Unfazed'];
     const canViewInvoices = allowedUsers.includes(username);
 
     if (!canViewInvoices) {
