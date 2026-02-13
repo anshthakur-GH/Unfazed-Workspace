@@ -278,7 +278,7 @@ export const generateInvoicePDF = (invoice) => {
 
     const termsText = [
         invoice.terms || '', // Existing terms if any
-        'For full terms and conditions, please visit:',
+        '',
         'https://unfazed-ai.online/policies'
     ].filter(Boolean).join('\n');
 
