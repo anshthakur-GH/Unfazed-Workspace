@@ -199,7 +199,7 @@ export const generateInvoicePDF = (invoice) => {
     currentYz += 8;
 
     // Amount Paid
-    if (invoice.amountPaid > 0) {
+    if (invoice.type !== 'quotation' && invoice.amountPaid > 0) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text('Amount Paid:', rightColX, currentYz);

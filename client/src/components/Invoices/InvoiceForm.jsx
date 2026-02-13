@@ -384,19 +384,21 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             <span>₹{total.toFixed(2)}</span>
                         </div>
 
-                        <div className="flex justify-between items-center text-text-muted text-sm mt-4">
-                            <span>Amount Paid</span>
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs">₹</span>
-                                <input
-                                    type="number"
-                                    min="0"
-                                    value={formData.amountPaid}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, amountPaid: Number(e.target.value) }))}
-                                    className="w-24 bg-background border border-border/50 rounded px-1 py-1 text-right focus:border-accent focus:outline-none text-sm"
-                                />
+                        {formData.type !== 'quotation' && (
+                            <div className="flex justify-between items-center text-text-muted text-sm mt-4">
+                                <span>Amount Paid</span>
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs">₹</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={formData.amountPaid}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, amountPaid: Number(e.target.value) }))}
+                                        className="w-24 bg-background border border-border/50 rounded px-1 py-1 text-right focus:border-accent focus:outline-none text-sm"
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {formData.type !== 'quotation' && (
                             <div className="flex justify-between text-md font-bold text-accent mt-2 pt-2 border-t border-dashed border-border">

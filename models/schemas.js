@@ -58,6 +58,7 @@ const goalSchema = new mongoose.Schema({
 });
 
 const invoiceSchema = new mongoose.Schema({
+    type: { type: String, enum: ['invoice', 'quotation'], default: 'invoice' },
     invoiceNumber: { type: String, required: true },
     billTo: {
         name: { type: String, required: true },
