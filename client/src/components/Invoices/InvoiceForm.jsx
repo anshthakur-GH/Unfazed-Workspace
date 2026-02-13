@@ -398,10 +398,12 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             </div>
                         </div>
 
-                        <div className="flex justify-between text-md font-bold text-accent mt-2 pt-2 border-t border-dashed border-border">
-                            <span>Balance Due</span>
-                            <span>₹{balanceDue.toFixed(2)}</span>
-                        </div>
+                        {formData.type !== 'quotation' && (
+                            <div className="flex justify-between text-md font-bold text-accent mt-2 pt-2 border-t border-dashed border-border">
+                                <span>Balance Due</span>
+                                <span>₹{balanceDue.toFixed(2)}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

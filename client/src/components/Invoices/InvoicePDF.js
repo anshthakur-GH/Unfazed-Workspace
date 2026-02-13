@@ -141,6 +141,10 @@ export const generateInvoicePDF = (invoice) => {
     });
 
     // Totals & Adjustments
+    const rightColX = 150;
+    const valColX = 190;
+    let currentYz = doc.lastAutoTable.finalY + 10;
+
     const safeDiscount = invoice.discount || { type: 'percentage', value: 0 };
     const safeTax = invoice.tax || { type: 'percentage', value: 0 };
 
@@ -204,14 +208,17 @@ export const generateInvoicePDF = (invoice) => {
     }
 
     // Balance Due
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...ORANGE);
-    doc.text('Balance Due:', rightColX, currentYz);
-    doc.text(formatCurrencyPDF(invoice.balanceDue), valColX, currentYz, { align: 'right' });
+    if (invoice.type !== 'quotation') {
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...ORANGE);
+        doc.text('Balance Due:', rightColX, currentYz);
+        doc.text(formatCurrencyPDF(invoice.balanceDue), valColX, currentYz, { align: 'right' });
+    }
 
     // --- FOOTER / NOTES (Dynamic Height Boxes) ---
     // Calculate start Y (push below totals, but ensure minimum separation)
+    let finalYz = currentYz;
     let bottomStart = finalYz;
 
     // If totals extend far down, use a fixed gap. If totals are short, use minimum Y (e.g. 210)
