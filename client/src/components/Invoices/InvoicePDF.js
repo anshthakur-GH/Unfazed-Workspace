@@ -263,37 +263,40 @@ export const generateInvoicePDF = (invoice) => {
     }
 
     // Terms Box
-    if (invoice.terms) {
-        // Check new page again
-        if (contentY > 270) {
-            doc.addPage();
-            contentY = 20;
-        }
-
-        doc.setTextColor(...DARK_GRAY);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Terms & Conditions:', 20, contentY);
-
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(...BLUE_LINK); // Make terms text blue to look link-like if it contains URLs
-
-        const boxWidth = 170;
-        const splitTerms = doc.splitTextToSize(invoice.terms, boxWidth);
-        const termsHeight = doc.getTextDimensions(splitTerms).h + 4;
-
-        // Draw Box
-        doc.setDrawColor(230);
-        doc.rect(20, contentY + 2, boxWidth, termsHeight + 4);
-
-        doc.text(splitTerms, 22, contentY + 7);
-
-        // Attempt to auto-link simple http/https string if standard jsPDF allows, 
-        // otherwise it's just styled blue. 
-        // Note: Full auto-linking logic is complex in pure jsPDF without plugins. 
-        // Since user asked for appearance primarily ("appear as a website URL"), blue color is key.
-
-        contentY += termsHeight + 10;
+    // Check new page again
+    if (contentY > 270) {
+        doc.addPage();
+        contentY = 20;
     }
+
+    doc.setTextColor(...DARK_GRAY);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Terms & Conditions:', 20, contentY);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...BLUE_LINK); // Make terms text blue to look link-like
+
+    const termsText = [
+        invoice.terms || '', // Existing terms if any
+        'For full terms and conditions, please visit:',
+        'https://unfazed-ai.online/policies'
+    ].filter(Boolean).join('\n');
+
+    const boxWidth = 170;
+    const splitTerms = doc.splitTextToSize(termsText, boxWidth);
+    const termsHeight = doc.getTextDimensions(splitTerms).h + 4;
+
+    // Draw Box
+    doc.setDrawColor(230);
+    doc.rect(20, contentY + 2, boxWidth, termsHeight + 4);
+
+    doc.text(splitTerms, 22, contentY + 7);
+
+    // Add link over the URL if possible (simple approximation based on position)
+    // For now, just having it textually is what was requested ("exact URL to appear")
+    // If we want it clickable, we'd need more complex calculation, but standard text is fine for print/PDF.
+
+    contentY += termsHeight + 10;
 
     doc.save(`${invoice.type === 'quotation' ? 'Quotation' : 'Invoice'}_${invoice.invoiceNumber}.pdf`);
 };

@@ -18,7 +18,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         shipping: 0,
         amountPaid: 0,
         notes: 'Includes complete workflow setup, API integrations, custom logic, testing, deployment, and 7-day support.',
-        terms: '',
+        terms: 'For full terms and conditions, please visit: https://unfazed-ai.online/policies',
     });
 
     useEffect(() => {
