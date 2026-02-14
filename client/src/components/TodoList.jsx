@@ -326,17 +326,6 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                 }`}
                         >
                             <div className="flex items-center gap-4">
-                                {!readOnly && index > 0 && (
-                                    <button
-                                        onClick={() => moveTodoUp(todo._id)}
-                                        className="text-text-muted hover:text-accent transition-colors p-1"
-                                        title="Move Up"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="m18 15-6-6-6 6" />
-                                        </svg>
-                                    </button>
-                                )}
                                 <button
                                     onClick={() => toggleTodo(todo._id, todo.isCompleted)}
                                     className={`text-accent transition-transform hover:scale-110`}
@@ -394,6 +383,18 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                     <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border flex items-center gap-2">
                                         {format(parseISO(todo.date), 'MMM d, yyyy')}
                                     </div>
+
+                                    {!readOnly && index > 0 && (
+                                        <button
+                                            onClick={() => moveTodoUp(todo._id)}
+                                            className="text-text-muted hover:text-accent transition-colors p-1 mr-1"
+                                            title="Move Up"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="m18 15-6-6-6 6" />
+                                            </svg>
+                                        </button>
+                                    )}
 
                                     {!readOnly && (
                                         <div className="relative">
