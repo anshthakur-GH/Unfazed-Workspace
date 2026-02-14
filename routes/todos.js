@@ -47,8 +47,28 @@ router.get('/', async (req, res) => {
             query.goal = { $exists: false };
         }
 
-        const todos = await Todo.find(query).sort({ date: 1 });
+        const todos = await Todo.find(query).sort({ order: 1 });
         res.json(todos);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Reorder todos
+router.put('/reorder', auth, async (req, res) => {
+    try {
+        const { todos } = req.body; // Array of { _id, order }
+
+        if (!Array.isArray(todos)) {
+            return res.status(400).json({ message: 'Invalid data format' });
+        }
+
+        const updates = todos.map(({ _id, order }) => {
+            return Todo.findByIdAndUpdate(_id, { order });
+        });
+
+        await Promise.all(updates);
+        res.json({ message: 'Todos reordered successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -58,13 +78,19 @@ router.get('/', async (req, res) => {
 router.post('/', auth, async (req, res) => {
     try {
         const { task, date, tags, priority, agencyWorkId } = req.body;
+
+        // Find the highest order to append the new todo at the end
+        const lastTodo = await Todo.findOne().sort({ order: -1 });
+        const newOrder = lastTodo && lastTodo.order !== undefined ? lastTodo.order + 1 : 0;
+
         // Enforce author as current user
         const todoData = {
             task,
             date,
             author: req.user.name,
             tags,
-            priority
+            priority,
+            order: newOrder
         };
 
         if (agencyWorkId) {

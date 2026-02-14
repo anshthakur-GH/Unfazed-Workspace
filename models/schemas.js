@@ -15,6 +15,7 @@ const todoSchema = new mongoose.Schema({
     tags: { type: [String], default: [] },
     priority: { type: String, enum: ['High', 'Medium', 'Low'], required: true, default: 'Medium' },
     isCompleted: { type: Boolean, default: false },
+    order: { type: Number, default: 0 },
     agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' },
     goal: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }
 });
