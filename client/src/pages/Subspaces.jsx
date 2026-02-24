@@ -13,6 +13,7 @@ const Subspaces = () => {
     const [loading, setLoading] = useState(false);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [editedTitle, setEditedTitle] = useState('');
+    const [isAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
     const lastSubspaceIdRef = useRef(null);
 
     useEffect(() => {

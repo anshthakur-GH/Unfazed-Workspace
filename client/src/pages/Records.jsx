@@ -12,6 +12,7 @@ const Records = () => {
     const [isCreating, setIsCreating] = useState(false);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [editedTitle, setEditedTitle] = useState('');
+    const [isAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
 
     useEffect(() => {
         fetchRecords();
@@ -167,7 +168,7 @@ const Records = () => {
                             </div>
                             <button
                                 onClick={(e) => deleteRecord(record._id, e)}
-                                className="text-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                className={`text-text-muted hover:text-red-500 transition-opacity p-1 ${selectedRecord?._id === record._id || isAdmin ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
                             >
                                 <Trash2 size={14} />
                             </button>

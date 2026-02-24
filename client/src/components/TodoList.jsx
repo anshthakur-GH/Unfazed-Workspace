@@ -18,6 +18,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [editingText, setEditingText] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
 
     useEffect(() => {
         fetchTodos();
@@ -103,7 +104,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     };
 
     const startEditing = (todo) => {
-        if (readOnly) return;
+        if (readOnly && !isAdmin) return;
         setEditingTodoId(todo._id);
         setEditingText(todo.task);
     };
@@ -172,7 +173,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     });
 
     const moveTodoUp = async (todoId) => {
-        if (readOnly) return;
+        if (readOnly && !isAdmin) return;
 
         const currentIndex = sortedTodos.findIndex(t => t._id === todoId);
         if (currentIndex <= 0) return; // Already at top or not found
@@ -237,7 +238,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
             </div>
 
 
-            {!readOnly && (
+            {(!readOnly || isAdmin) && (
                 <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
                     <div className="flex flex-col md:flex-row gap-4">
                         <input
@@ -346,7 +347,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                     <span
                                         className={`text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
                                         onDoubleClick={() => startEditing(todo)}
-                                        title={readOnly ? "" : "Double click to edit"}
+                                        title={(readOnly && !isAdmin) ? "" : "Double click to edit"}
                                     >
                                         {todo.task}
                                     </span>
@@ -384,7 +385,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                         {format(parseISO(todo.date), 'MMM d, yyyy')}
                                     </div>
 
-                                    {!readOnly && index > 0 && (
+                                    {(!readOnly || isAdmin) && index > 0 && (
                                         <button
                                             onClick={() => moveTodoUp(todo._id)}
                                             className="text-text-muted hover:text-accent transition-colors p-1 mr-1"
@@ -396,7 +397,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                         </button>
                                     )}
 
-                                    {!readOnly && (
+                                    {(!readOnly || isAdmin) && (
                                         <div className="relative">
                                             <button
                                                 onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
@@ -417,7 +418,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                         </div>
                                     )}
                                 </div>
-                                {!readOnly && (
+                                {(!readOnly || isAdmin) && (
                                     <button
                                         onClick={() => deleteTodo(todo._id)}
                                         className="text-text-muted hover:text-red-500 transition-colors p-2"
