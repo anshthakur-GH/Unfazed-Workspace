@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X, Target } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X, Target, Bell } from 'lucide-react';
+import axios from 'axios';
+import { isToday, parseISO } from 'date-fns';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [todayFollowUpsCount, setTodayFollowUpsCount] = useState(0);
 
     // Auto-close sidebar on mobile when route changes
     useEffect(() => {
@@ -18,6 +23,28 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
         // We will just call closeSidebar() which should handle closing.
         // But to be safe, let's just use the click handler on NavLinks.
     }, [location.pathname]);
+
+    useEffect(() => {
+        const fetchFollowups = async () => {
+            const username = localStorage.getItem('username');
+            if (!username) return;
+            try {
+                const response = await axios.get(`${API_URL}/leads`, {
+                    params: { assignedTo: username }
+                });
+                const todayFollowUps = response.data.filter(l => {
+                    if (!l.reminderDate) return false;
+                    return isToday(parseISO(l.reminderDate));
+                });
+                setTodayFollowUpsCount(todayFollowUps.length);
+            } catch (error) {
+                console.error('Error fetching leads for notifications:', error);
+            }
+        };
+
+        fetchFollowups();
+        // Optional: refresh every few minutes or leave as mount-only
+    }, [location.pathname]); // Re-fetch when navigating to keep it fresh
 
 
     const handleLogout = () => {
@@ -62,6 +89,22 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
                     <div className={`flex flex-col px-2 bg-transparent ${!isOpen ? 'md:hidden' : ''}`}>
                         <h1 className="text-2xl font-bold text-accent whitespace-nowrap overflow-hidden leading-none">Unfazed</h1>
                         <span className="text-[10px] text-white font-normal leading-none opacity-80">Workspace</span>
+                    </div>
+
+                    {/* Notification Bell (Visible when sidebar is open or on mobile) */}
+                    <div className={`relative ${!isOpen ? 'md:hidden' : ''}`}>
+                        <button
+                            onClick={() => navigate('/dashboard/leads')}
+                            className="p-1.5 text-text-muted hover:text-accent transition-colors rounded-full hover:bg-border/50 relative"
+                            title="Follow-ups Today"
+                        >
+                            <Bell size={20} />
+                            {todayFollowUpsCount > 0 && (
+                                <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 flex items-center justify-center min-w-[18px] h-[18px] text-[10px] font-bold text-white bg-red-500 rounded-full px-1 shadow-[0_0_0_2px_rgba(var(--background),1)] border border-background">
+                                    {todayFollowUpsCount}
+                                </span>
+                            )}
+                        </button>
                     </div>
 
                     {/* Mobile: Close Button */}
@@ -143,12 +186,18 @@ const Layout = () => {
                     <h1 className="text-xl font-bold text-accent leading-none">Unfazed</h1>
                     <span className="text-[10px] text-white/70 leading-none">Workspace</span>
                 </div>
-                <button
-                    onClick={() => setIsSidebarOpen(true)}
-                    className="p-2 text-text-muted hover:text-white"
-                >
-                    <Menu size={24} />
-                </button>
+                <div className="flex items-center gap-2">
+                    {/* Move notification bell to mobile header as well when sidebar is closed? 
+                        Actually Sidebar renders the bell, but mobile header could use one too if we lift state.
+                        Since we kept state in Sidebar, the easiest is to just rely on the user opening the sidebar to see it,
+                        or we can just keep the layout clean as is since Sidebar will show it on mobile too. */}
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="p-2 text-text-muted hover:text-white relative"
+                    >
+                        <Menu size={24} />
+                    </button>
+                </div>
             </header>
 
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} closeSidebar={closeSidebar} />
