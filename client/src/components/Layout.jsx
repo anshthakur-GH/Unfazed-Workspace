@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X, Target, Bell } from 'lucide-react';
+import { Target, Bell } from 'lucide-react';
 import axios from 'axios';
 import { isToday, parseISO } from 'date-fns';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { API_URL } from '../config';
 
 const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
     const navigate = useNavigate();
@@ -29,7 +28,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
             const username = localStorage.getItem('username');
             if (!username) return;
             try {
-                const response = await axios.get(`${API_URL}/leads`, {
+                const response = await axios.get(`${API_URL}/api/leads`, {
                     params: { assignedTo: username }
                 });
                 const todayFollowUps = response.data.filter(l => {

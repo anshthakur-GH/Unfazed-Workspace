@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Target, Users, Calendar, Plus, X, Edit2, Trash2, Search, ExternalLink, Filter } from 'lucide-react';
 import { format, isToday, parseISO, startOfDay } from 'date-fns';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { API_URL } from '../config';
 
 const Leads = () => {
     const [leads, setLeads] = useState([]);
@@ -32,7 +31,7 @@ const Leads = () => {
     const fetchLeads = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get(`${API_URL}/leads`, {
+            const response = await axios.get(`${API_URL}/api/leads`, {
                 params: { assignedTo: username } // Fetch only leads for this user
             });
             setLeads(response.data);
@@ -89,9 +88,9 @@ const Leads = () => {
             }
 
             if (currentLead) {
-                await axios.put(`${API_URL}/leads/${currentLead._id}`, payload);
+                await axios.put(`${API_URL}/api/leads/${currentLead._id}`, payload);
             } else {
-                await axios.post(`${API_URL}/leads`, payload);
+                await axios.post(`${API_URL}/api/leads`, payload);
             }
             fetchLeads();
             handleCloseModal();
@@ -104,7 +103,7 @@ const Leads = () => {
     const handleDelete = async (id) => {
         if (!window.confirm('Are you sure you want to delete this lead?')) return;
         try {
-            await axios.delete(`${API_URL}/leads/${id}`);
+            await axios.delete(`${API_URL}/api/leads/${id}`);
             fetchLeads();
         } catch (error) {
             console.error('Error deleting lead:', error);
