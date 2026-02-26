@@ -62,12 +62,12 @@ const leadSchema = new mongoose.Schema({
     name: { type: String, required: true },
     status: {
         type: String,
-        enum: ['Interested', 'follow up scheduled', 'Meet scheduled', 'Feedback Scheduled'],
+        enum: ['Interested', 'follow up scheduled', 'Meet scheduled', 'Feedback Scheduled', 'Pending', 'Not Interested', 'Follow-up Scheduled'],
         default: 'Interested'
     },
     platform: {
         type: String,
-        enum: ['WhatsApp', 'Linkedin', 'Facebook', 'Instagram', 'X', 'Phone Call'],
+        enum: ['WhatsApp', 'Linkedin', 'Facebook', 'Instagram', 'X', 'Phone Call', 'LinkedIn', 'Other'],
         required: true
     },
     profileUrl: { type: String },

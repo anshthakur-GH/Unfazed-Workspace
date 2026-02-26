@@ -46,11 +46,21 @@ const Leads = () => {
 
     const handleOpenModal = (lead = null) => {
         if (lead) {
+            // Map old obsolete data to the new UI options gently
+            let mappedStatus = lead.status;
+            if (mappedStatus === 'Pending') mappedStatus = 'Interested';
+            if (mappedStatus === 'Not Interested') mappedStatus = 'Feedback Scheduled';
+            if (mappedStatus === 'Follow-up Scheduled') mappedStatus = 'follow up scheduled';
+
+            let mappedPlatform = lead.platform;
+            if (mappedPlatform === 'LinkedIn') mappedPlatform = 'Linkedin';
+            if (mappedPlatform === 'Other') mappedPlatform = 'WhatsApp';
+
             setCurrentLead(lead);
             setFormData({
                 name: lead.name,
-                status: lead.status,
-                platform: lead.platform,
+                status: mappedStatus,
+                platform: mappedPlatform,
                 profileUrl: lead.profileUrl || '',
                 email: lead.email || '',
                 phone: lead.phone || '',
@@ -123,6 +133,9 @@ const Leads = () => {
             case 'follow up scheduled': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
             case 'Meet scheduled': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
             case 'Feedback Scheduled': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+            case 'Pending': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+            case 'Not Interested': return 'bg-red-500/20 text-red-400 border-red-500/30';
+            case 'Follow-up Scheduled': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
             default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
         }
     };
@@ -131,6 +144,7 @@ const Leads = () => {
         switch (platform) {
             case 'WhatsApp': return 'text-green-500';
             case 'Linkedin': return 'text-blue-500';
+            case 'LinkedIn': return 'text-blue-500';
             case 'Facebook': return 'text-blue-600';
             case 'Instagram': return 'text-pink-500';
             case 'X': return 'text-gray-300';
