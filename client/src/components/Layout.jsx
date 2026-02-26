@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Target, Bell } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X, Target, Bell } from 'lucide-react';
 import axios from 'axios';
 import { isToday, parseISO } from 'date-fns';
 import { API_URL } from '../config';
