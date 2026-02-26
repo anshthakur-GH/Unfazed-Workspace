@@ -58,6 +58,26 @@ const goalSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+const leadSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    status: {
+        type: String,
+        enum: ['Pending', 'Interested', 'Not Interested', 'Follow-up Scheduled'],
+        default: 'Pending'
+    },
+    platform: {
+        type: String,
+        enum: ['LinkedIn', 'Instagram', 'Facebook', 'Other'],
+        required: true
+    },
+    profileUrl: { type: String },
+    assignedTo: { type: String, required: true }, // The team member managing this lead
+    lastContactDate: { type: Date, default: Date.now },
+    reminderDate: { type: Date }, // Date when a follow-up is required
+    notes: { type: String, default: '' },
+    createdAt: { type: Date, default: Date.now }
+});
+
 const invoiceSchema = new mongoose.Schema({
     type: { type: String, enum: ['invoice', 'quotation'], default: 'invoice' },
     invoiceNumber: { type: String, required: true },
@@ -100,6 +120,7 @@ module.exports = {
     DailyWork: mongoose.model('DailyWork', dailyWorkSchema),
     Goal: mongoose.model('Goal', goalSchema),
     Invoice: mongoose.model('Invoice', invoiceSchema),
+    Lead: mongoose.model('Lead', leadSchema),
     User: mongoose.model('User', new mongoose.Schema({
         username: { type: String, required: true, unique: true },
         password: { type: String, required: true }

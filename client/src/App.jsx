@@ -8,7 +8,7 @@ import Agency from './pages/Agency';
 import Records from './pages/Records';
 import DailyWorks from './pages/DailyWorks';
 import Invoices from './pages/Invoices';
-
+import Leads from './pages/Leads';
 
 function App() {
   const isAuthenticated = () => {
@@ -55,8 +55,8 @@ function App() {
             }
           />
           <Route path="todos" element={<Todos />} />
+          <Route path="leads" element={<Leads />} />
           <Route path="agency" element={<Agency />} />
-          <Route path="daily-works" element={<DailyWorks />} />
           <Route path="daily-works" element={<DailyWorks />} />
           <Route path="records" element={<Records />} />
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, Briefcase, LogOut, Table, ChevronLeft, ChevronRight, Calendar, FileText, Menu, X, Target } from 'lucide-react';
 
 const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
     const navigate = useNavigate();
@@ -33,11 +33,11 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
     const navItems = [
         ...(canViewInvoices ? [{ path: '/dashboard/invoices', icon: FileText, label: 'Invoices' }] : []),
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Subspaces' },
+        { path: '/dashboard/leads', icon: Target, label: 'Leads / Follow-Ups' },
         { path: '/dashboard/todos', icon: CheckSquare, label: 'To-Do List' },
         { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Works' },
         { path: '/dashboard/agency', icon: Briefcase, label: 'Agency Work' },
         { path: '/dashboard/records', icon: Table, label: 'Records' },
-
     ];
 
     return (
