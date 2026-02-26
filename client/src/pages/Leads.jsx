@@ -15,9 +15,11 @@ const Leads = () => {
     const [currentLead, setCurrentLead] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
-        status: 'Pending',
-        platform: 'LinkedIn',
+        status: 'Interested',
+        platform: 'WhatsApp',
         profileUrl: '',
+        email: '',
+        phone: '',
         reminderDate: '',
         notes: ''
     });
@@ -50,6 +52,8 @@ const Leads = () => {
                 status: lead.status,
                 platform: lead.platform,
                 profileUrl: lead.profileUrl || '',
+                email: lead.email || '',
+                phone: lead.phone || '',
                 reminderDate: lead.reminderDate ? new Date(lead.reminderDate).toISOString().split('T')[0] : '',
                 notes: lead.notes || ''
             });
@@ -57,9 +61,11 @@ const Leads = () => {
             setCurrentLead(null);
             setFormData({
                 name: '',
-                status: 'Pending',
-                platform: 'LinkedIn',
+                status: 'Interested',
+                platform: 'WhatsApp',
                 profileUrl: '',
+                email: '',
+                phone: '',
                 reminderDate: '',
                 notes: ''
             });
@@ -114,17 +120,21 @@ const Leads = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'Interested': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
-            case 'Not Interested': return 'bg-red-500/20 text-red-400 border-red-500/30';
-            case 'Follow-up Scheduled': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-            default: return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'; // Pending
+            case 'follow up scheduled': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+            case 'Meet scheduled': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+            case 'Feedback Scheduled': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+            default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
         }
     };
 
     const getPlatformColor = (platform) => {
         switch (platform) {
-            case 'LinkedIn': return 'text-blue-500';
-            case 'Instagram': return 'text-pink-500';
+            case 'WhatsApp': return 'text-green-500';
+            case 'Linkedin': return 'text-blue-500';
             case 'Facebook': return 'text-blue-600';
+            case 'Instagram': return 'text-pink-500';
+            case 'X': return 'text-gray-300';
+            case 'Phone Call': return 'text-gray-400';
             default: return 'text-gray-400';
         }
     };
@@ -252,10 +262,10 @@ const Leads = () => {
                             className="bg-background border border-border text-text text-sm rounded-lg focus:ring-accent focus:border-accent block p-2.5 transition-colors"
                         >
                             <option value="All">All Statuses</option>
-                            <option value="Pending">Pending</option>
                             <option value="Interested">Interested</option>
-                            <option value="Follow-up Scheduled">Follow-up Scheduled</option>
-                            <option value="Not Interested">Not Interested</option>
+                            <option value="follow up scheduled">follow up scheduled</option>
+                            <option value="Meet scheduled">Meet scheduled</option>
+                            <option value="Feedback Scheduled">Feedback Scheduled</option>
                         </select>
                     </div>
                 </div>
@@ -277,6 +287,7 @@ const Leads = () => {
                                 <thead className="text-xs text-text uppercase bg-background border-b border-border sticky top-0 z-10">
                                     <tr>
                                         <th className="px-6 py-4 font-medium">Name</th>
+                                        <th className="px-6 py-4 font-medium">Contact Details</th>
                                         <th className="px-6 py-4 font-medium">Status</th>
                                         <th className="px-6 py-4 font-medium">Platform</th>
                                         <th className="px-6 py-4 font-medium">Next Follow-Up</th>
@@ -295,6 +306,24 @@ const Leads = () => {
                                                         <div className="font-medium text-white">{lead.name}</div>
                                                         <div className="text-xs text-text-muted max-w-[200px] truncate">{lead.notes}</div>
                                                     </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex flex-col text-sm space-y-1">
+                                                    {lead.email ? (
+                                                        <a href={`mailto:${lead.email}`} className="text-white hover:text-accent truncate max-w-[150px]" title={lead.email}>
+                                                            {lead.email}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-text-muted/50 text-xs italic">No email</span>
+                                                    )}
+                                                    {lead.phone ? (
+                                                        <a href={`tel:${lead.phone}`} className="text-white hover:text-accent truncate max-w-[150px]" title={lead.phone}>
+                                                            {lead.phone}
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-text-muted/50 text-xs italic">No phone</span>
+                                                    )}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -385,10 +414,10 @@ const Leads = () => {
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                             className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5"
                                         >
-                                            <option value="Pending">Pending</option>
                                             <option value="Interested">Interested</option>
-                                            <option value="Follow-up Scheduled">Follow-up Scheduled</option>
-                                            <option value="Not Interested">Not Interested</option>
+                                            <option value="follow up scheduled">follow up scheduled</option>
+                                            <option value="Meet scheduled">Meet scheduled</option>
+                                            <option value="Feedback Scheduled">Feedback Scheduled</option>
                                         </select>
                                     </div>
                                     <div>
@@ -398,11 +427,36 @@ const Leads = () => {
                                             onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
                                             className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5"
                                         >
-                                            <option value="LinkedIn">LinkedIn</option>
-                                            <option value="Instagram">Instagram</option>
+                                            <option value="WhatsApp">WhatsApp</option>
+                                            <option value="Linkedin">Linkedin</option>
                                             <option value="Facebook">Facebook</option>
-                                            <option value="Other">Other</option>
+                                            <option value="Instagram">Instagram</option>
+                                            <option value="X">X</option>
+                                            <option value="Phone Call">Phone Call</option>
                                         </select>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-muted mb-1">Email Address</label>
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5"
+                                            placeholder="lead@example.com"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-text-muted mb-1">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5"
+                                            placeholder="+1 (xxx)"
+                                        />
                                     </div>
                                 </div>
 

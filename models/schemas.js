@@ -62,15 +62,17 @@ const leadSchema = new mongoose.Schema({
     name: { type: String, required: true },
     status: {
         type: String,
-        enum: ['Pending', 'Interested', 'Not Interested', 'Follow-up Scheduled'],
-        default: 'Pending'
+        enum: ['Interested', 'follow up scheduled', 'Meet scheduled', 'Feedback Scheduled'],
+        default: 'Interested'
     },
     platform: {
         type: String,
-        enum: ['LinkedIn', 'Instagram', 'Facebook', 'Other'],
+        enum: ['WhatsApp', 'Linkedin', 'Facebook', 'Instagram', 'X', 'Phone Call'],
         required: true
     },
     profileUrl: { type: String },
+    email: { type: String },
+    phone: { type: String },
     assignedTo: { type: String, required: true }, // The team member managing this lead
     lastContactDate: { type: Date, default: Date.now },
     reminderDate: { type: Date }, // Date when a follow-up is required

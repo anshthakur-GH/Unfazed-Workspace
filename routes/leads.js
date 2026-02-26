@@ -25,6 +25,8 @@ router.post('/', async (req, res) => {
         status: req.body.status,
         platform: req.body.platform,
         profileUrl: req.body.profileUrl,
+        email: req.body.email,
+        phone: req.body.phone,
         assignedTo: req.body.assignedTo,
         lastContactDate: req.body.lastContactDate,
         reminderDate: req.body.reminderDate,
@@ -49,6 +51,8 @@ router.put('/:id', async (req, res) => {
         if (req.body.status != null) lead.status = req.body.status;
         if (req.body.platform != null) lead.platform = req.body.platform;
         if (req.body.profileUrl != null) lead.profileUrl = req.body.profileUrl;
+        if (req.body.email != null) lead.email = req.body.email;
+        if (req.body.phone != null) lead.phone = req.body.phone;
         if (req.body.assignedTo != null) lead.assignedTo = req.body.assignedTo;
         if (req.body.lastContactDate != null) lead.lastContactDate = req.body.lastContactDate;
         if (req.body.reminderDate !== undefined) lead.reminderDate = req.body.reminderDate; // Allow nulling out
