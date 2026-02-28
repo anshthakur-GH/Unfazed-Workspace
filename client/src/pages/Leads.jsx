@@ -169,6 +169,14 @@ const Leads = () => {
             (lead.notes && lead.notes.toLowerCase().includes(searchQuery.toLowerCase()));
         const matchesStatus = statusFilter === 'All' || lead.status === statusFilter;
         return matchesSearch && matchesStatus;
+    }).sort((a, b) => {
+        // Push leads with no reminder date to the very bottom
+        if (!a.reminderDate && !b.reminderDate) return 0;
+        if (!a.reminderDate) return 1;
+        if (!b.reminderDate) return -1;
+
+        // Sort the remaining leads chronologically (missed/closest first)
+        return new Date(a.reminderDate) - new Date(b.reminderDate);
     });
 
     return (
