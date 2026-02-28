@@ -21,7 +21,8 @@ const Leads = () => {
         email: '',
         phone: '',
         reminderDate: '',
-        notes: ''
+        notes: '',
+        assignedTo: localStorage.getItem('username') || ''
     });
 
     const username = localStorage.getItem('username');
@@ -33,9 +34,7 @@ const Leads = () => {
     const fetchLeads = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get(`${API_URL}/api/leads`, {
-                params: { assignedTo: username } // Fetch only leads for this user
-            });
+            const response = await axios.get(`${API_URL}/api/leads`);
             setLeads(response.data);
         } catch (error) {
             console.error('Error fetching leads:', error);
@@ -65,7 +64,8 @@ const Leads = () => {
                 email: lead.email || '',
                 phone: lead.phone || '',
                 reminderDate: lead.reminderDate ? new Date(lead.reminderDate).toISOString().split('T')[0] : '',
-                notes: lead.notes || ''
+                notes: lead.notes || '',
+                assignedTo: lead.assignedTo || username
             });
         } else {
             setCurrentLead(null);
@@ -77,7 +77,8 @@ const Leads = () => {
                 email: '',
                 phone: '',
                 reminderDate: '',
-                notes: ''
+                notes: '',
+                assignedTo: username
             });
         }
         setIsModalOpen(true);
@@ -92,8 +93,7 @@ const Leads = () => {
         e.preventDefault();
         try {
             const payload = {
-                ...formData,
-                assignedTo: username
+                ...formData
             };
 
             // Format date if exists
@@ -304,6 +304,7 @@ const Leads = () => {
                                         <th className="px-6 py-4 font-medium">Contact Details</th>
                                         <th className="px-6 py-4 font-medium">Status</th>
                                         <th className="px-6 py-4 font-medium">Platform</th>
+                                        <th className="px-6 py-4 font-medium">Assigned To</th>
                                         <th className="px-6 py-4 font-medium">Next Follow-Up</th>
                                         <th className="px-6 py-4 font-medium text-right">Actions</th>
                                     </tr>
@@ -320,6 +321,14 @@ const Leads = () => {
                                                         <div className="font-medium text-white">{lead.name}</div>
                                                         <div className="text-xs text-text-muted max-w-[200px] truncate">{lead.notes}</div>
                                                     </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-6 h-6 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold text-xs" title={lead.assignedTo}>
+                                                        {lead.assignedTo ? lead.assignedTo.charAt(0).toUpperCase() : '?'}
+                                                    </div>
+                                                    <span className="text-white text-sm">{lead.assignedTo ? lead.assignedTo.split('_')[0] : 'Unknown'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -381,6 +390,9 @@ const Leads = () => {
                                                     <button onClick={() => handleOpenModal(lead)} className="text-text-muted hover:text-white transition-colors">
                                                         <Edit2 size={18} />
                                                     </button>
+                                                    <button onClick={() => handleDelete(lead._id)} className="text-text-muted hover:text-red-500 transition-colors">
+                                                        <Trash2 size={18} />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -418,6 +430,20 @@ const Leads = () => {
                                         className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5"
                                         placeholder="e.g. John Doe"
                                     />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">Assigned To *</label>
+                                    <select
+                                        value={formData.assignedTo}
+                                        onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+                                        className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5"
+                                        required
+                                    >
+                                        <option value="Ansh_Unfazed">Ansh_Unfazed</option>
+                                        <option value="AnshSaxena_Unfazed">AnshSaxena_Unfazed</option>
+                                        <option value="Ayush_Unfazed">Ayush_Unfazed</option>
+                                        <option value="Navtej_Unfazed">Navtej_Unfazed</option>
+                                    </select>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">

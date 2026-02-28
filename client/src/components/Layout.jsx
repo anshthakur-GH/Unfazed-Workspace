@@ -28,9 +28,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
             const username = localStorage.getItem('username');
             if (!username) return;
             try {
-                const response = await axios.get(`${API_URL}/api/leads`, {
-                    params: { assignedTo: username }
-                });
+                const response = await axios.get(`${API_URL}/api/leads`);
                 const todayFollowUps = response.data.filter(l => {
                     if (!l.reminderDate) return false;
                     return isToday(parseISO(l.reminderDate));
