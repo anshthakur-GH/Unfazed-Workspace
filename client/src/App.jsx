@@ -51,7 +51,7 @@ function App() {
           <Route path="daily-works" element={<DailyWorks />} />
           <Route path="records" element={<Records />} />
 
-          <Route path="" element={<Navigate to="subspaces" replace />} />
+          <Route path="" element={<Navigate to="leads" replace />} />
         </Route>
       </Routes>
     </Router>

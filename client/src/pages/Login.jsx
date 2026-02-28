@@ -16,7 +16,7 @@ const Login = () => {
             if (res.data.success) {
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('username', res.data.username);
-                navigate('/dashboard/subspaces');
+                navigate('/dashboard/leads');
             }
         } catch (err) {
             setError('Invalid credentials');

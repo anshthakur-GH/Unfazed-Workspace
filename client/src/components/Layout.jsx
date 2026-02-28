@@ -56,12 +56,12 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
 
     const navItems = [
         ...(canViewInvoices ? [{ path: '/dashboard/invoices', icon: FileText, label: 'Invoices' }] : []),
+        { path: '/dashboard/todos', icon: CheckSquare, label: 'To/Do list' },
+        { path: '/dashboard/leads', icon: Target, label: 'Potential Leads / Follow Up' },
+        { path: '/dashboard/agency', icon: Briefcase, label: 'Project Progress' },
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Subspaces' },
-        { path: '/dashboard/leads', icon: Target, label: 'Leads / Follow-Ups' },
-        { path: '/dashboard/todos', icon: CheckSquare, label: 'To-Do List' },
-        { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Works' },
-        { path: '/dashboard/agency', icon: Briefcase, label: 'Agency Work' },
-        { path: '/dashboard/records', icon: Table, label: 'Records' },
+        { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Work' },
+        { path: '/dashboard/records', icon: Table, label: 'Records - sheet' },
     ];
 
     return (
