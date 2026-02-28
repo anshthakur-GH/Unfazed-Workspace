@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Target, Users, Calendar, Plus, X, Edit2, Trash2, Search, ExternalLink, Filter } from 'lucide-react';
+import { Target, Users, Calendar, Plus, X, Edit2, Trash2, Search, ExternalLink, Filter, Copy, Check } from 'lucide-react';
 import { format, isToday, parseISO, startOfDay } from 'date-fns';
 import { API_URL } from '../config';
 
@@ -21,6 +21,7 @@ const Leads = () => {
         email: '',
         phone: '',
         reminderDate: '',
+        nextMessage: '',
         notes: '',
         assignedTo: localStorage.getItem('username') || ''
     });
@@ -64,6 +65,7 @@ const Leads = () => {
                 email: lead.email || '',
                 phone: lead.phone || '',
                 reminderDate: lead.reminderDate ? new Date(lead.reminderDate).toISOString().split('T')[0] : '',
+                nextMessage: lead.nextMessage || '',
                 notes: lead.notes || '',
                 assignedTo: lead.assignedTo || username
             });
@@ -77,6 +79,7 @@ const Leads = () => {
                 email: '',
                 phone: '',
                 reminderDate: '',
+                nextMessage: '',
                 notes: '',
                 assignedTo: username
             });
@@ -125,6 +128,16 @@ const Leads = () => {
             console.error('Error deleting lead:', error);
             alert('Failed to delete lead');
         }
+    };
+
+    const [copiedId, setCopiedId] = useState(null);
+
+    const handleCopyMessage = (e, text, id) => {
+        e.stopPropagation();
+        if (!text) return;
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
     };
 
     const getStatusColor = (status) => {
@@ -317,6 +330,7 @@ const Leads = () => {
                                         <th className="px-6 py-4 font-medium">Status</th>
                                         <th className="px-6 py-4 font-medium">Platform</th>
                                         <th className="px-6 py-4 font-medium">Assigned To</th>
+                                        <th className="px-6 py-4 font-medium">Next Message</th>
                                         <th className="px-6 py-4 font-medium">Next Follow-Up</th>
                                         <th className="px-6 py-4 font-medium text-right">Actions</th>
                                     </tr>
@@ -375,6 +389,24 @@ const Leads = () => {
                                                         </a>
                                                     )}
                                                 </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {lead.nextMessage ? (
+                                                    <div className="flex items-center gap-2 group/msg">
+                                                        <div className="max-w-[150px] truncate text-text-muted text-xs" title={lead.nextMessage}>
+                                                            {lead.nextMessage}
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => handleCopyMessage(e, lead.nextMessage, lead._id)}
+                                                            className="text-text-muted hover:text-accent transition-colors opacity-50 group-hover/msg:opacity-100"
+                                                            title="Copy Message"
+                                                        >
+                                                            {copiedId === lead._id ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-text-muted/50 italic text-xs">No message</span>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {lead.reminderDate ? (
@@ -534,7 +566,17 @@ const Leads = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-text-muted mb-1">Notes</label>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">Next Follow-Up Message</label>
+                                    <textarea
+                                        value={formData.nextMessage}
+                                        onChange={(e) => setFormData({ ...formData, nextMessage: e.target.value })}
+                                        className="w-full bg-background border border-border text-white rounded-lg focus:ring-accent focus:border-accent p-2.5 min-h-[80px] resize-y"
+                                        placeholder="Draft the message you want to send on the next follow-up date..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-text-muted mb-1">General Notes</label>
                                     <textarea
                                         value={formData.notes}
                                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}

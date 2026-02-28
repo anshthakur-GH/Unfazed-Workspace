@@ -76,6 +76,7 @@ const leadSchema = new mongoose.Schema({
     assignedTo: { type: String, required: true }, // The team member managing this lead
     lastContactDate: { type: Date, default: Date.now },
     reminderDate: { type: Date }, // Date when a follow-up is required
+    nextMessage: { type: String, default: '' },
     notes: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
