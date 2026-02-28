@@ -3,8 +3,17 @@ const router = express.Router();
 const { Invoice } = require('../models/schemas');
 const auth = require('../middleware/auth');
 
+// Admin check middleware
+const adminCheck = (req, res, next) => {
+    if (req.user && req.user.username === 'Ansh_Unfazed') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access denied. Admin only.' });
+    }
+};
+
 // Get all invoices
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
     try {
         const invoices = await Invoice.find().sort({ date: -1 });
         res.json(invoices);
@@ -14,7 +23,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get single invoice
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     try {
         const invoice = await Invoice.findOne({ id: req.params.id });
         // Note: Frontend generates UUID for 'id'. 
@@ -43,7 +52,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create invoice
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, adminCheck, async (req, res) => {
     try {
         const invoiceData = req.body;
         // Backend overrides
@@ -62,7 +71,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Update invoice
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, adminCheck, async (req, res) => {
     try {
         // We assume :id is the MongoDB _id
         const invoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -74,7 +83,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete invoice
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, adminCheck, async (req, res) => {
     try {
         const invoice = await Invoice.findByIdAndDelete(req.params.id);
         if (!invoice) return res.status(404).json({ message: 'Invoice not found' });

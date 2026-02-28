@@ -12,6 +12,7 @@ const Invoices = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [localInvoicesCount, setLocalInvoicesCount] = useState(0);
+    const isAdmin = localStorage.getItem('username') === 'Ansh_Unfazed';
 
     useEffect(() => {
         const saved = localStorage.getItem('unfazed_invoices');
@@ -217,7 +218,7 @@ const Invoices = () => {
                         <h1 className="text-3xl font-bold text-text">Invoice Management</h1>
                         <p className="text-text-muted">Create, manage, and track invoices for Unfazed AI.</p>
                     </div>
-                    {localInvoicesCount > 0 && (
+                    {localInvoicesCount > 0 && isAdmin && (
                         <button
                             onClick={handleMigrateLocalData}
                             className="bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 px-4 py-2 rounded-lg text-sm font-medium border border-yellow-500/20 transition-colors animate-pulse"
@@ -237,6 +238,7 @@ const Invoices = () => {
                     onDuplicate={handleDuplicate}
                     onDownloadPDF={handleDownloadPDF}
                     onStatusChange={handleStatusChange}
+                    isAdmin={isAdmin}
                 />
             )}
 

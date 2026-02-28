@@ -3,7 +3,7 @@ import { Plus, Search, FileText, Download, Trash2, Edit, Filter, ArrowUpRight, A
 import { formatCurrency, formatDate } from './utils';
 import { jsPDF } from 'jspdf'; // Ensure jsPacket is imported if needed, though mostly standard utils.
 
-const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate, onDownloadPDF, onStatusChange }) => {
+const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate, onDownloadPDF, onStatusChange, isAdmin }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all'); // all, paid, unpaid
 
@@ -132,13 +132,15 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                     </div>
                 </div>
 
-                <button
-                    onClick={onCreateNew}
-                    className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-accent/20"
-                >
-                    <Plus className="w-4 h-4" />
-                    Create Invoice
-                </button>
+                {isAdmin && (
+                    <button
+                        onClick={onCreateNew}
+                        className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-accent/20"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Create Invoice
+                    </button>
+                )}
             </div>
 
             {/* Invoices Table */}
@@ -152,7 +154,7 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                                 <th className="p-4 text-xs font-semibold text-text-muted uppercase tracking-wider">Date</th>
                                 <th className="p-4 text-xs font-semibold text-text-muted uppercase tracking-wider">Amount</th>
                                 <th className="p-4 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-                                <th className="p-4 text-xs font-semibold text-text-muted uppercase tracking-wider text-right">Actions</th>
+                                {isAdmin && <th className="p-4 text-xs font-semibold text-text-muted uppercase tracking-wider text-right">Actions</th>}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -165,53 +167,55 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                                         <td className="p-4 text-sm font-medium text-text">{formatCurrency(inv.total)}</td>
                                         <td className="p-4">
                                             <button
-                                                onClick={() => onStatusChange && onStatusChange(inv.id, inv.status === 'paid' ? 'unpaid' : 'paid')}
-                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer transition-colors hover:opacity-80 ${inv.status === 'paid'
+                                                onClick={() => isAdmin && onStatusChange && onStatusChange(inv.id, inv.status === 'paid' ? 'unpaid' : 'paid')}
+                                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isAdmin ? 'cursor-pointer hover:opacity-80' : 'cursor-default'} transition-colors ${inv.status === 'paid'
                                                     ? 'bg-green-500/10 text-green-500 border border-green-500/20'
                                                     : 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
                                                     }`}
-                                                title="Click to toggle status"
+                                                title={isAdmin ? "Click to toggle status" : "Status"}
                                             >
                                                 {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
                                             </button>
                                         </td>
-                                        <td className="p-4 text-right">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => onDuplicate && onDuplicate(inv)}
-                                                    className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
-                                                    title="Duplicate"
-                                                >
-                                                    <Copy className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => onDownloadPDF(inv)}
-                                                    className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
-                                                    title="Download PDF"
-                                                >
-                                                    <Download className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => onEdit(inv)}
-                                                    className="p-1.5 text-text-muted hover:text-blue-500 hover:bg-blue-500/10 rounded-md transition-colors"
-                                                    title="Edit"
-                                                >
-                                                    <Edit className="w-4 h-4" />
-                                                </button>
-                                                <button
-                                                    onClick={() => onDelete(inv.id)}
-                                                    className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {isAdmin && (
+                                            <td className="p-4 text-right">
+                                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button
+                                                        onClick={() => onDuplicate && onDuplicate(inv)}
+                                                        className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
+                                                        title="Duplicate"
+                                                    >
+                                                        <Copy className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onDownloadPDF(inv)}
+                                                        className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
+                                                        title="Download PDF"
+                                                    >
+                                                        <Download className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onEdit(inv)}
+                                                        className="p-1.5 text-text-muted hover:text-blue-500 hover:bg-blue-500/10 rounded-md transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onDelete(inv.id)}
+                                                        className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="p-12 text-center text-text-muted">
+                                    <td colSpan={isAdmin ? "6" : "5"} className="p-12 text-center text-text-muted">
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="p-4 bg-background rounded-full">
                                                 <FileText className="w-6 h-6 opacity-50" />

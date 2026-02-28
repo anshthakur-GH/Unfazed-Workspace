@@ -175,8 +175,12 @@ const Leads = () => {
         if (!a.reminderDate) return 1;
         if (!b.reminderDate) return -1;
 
-        // Sort the remaining leads chronologically (missed/closest first)
-        return new Date(a.reminderDate) - new Date(b.reminderDate);
+        // Sort the remaining leads by how close their reminder date is to TODAY (nearest first)
+        const now = new Date();
+        const diffA = Math.abs(new Date(a.reminderDate) - now);
+        const diffB = Math.abs(new Date(b.reminderDate) - now);
+
+        return diffA - diffB;
     });
 
     return (

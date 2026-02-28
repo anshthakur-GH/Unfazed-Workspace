@@ -22,16 +22,7 @@ function App() {
     return children;
   };
 
-  const AdminRoute = ({ children }) => {
-    const username = localStorage.getItem('username');
-    const allowedUsers = ['Ansh_Unfazed'];
-    const canViewInvoices = allowedUsers.includes(username);
 
-    if (!canViewInvoices) {
-      return <Navigate to="/dashboard/subspaces" replace />;
-    }
-    return children;
-  };
 
   return (
     <Router>
@@ -49,9 +40,9 @@ function App() {
           <Route
             path="invoices"
             element={
-              <AdminRoute>
+              <ProtectedRoute>
                 <Invoices />
-              </AdminRoute>
+              </ProtectedRoute>
             }
           />
           <Route path="todos" element={<Todos />} />
