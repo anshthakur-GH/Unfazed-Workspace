@@ -35,7 +35,7 @@ const recordSchema = new mongoose.Schema({
     // 2D array for table data: 50 rows x 10 columns
     data: {
         type: [[String]],
-        default: Array(50).fill(Array(10).fill(''))
+        default: () => Array.from({ length: 50 }, () => Array(10).fill(''))
     },
     createdBy: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }

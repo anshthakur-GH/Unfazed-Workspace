@@ -12,6 +12,16 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
+// Request Timing Middleware
+app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(`${req.method} ${req.originalUrl} - ${duration}ms`);
+    });
+    next();
+});
+
 // Health Check
 app.get("/health", (req, res) => {
     res.status(200).send("ok");
@@ -45,13 +55,22 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
+        console.time('Login Process');
+        console.time('DB Find User');
         const user = await User.findOne({ username });
+        console.timeEnd('DB Find User');
+
         if (!user) {
+            console.timeEnd('Login Process');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
+        console.time('Bcrypt Compare');
         const isMatch = await bcrypt.compare(password, user.password);
+        console.timeEnd('Bcrypt Compare');
+
         if (!isMatch) {
+            console.timeEnd('Login Process');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
@@ -61,8 +80,10 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
+        console.timeEnd('Login Process');
         res.json({ success: true, token, username: user.username });
     } catch (err) {
+        console.timeEnd('Login Process');
         console.error("Login error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
