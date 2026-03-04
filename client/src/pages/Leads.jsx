@@ -199,36 +199,36 @@ const Leads = () => {
     return (
         <div className="flex flex-col h-full gap-6 pb-20 md:pb-0">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tighter flex items-center gap-3">
-                        <Target className="text-accent" size={32} />
+                    <h1 className="text-xl md:text-3xl font-black text-white tracking-tighter flex items-center gap-2 md:gap-3">
+                        <Target className="text-accent" size={24} />
                         Leads & Pipeline
                     </h1>
-                    <p className="text-text-muted text-sm font-medium mt-1">Track outreach, follow-ups, and conversions</p>
+                    <p className="text-[10px] md:text-sm font-medium text-text-muted mt-0.5">Track outreach, follow-ups, and conversions</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="w-full md:w-auto bg-accent hover:bg-accent-hover text-white px-6 py-4 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-3 group"
+                    className="w-full md:w-auto bg-accent hover:bg-accent-hover text-white px-5 py-3 md:py-4 rounded-xl font-black uppercase tracking-widest text-[11px] md:text-sm transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2 group"
                 >
-                    <Plus className="group-hover:rotate-90 transition-transform duration-300" size={20} />
+                    <Plus className="group-hover:rotate-90 transition-transform duration-300" size={18} />
                     Add New Lead
                 </button>
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {[
                     { label: 'Total Leads', value: leads.length, icon: Users, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                     { label: 'Interested', value: interestedCount, icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                     { label: 'Today\'s Follow-ups', value: todayFollowUps.length, icon: Calendar, color: 'text-accent', bg: 'bg-accent/10' },
                 ].map((stat, i) => (
-                    <div key={i} className={`p-4 rounded-2xl border border-border shadow-sm flex flex-col gap-1 ${stat.bg} ${i === 2 && stat.value > 0 ? 'ring-2 ring-accent ring-inset animate-pulse' : ''}`}>
+                    <div key={i} className={`p-3 md:p-4 rounded-2xl border border-border shadow-sm flex flex-col gap-1 ${stat.bg} ${i === 2 && stat.value > 0 ? 'ring-2 ring-accent ring-inset animate-pulse' : ''}`}>
                         <div className="flex items-center justify-between">
-                            <stat.icon className={stat.color} size={18} />
-                            <span className={`text-xl font-black ${stat.color}`}>{stat.value}</span>
+                            <stat.icon className={stat.color} size={16} md:size={18} />
+                            <span className={`text-lg md:text-xl font-black ${stat.color}`}>{stat.value}</span>
                         </div>
-                        <span className="text-[10px] uppercase font-black tracking-widest text-text-muted">{stat.label}</span>
+                        <span className="text-[9px] md:text-[10px] uppercase font-black tracking-widest text-text-muted">{stat.label}</span>
                     </div>
                 ))}
             </div>
@@ -240,12 +240,12 @@ const Leads = () => {
                         <Calendar size={12} />
                         Action Required Today
                     </h3>
-                    <div className="flex overflow-x-auto gap-4 pb-2 md:grid md:grid-cols-2 lg:grid-cols-3 no-scrollbar custom-scrollbar">
+                    <div className="flex overflow-x-auto gap-3 md:gap-4 pb-2 md:grid md:grid-cols-2 lg:grid-cols-3 no-scrollbar custom-scrollbar">
                         {todayFollowUps.map(lead => (
-                            <div key={`idx-${lead._id}`} className="flex-shrink-0 w-[280px] md:w-auto bg-accent/5 border border-accent/20 rounded-2xl p-4 flex flex-col gap-3 hover:bg-accent/10 transition-colors">
+                            <div key={`idx-${lead._id}`} className="flex-shrink-0 w-[240px] md:w-auto bg-accent/5 border border-accent/20 rounded-2xl p-3 md:p-4 flex flex-col gap-2 md:gap-3 hover:bg-accent/10 transition-colors">
                                 <div className="flex justify-between items-start">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center font-black text-lg shadow-lg shadow-accent/20">
+                                    <div className="flex items-center gap-2 md:gap-3">
+                                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-accent text-white flex items-center justify-center font-black text-sm md:text-lg shadow-lg shadow-accent/20">
                                             {lead.name.charAt(0).toUpperCase()}
                                         </div>
                                         <div className="flex flex-col">

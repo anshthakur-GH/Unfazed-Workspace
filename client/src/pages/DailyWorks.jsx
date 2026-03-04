@@ -140,14 +140,14 @@ const DailyWorks = () => {
         <div className="flex flex-col md:flex-row h-full gap-6 relative">
             {/* Sidebar List */}
             <div className={`${showHistory ? 'flex' : 'hidden'} md:flex w-full md:w-64 flex-col bg-card rounded-xl border border-border overflow-hidden h-full`}>
-                <div className="p-4 border-b border-border flex justify-between items-center bg-secondary/20">
-                    <h3 className="font-bold text-text-muted text-sm uppercase tracking-wider">History</h3>
+                <div className="p-3 md:p-4 border-b border-border flex justify-between items-center bg-secondary/20">
+                    <h3 className="font-bold text-text-muted text-[10px] md:text-sm uppercase tracking-wider">History</h3>
                     <button
                         onClick={handleCreateToday}
                         className="p-1 hover:bg-accent hover:text-white rounded-full transition-colors text-accent"
                         title="Add Today's Work"
                     >
-                        <Plus size={18} />
+                        <Plus size={16} md:size={18} />
                     </button>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -161,10 +161,10 @@ const DailyWorks = () => {
                                     selectWork(work);
                                     if (window.innerWidth < 768) setShowHistory(false);
                                 }}
-                                className={`p-4 border-b border-border cursor-pointer transition-all hover:bg-secondary/30 ${selectedWorkId === work._id ? 'bg-accent/10 border-l-4 border-l-accent' : 'border-l-4 border-l-transparent'
+                                className={`p-3 md:p-4 border-b border-border cursor-pointer transition-all hover:bg-secondary/30 ${selectedWorkId === work._id ? 'bg-accent/10 border-l-4 border-l-accent' : 'border-l-4 border-l-transparent'
                                     }`}
                             >
-                                <div className="font-bold text-sm text-text mb-1 truncate flex items-center gap-2">
+                                <div className="font-bold text-xs md:text-sm text-text mb-1 truncate flex items-center gap-2">
                                     {work.dateLabel}
                                     {work.createdBy && (
                                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${work.createdBy === 'Ansh' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-purple-500/10 text-purple-500 border-purple-500/20'}`}>
@@ -211,7 +211,7 @@ const DailyWorks = () => {
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2 group">
-                                            <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 truncate">
+                                            <h2 className="text-base md:text-2xl font-bold text-white flex items-center gap-2 truncate">
                                                 {dateLabel}
                                             </h2>
                                             <button

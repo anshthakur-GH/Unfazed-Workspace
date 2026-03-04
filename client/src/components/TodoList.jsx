@@ -315,7 +315,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                 </div>
                             </div>
 
-                            <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-8 py-4 md:py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg shadow-accent/20">
+                            <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-8 py-3.5 md:py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg shadow-accent/20 text-[11px] md:text-sm">
                                 Add Task
                             </button>
                         </div>
@@ -356,7 +356,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                     sortedTodos.map((todo, index) => (
                         <div
                             key={todo._id}
-                            className={`flex items-center justify-between p-4 rounded-lg border transition-all ${todo.isCompleted ? 'bg-background/50 border-border opacity-60' : 'bg-background border-border hover:border-accent/50'
+                            className={`flex items-center justify-between p-3 md:p-4 rounded-lg border transition-all ${todo.isCompleted ? 'bg-background/50 border-border opacity-60' : 'bg-background border-border hover:border-accent/50'
                                 }`}
                         >
                             <div className="flex items-center gap-4">
@@ -378,7 +378,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                     />
                                 ) : (
                                     <span
-                                        className={`text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
+                                        className={`text-base md:text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
                                         onDoubleClick={() => startEditing(todo)}
                                         title={(readOnly && !isAdmin) ? "" : "Double click to edit"}
                                     >

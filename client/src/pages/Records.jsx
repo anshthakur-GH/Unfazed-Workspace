@@ -127,8 +127,8 @@ const Records = () => {
         <div className="bg-card rounded-xl border border-border h-full flex overflow-hidden">
             {/* Sidebar List */}
             <div className={`${selectedRecord ? 'hidden md:flex' : 'flex'} w-full md:w-64 border-r border-border flex-col bg-background/50`}>
-                <div className="p-4 border-b border-border">
-                    <h2 className="text-xl font-bold text-white mb-4">Records</h2>
+                <div className="p-3 md:p-4 border-b border-border">
+                    <h2 className="text-lg md:text-xl font-bold text-white mb-4">Records</h2>
                     {isCreating ? (
                         <form onSubmit={createRecord} className="flex gap-2">
                             <input
@@ -161,10 +161,10 @@ const Records = () => {
                                 }`}
                         >
                             <div className="overflow-hidden">
-                                <h3 className={`font-medium truncate ${selectedRecord?._id === record._id ? 'text-accent' : 'text-text'}`}>
+                                <h3 className={`font-medium truncate text-sm md:text-base ${selectedRecord?._id === record._id ? 'text-accent' : 'text-text'}`}>
                                     {record.title}
                                 </h3>
-                                <p className="text-xs text-text-muted">{format(new Date(record.createdAt), 'MMM d, yyyy')}</p>
+                                <p className="text-[10px] md:text-xs text-text-muted">{format(new Date(record.createdAt), 'MMM d, yyyy')}</p>
                             </div>
                             <button
                                 onClick={(e) => deleteRecord(record._id, e)}
@@ -203,11 +203,11 @@ const Records = () => {
                                             onBlur={updateTitle}
                                             onKeyDown={(e) => e.key === 'Enter' && updateTitle()}
                                             autoFocus
-                                            className="text-xl font-bold text-white bg-transparent border-b border-accent focus:outline-none mb-1"
+                                            className="text-lg md:text-xl font-bold text-white bg-transparent border-b border-accent focus:outline-none mb-1"
                                         />
                                     ) : (
                                         <h2
-                                            className="text-xl font-bold text-white cursor-pointer hover:text-accent transition-colors"
+                                            className="text-lg md:text-xl font-bold text-white cursor-pointer hover:text-accent transition-colors"
                                             onClick={() => setIsEditingTitle(true)}
                                             title="Click to rename"
                                         >
@@ -263,7 +263,7 @@ const Records = () => {
                                                             type="text"
                                                             value={cell || ''}
                                                             onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                                                            className={`w-full min-h-[50px] px-4 py-3 bg-transparent text-sm focus:outline-none transition-colors
+                                                            className={`w-full min-h-[40px] md:min-h-[50px] px-3 md:px-4 py-2 md:py-3 bg-transparent text-xs md:text-sm focus:outline-none transition-colors
                                                                 ${rowIndex === 0 ? 'font-black text-white bg-accent/10 placeholder:text-accent/30' : 'text-text focus:bg-accent/5'}
                                                             `}
                                                             placeholder={rowIndex === 0 ? `Header ${String.fromCharCode(64 + colIndex + 1)}` : ""}

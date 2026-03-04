@@ -145,8 +145,8 @@ const Subspaces = () => {
         <div className="flex flex-col md:flex-row h-full gap-6 relative">
             {/* List of Subspaces */}
             <div className={`${showList ? 'flex' : 'hidden'} md:flex w-full md:w-1/3 flex-col gap-4 h-full`}>
-                <div className="bg-card p-4 rounded-xl border border-border h-full flex flex-col">
-                    <h2 className="text-xl font-bold text-white mb-4">Subspaces</h2>
+                <div className="bg-card p-3 md:p-4 rounded-xl border border-border h-full flex flex-col">
+                    <h2 className="text-lg md:text-xl font-bold text-white mb-4">Subspaces</h2>
                     <form onSubmit={createSubspace} className="flex flex-col gap-2 mb-4">
                         <div className="flex gap-2">
                             <input
@@ -188,7 +188,7 @@ const Subspaces = () => {
                                     setSelectedSubspace(sub);
                                     if (window.innerWidth < 768) setShowList(false);
                                 }}
-                                className={`p-4 rounded-xl cursor-pointer transition-all border ${selectedSubspace?._id === sub._id
+                                className={`p-3 md:p-4 rounded-xl cursor-pointer transition-all border ${selectedSubspace?._id === sub._id
                                     ? 'bg-accent/10 border-accent text-accent'
                                     : 'bg-background hover:bg-border/50 border-transparent text-text-muted'
                                     }`}
@@ -245,7 +245,7 @@ const Subspaces = () => {
                                     />
                                 ) : (
                                     <h2
-                                        className="text-xl md:text-2xl font-bold text-white cursor-pointer hover:text-accent transition-colors truncate"
+                                        className="text-lg md:text-2xl font-bold text-white cursor-pointer hover:text-accent transition-colors truncate"
                                         onClick={() => setIsEditingTitle(true)}
                                         title="Click to rename"
                                     >

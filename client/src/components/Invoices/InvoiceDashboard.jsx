@@ -201,18 +201,18 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                 <div className="md:hidden divide-y divide-border">
                     {filteredInvoices.length > 0 ? (
                         filteredInvoices.map((inv) => (
-                            <div key={inv.id} className="p-4 space-y-3 bg-secondary/10 active:bg-secondary/20 transition-colors">
+                            <div key={inv.id} className="p-3 md:p-4 space-y-3 bg-secondary/10 active:bg-secondary/20 transition-colors">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <p className="text-xs font-black text-accent uppercase tracking-widest">#{inv.invoiceNumber}</p>
-                                        <h4 className="text-base font-bold text-white mt-1">{inv.billTo?.name || 'Unknown Client'}</h4>
-                                        <p className="text-xs text-text-muted mt-0.5">{formatDate(inv.date)}</p>
+                                        <p className="text-[9px] md:text-xs font-black text-accent uppercase tracking-widest">#{inv.invoiceNumber}</p>
+                                        <h4 className="text-sm md:text-base font-bold text-white mt-0.5 md:mt-1">{inv.billTo?.name || 'Unknown Client'}</h4>
+                                        <p className="text-[10px] md:text-xs text-text-muted mt-0.5">{formatDate(inv.date)}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-lg font-black text-white">{formatCurrency(inv.total)}</p>
+                                        <p className="text-base md:text-lg font-black text-white">{formatCurrency(inv.total)}</p>
                                         <button
                                             onClick={() => isAdmin && onStatusChange && onStatusChange(inv.id, inv.status === 'paid' ? 'unpaid' : 'paid')}
-                                            className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mt-2 border ${inv.status === 'paid'
+                                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider mt-1.5 md:mt-2 border ${inv.status === 'paid'
                                                 ? 'bg-green-500/10 text-green-500 border-green-500/20'
                                                 : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
                                                 }`}
@@ -224,15 +224,15 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                                 {isAdmin && (
                                     <div className="flex items-center justify-between pt-2 border-t border-border/50">
                                         <div className="flex gap-1">
-                                            <button onClick={() => onDownloadPDF(inv)} className="p-2.5 text-text-muted bg-background border border-border rounded-xl"><Download size={16} /></button>
-                                            <button onClick={() => onDuplicate && onDuplicate(inv)} className="p-2.5 text-text-muted bg-background border border-border rounded-xl ml-2"><Copy size={16} /></button>
+                                            <button onClick={() => onDownloadPDF(inv)} className="p-2 text-text-muted bg-background border border-border rounded-xl"><Download size={14} /></button>
+                                            <button onClick={() => onDuplicate && onDuplicate(inv)} className="p-2 text-text-muted bg-background border border-border rounded-xl ml-1.5 md:ml-2"><Copy size={14} /></button>
                                         </div>
                                         <div className="flex gap-2">
-                                            <button onClick={() => onEdit(inv)} className="flex items-center gap-2 px-4 py-2.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-xl text-xs font-black uppercase tracking-widest">
-                                                <Edit size={14} /> Edit
+                                            <button onClick={() => onEdit(inv)} className="flex items-center gap-2 px-3 md:px-4 py-2 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest">
+                                                <Edit size={12} /> Edit
                                             </button>
-                                            <button onClick={() => onDelete(inv.id)} className="p-2.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl transition-colors">
-                                                <Trash2 size={16} />
+                                            <button onClick={() => onDelete(inv.id)} className="p-2 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl transition-colors">
+                                                <Trash2 size={14} />
                                             </button>
                                         </div>
                                     </div>

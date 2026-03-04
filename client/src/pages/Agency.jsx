@@ -140,8 +140,8 @@ const Agency = () => {
                 {/* Section 1: Latest Work Input */}
                 <div className={`${activeMobileTab === 'add' ? 'flex' : 'hidden'} md:flex w-full md:w-1/3 flex-col order-2 md:order-1 overflow-y-auto`}>
                     <div className="bg-card p-4 md:p-6 rounded-xl border border-border shadow-lg">
-                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                            <Send size={24} className="text-accent" />
+                        <h2 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6 flex items-center gap-2">
+                            <Send size={20} className="text-accent" />
                             Add Latest Work
                         </h2>
                         <form onSubmit={addWork} className="space-y-4">
@@ -205,7 +205,7 @@ const Agency = () => {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-3 md:py-4 rounded-xl text-[11px] md:text-sm transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {loading ? 'Adding...' : 'Add Update'}
                             </button>
@@ -215,8 +215,8 @@ const Agency = () => {
 
                 {/* Section 2: Work Progress Feed */}
                 <div className={`${activeMobileTab === 'feed' ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-card rounded-xl border border-border p-4 md:p-6 shadow-lg overflow-hidden order-1 md:order-2 h-full`}>
-                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <Clock size={24} className="text-accent" />
+                    <h2 className="text-lg md:text-xl font-bold text-white mb-4 md:mb-6 flex items-center gap-2">
+                        <Clock size={20} className="text-accent" />
                         Updates Feed
                     </h2>
                     <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2 pb-10">
@@ -266,13 +266,13 @@ const Agency = () => {
                                                     dangerouslySetInnerHTML={{ __html: work.note }}
                                                 />
                                                 <div className="flex items-center gap-3">
-                                                    <div className="flex-1 bg-border/20 h-2 rounded-full overflow-hidden">
+                                                    <div className="flex-1 bg-border/20 h-1.5 md:h-2 rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-accent transition-all duration-1000 ease-out"
                                                             style={{ width: `${work.progress}%` }}
                                                         />
                                                     </div>
-                                                    <span className="text-xl font-black text-accent">{work.progress}%</span>
+                                                    <span className="text-base md:text-xl font-black text-accent">{work.progress}%</span>
                                                 </div>
                                             </div>
                                         )}

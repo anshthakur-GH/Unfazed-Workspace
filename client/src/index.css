@@ -34,18 +34,37 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes scaleUp {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-fade-in {
@@ -69,9 +88,75 @@ input[type=number]::-webkit-outer-spin-button {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Mobile Scalability Resets */
+@media (max-width: 768px) {
+  h1 {
+    @apply text-2xl !important;
+  }
+
+  h2 {
+    @apply text-xl !important;
+  }
+
+  h3 {
+    @apply text-lg !important;
+  }
+
+  /* Scale down common text sizes */
+  .text-4xl {
+    @apply text-2xl !important;
+  }
+
+  .text-3xl {
+    @apply text-xl !important;
+  }
+
+  .text-2xl {
+    @apply text-lg !important;
+  }
+
+  .text-xl {
+    @apply text-base !important;
+  }
+
+  .text-base {
+    @apply text-sm !important;
+  }
+
+  .text-sm {
+    @apply text-[11px] !important;
+  }
+
+  /* Scale down buttons and interactive elements */
+  button {
+    @apply scale-95 transition-transform active:scale-90 !important;
+  }
+
+  .py-4 {
+    @apply py-2.5 !important;
+  }
+
+  .px-6 {
+    @apply px-4 !important;
+  }
+
+  .px-8 {
+    @apply px-5 !important;
+  }
+
+  .p-6 {
+    @apply p-4 !important;
+  }
+
+  .p-8 {
+    @apply p-5 !important;
+  }
 }
 
 /* Safe Area Padding */
