@@ -225,69 +225,130 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                 </div>
 
                 {/* Line Items */}
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[600px]">
-                        <thead>
-                            <tr className="border-b border-border text-left">
-                                <th className="py-2 text-xs font-semibold text-text-muted uppercase w-[45%]">Item Details</th>
-                                <th className="py-2 text-xs font-semibold text-text-muted uppercase w-[15%] text-center">Quantity</th>
-                                <th className="py-2 text-xs font-semibold text-text-muted uppercase w-[20%] text-right">Rate</th>
-                                <th className="py-2 text-xs font-semibold text-text-muted uppercase w-[20%] text-right">Amount</th>
-                                <th className="w-10"></th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/50">
-                            {formData.items.map((item) => (
-                                <tr key={item.id} className="group">
-                                    <td className="py-2 pr-2">
+                <div className="space-y-4">
+                    <h3 className="text-sm font-black text-text-muted uppercase tracking-widest border-b border-border/50 pb-2">Line Items</h3>
+
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full min-w-[600px]">
+                            <thead>
+                                <tr className="border-b border-border text-left">
+                                    <th className="py-3 text-xs font-black text-text-muted uppercase w-[45%]">Item Details</th>
+                                    <th className="py-3 text-xs font-black text-text-muted uppercase w-[15%] text-center">Qty</th>
+                                    <th className="py-3 text-xs font-black text-text-muted uppercase w-[20%] text-right">Rate (₹)</th>
+                                    <th className="py-3 text-xs font-black text-text-muted uppercase w-[20%] text-right">Amount (₹)</th>
+                                    <th className="w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/30">
+                                {formData.items.map((item) => (
+                                    <tr key={item.id} className="group hover:bg-white/[0.01]">
+                                        <td className="py-4 pr-4">
+                                            <input
+                                                type="text"
+                                                value={item.description}
+                                                onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
+                                                placeholder="What are you charging for?"
+                                                className="w-full bg-transparent border-none focus:ring-0 text-white font-medium placeholder:text-text-muted/30"
+                                            />
+                                        </td>
+                                        <td className="py-4 px-2">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={item.quantity}
+                                                onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
+                                                className="w-full bg-background/50 border border-border/50 rounded-xl px-2 py-2 text-text text-center focus:border-accent transition-all"
+                                            />
+                                        </td>
+                                        <td className="py-4 px-2">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={item.rate || ''}
+                                                onChange={(e) => handleItemChange(item.id, 'rate', Number(e.target.value))}
+                                                className="w-full bg-background/50 border border-border/50 rounded-xl px-2 py-2 text-text text-right focus:border-accent transition-all"
+                                            />
+                                        </td>
+                                        <td className="py-4 pl-4 text-right text-white font-black">
+                                            {item.amount.toFixed(2)}
+                                        </td>
+                                        <td className="py-4 text-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => removeItem(item.id)}
+                                                className="text-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-2"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile Card View for Items */}
+                    <div className="md:hidden space-y-4">
+                        {formData.items.map((item, idx) => (
+                            <div key={item.id} className="bg-background/40 border border-border rounded-2xl p-4 relative group animate-in zoom-in-95 duration-200">
+                                <div className="absolute -top-2 -left-2 w-6 h-6 bg-accent text-[10px] font-black text-white rounded-full flex items-center justify-center shadow-lg">{idx + 1}</div>
+                                <button
+                                    type="button"
+                                    onClick={() => removeItem(item.id)}
+                                    className="absolute -top-2 -right-2 w-8 h-8 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full flex items-center justify-center active:bg-red-500 active:text-white transition-all shadow-lg"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block mb-1">Description</label>
                                         <input
                                             type="text"
                                             value={item.description}
                                             onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
-                                            placeholder="Description"
-                                            className="w-full bg-transparent border-none focus:ring-0 text-text placeholder:text-text-muted/30"
+                                            placeholder="Item detail..."
+                                            className="w-full bg-background border border-border rounded-xl px-4 py-3 text-white focus:border-accent outline-none"
                                         />
-                                    </td>
-                                    <td className="py-2 px-2">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value={item.quantity}
-                                            onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                                            className="w-full bg-background border border-border/50 rounded px-2 py-1 text-text text-center focus:border-accent focus:outline-none"
-                                        />
-                                    </td>
-                                    <td className="py-2 px-2">
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            value={item.rate || ''} // Empty string if 0 for cleaner UX
-                                            onChange={(e) => handleItemChange(item.id, 'rate', Number(e.target.value))}
-                                            className="w-full bg-background border border-border/50 rounded px-2 py-1 text-text text-right focus:border-accent focus:outline-none"
-                                        />
-                                    </td>
-                                    <td className="py-2 pl-2 text-right text-text font-medium">
-                                        {item.amount.toFixed(2)}
-                                    </td>
-                                    <td className="py-2 text-center">
-                                        <button
-                                            type="button"
-                                            onClick={() => removeItem(item.id)}
-                                            className="text-text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block mb-1">Quantity</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={item.quantity}
+                                                onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
+                                                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-center"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-[10px] font-black text-text-muted uppercase tracking-widest block mb-1">Rate (₹)</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                value={item.rate || ''}
+                                                onChange={(e) => handleItemChange(item.id, 'rate', Number(e.target.value))}
+                                                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-white focus:border-accent outline-none text-center"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2 border-t border-border/30">
+                                        <span className="text-xs font-black text-text-muted uppercase tracking-widest">Total Amount</span>
+                                        <span className="text-lg font-black text-accent">₹{item.amount.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
                     <button
                         type="button"
                         onClick={addItem}
-                        className="mt-4 flex items-center text-accent hover:text-accent-hover text-sm font-medium transition-colors"
+                        className="w-full md:w-auto flex items-center justify-center gap-2 bg-accent/10 hover:bg-accent text-accent hover:text-white border border-accent/20 px-6 py-4 md:py-3 rounded-2xl font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-lg shadow-accent/5"
                     >
-                        <Plus className="w-4 h-4 mr-1" /> Add Line Item
+                        <Plus size={18} /> Add New Item
                     </button>
                 </div>
 

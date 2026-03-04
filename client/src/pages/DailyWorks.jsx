@@ -130,14 +130,16 @@ const DailyWorks = () => {
         }
     }, [content, dateLabel]);
 
+    const [showHistory, setShowHistory] = useState(true);
+
     if (loading) return <div className="p-10 text-text-muted">Loading...</div>;
 
     const selectedWork = works.find(w => w._id === selectedWorkId);
 
     return (
-        <div className="flex h-full gap-6">
+        <div className="flex flex-col md:flex-row h-full gap-6 relative">
             {/* Sidebar List */}
-            <div className="w-64 flex flex-col bg-card rounded-xl border border-border overflow-hidden">
+            <div className={`${showHistory ? 'flex' : 'hidden'} md:flex w-full md:w-64 flex-col bg-card rounded-xl border border-border overflow-hidden h-full`}>
                 <div className="p-4 border-b border-border flex justify-between items-center bg-secondary/20">
                     <h3 className="font-bold text-text-muted text-sm uppercase tracking-wider">History</h3>
                     <button
@@ -155,7 +157,10 @@ const DailyWorks = () => {
                         works.map(work => (
                             <div
                                 key={work._id}
-                                onClick={() => selectWork(work)}
+                                onClick={() => {
+                                    selectWork(work);
+                                    if (window.innerWidth < 768) setShowHistory(false);
+                                }}
                                 className={`p-4 border-b border-border cursor-pointer transition-all hover:bg-secondary/30 ${selectedWorkId === work._id ? 'bg-accent/10 border-l-4 border-l-accent' : 'border-l-4 border-l-transparent'
                                     }`}
                             >
@@ -180,83 +185,78 @@ const DailyWorks = () => {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col bg-card rounded-xl border border-border overflow-hidden shadow-lg">
+            <div className={`${!showHistory ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-card rounded-xl border border-border overflow-hidden shadow-lg h-full`}>
                 {selectedWorkId ? (
                     <>
                         {/* Header */}
-                        <div className="p-6 border-b border-border flex justify-between items-center bg-secondary/10">
-                            <div className="flex-1">
-                                {isEditingLabel ? (
-                                    <div className="flex items-center gap-2">
-                                        <input
-                                            type="text"
-                                            value={dateLabel}
-                                            onChange={(e) => setDateLabel(e.target.value)}
-                                            className="bg-background border border-border rounded px-3 py-1 text-xl font-bold text-text focus:outline-none focus:border-accent"
-                                            autoFocus
-                                            onKeyDown={(e) => e.key === 'Enter' && updateLabel()}
-                                        />
-                                        <button onClick={updateLabel} className="p-2 bg-accent text-white rounded hover:bg-accent-hover transition-colors">
-                                            <Check size={18} />
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div className="flex items-center gap-3 group">
-                                        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                                            <CalendarIcon className="text-accent" size={24} />
-                                            {dateLabel}
-                                        </h2>
-                                        <button
-                                            onClick={() => setIsEditingLabel(true)}
-                                            className="opacity-0 group-hover:opacity-100 text-text-muted hover:text-accent transition-all p-1"
-                                            title="Rename"
-                                        >
-                                            <Edit2 size={16} />
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="text-sm text-text-muted mt-1">
-                                    Created: {format(new Date(selectedWork.createdAt), 'PP pp')}
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <div className="text-right">
-                                    <div className={`text-xs font-mono transition-opacity ${saving ? 'opacity-100' : 'opacity-0'} text-accent`}>
-                                        Saving...
-                                    </div>
-                                    {lastSaved && !saving && (
-                                        <div className="text-[10px] text-text-muted">
-                                            Saved: {lastSaved.toLocaleTimeString()}
+                        <div className="p-4 md:p-6 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-secondary/10">
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                <button
+                                    onClick={() => setShowHistory(true)}
+                                    className="md:hidden p-2 -ml-2 text-accent"
+                                >
+                                    <Plus className="rotate-45" size={24} />
+                                </button>
+                                <div className="flex-1">
+                                    {isEditingLabel ? (
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                value={dateLabel}
+                                                onChange={(e) => setDateLabel(e.target.value)}
+                                                className="bg-background border border-border rounded px-3 py-1 text-lg font-bold text-text focus:outline-none focus:border-accent w-full"
+                                                autoFocus
+                                                onKeyDown={(e) => e.key === 'Enter' && updateLabel()}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2 group">
+                                            <h2 className="text-lg md:text-2xl font-bold text-white flex items-center gap-2 truncate">
+                                                {dateLabel}
+                                            </h2>
+                                            <button
+                                                onClick={() => setIsEditingLabel(true)}
+                                                className="text-text-muted hover:text-accent p-1"
+                                            >
+                                                <Edit2 size={16} />
+                                            </button>
                                         </div>
                                     )}
                                 </div>
-                                <div className="bg-background p-2 rounded-lg border border-border">
-                                    <Save size={20} className={saving ? 'text-accent animate-pulse' : 'text-text-muted'} />
+                            </div>
+                            <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                                <div className="text-[10px] text-text-muted">
+                                    {saving ? <span className="text-accent animate-pulse uppercase font-black">Saving...</span> : `Updated: ${format(new Date(selectedWork.updatedAt), 'HH:mm')}`}
+                                </div>
+                                <div className="bg-background p-1.5 rounded-lg border border-border">
+                                    <Save size={18} className={saving ? 'text-accent animate-pulse' : 'text-text-muted'} />
                                 </div>
                             </div>
                         </div>
 
                         {/* Editor */}
-                        <div className="flex-1 p-6 overflow-hidden flex flex-col">
+                        <div className="flex-1 p-2 md:p-6 overflow-hidden flex flex-col">
                             <RichTextEditor
                                 value={content}
                                 onChange={setContent}
-                                placeholder="Write your daily work updates here..."
+                                placeholder="Work updates..."
                                 className="flex-1 h-full"
                                 minHeight="100%"
                             />
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-text-muted p-10">
+                    <div className="flex-1 flex flex-col items-center justify-center text-text-muted p-10 text-center">
                         <CalendarIcon size={64} className="mb-4 opacity-20" />
-                        <p className="text-lg mb-4">Select a day working record or create a new one.</p>
+                        <p className="text-lg mb-4">Select a record</p>
                         <button
-                            onClick={handleCreateToday}
-                            className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg hover:shadow-accent/20 flex items-center gap-2"
+                            onClick={() => {
+                                handleCreateToday();
+                                if (window.innerWidth < 768) setShowHistory(false);
+                            }}
+                            className="bg-accent text-white px-6 py-3 rounded-xl font-bold"
                         >
-                            <Plus size={20} />
-                            Create Record for Today
+                            Create Today's Record
                         </button>
                     </div>
                 )}

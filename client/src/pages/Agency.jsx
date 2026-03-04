@@ -116,250 +116,212 @@ const Agency = () => {
         return () => clearTimeout(timer);
     }, [editContent, editProgress, editPriority, editDeadline, editingId]);
 
+    const [activeMobileTab, setActiveMobileTab] = useState('feed'); // 'feed' or 'add'
+
     return (
-        <div className="flex flex-col md:flex-row h-full gap-8">
-            {/* Section 1: Latest Work Input */}
-            <div className="w-full md:w-1/3 flex flex-col order-2 md:order-1">
-                <div className="bg-card p-6 rounded-xl border border-border shadow-lg">
-                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                        <Send size={24} className="text-accent" />
-                        Add Latest Work
-                    </h2>
-                    <form onSubmit={addWork} className="space-y-4">
-                        <div>
-                            <label className="block text-sm text-text-muted mb-2">Work Description / Note</label>
-                            <RichTextEditor
-                                value={note}
-                                onChange={setNote}
-                                placeholder="What's the update?"
-                                minHeight="128px"
-                            />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm text-text-muted mb-2">Priority</label>
-                                <select
-                                    className="w-full bg-background border border-border rounded-lg p-3 text-text focus:outline-none focus:border-accent"
-                                    value={priority}
-                                    onChange={(e) => setPriority(e.target.value)}
-                                >
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Low">Low</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm text-text-muted mb-2">Deadline</label>
-                                <input
-                                    type="date"
-                                    className="w-full bg-background border border-border rounded-lg p-3 text-text focus:outline-none focus:border-accent"
-                                    value={deadline}
-                                    onChange={(e) => setDeadline(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm text-text-muted mb-2">Assign To</label>
-                            <div className="relative">
-                                <select
-                                    className="w-full bg-background border border-border rounded-lg p-3 text-text appearance-none focus:outline-none focus:border-accent cursor-pointer"
-                                    value={assignedTo}
-                                    onChange={(e) => setAssignedTo(e.target.value)}
-                                >
-                                    <option value="Ansh">Ansh</option>
-                                    <option value="Navtej">Navtej</option>
-                                </select>
-                                <User className="absolute right-3 top-3 text-text-muted pointer-events-none" size={18} />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm text-text-muted mb-2">Progress: {progress}%</label>
-                            <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                value={progress}
-                                onChange={(e) => setProgress(Number(e.target.value))}
-                                className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-accent hover:bg-accent-hover text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                        >
-                            {loading ? 'Adding...' : 'Add Work'}
-                        </button>
-                    </form>
-                </div>
+        <div className="flex flex-col h-full gap-6">
+            {/* Mobile Tab Switcher */}
+            <div className="md:hidden flex bg-card rounded-xl p-1 border border-border">
+                <button
+                    onClick={() => setActiveMobileTab('feed')}
+                    className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${activeMobileTab === 'feed' ? 'bg-accent text-white shadow-lg' : 'text-text-muted'}`}
+                >
+                    Updates Feed
+                </button>
+                <button
+                    onClick={() => setActiveMobileTab('add')}
+                    className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${activeMobileTab === 'add' ? 'bg-accent text-white shadow-lg' : 'text-text-muted'}`}
+                >
+                    Add Update
+                </button>
             </div>
 
-            {/* Section 2: Work Progress Feed */}
-            <div className="flex-1 flex flex-col bg-card rounded-xl border border-border p-6 shadow-lg overflow-hidden order-1 md:order-2 h-[50vh] md:h-auto">
-                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <Clock size={24} className="text-accent" />
-                    Work Progress
-                </h2>
-                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
-                    {works.length === 0 ? (
-                        <div className="text-center text-text-muted opacity-50 py-10">No work updates yet.</div>
-                    ) : (
-                        works.map((work) => (
-                            <div key={work._id} className="bg-background border border-border p-4 rounded-lg flex flex-col gap-2 hover:border-accent/30 transition-colors">
-                                <div className="flex justify-between items-start">
-                                    <span className="bg-accent/10 text-accent text-xs font-bold px-2 py-1 rounded uppercase tracking-wider">
-                                        {work.assignedTo}
-                                    </span>
-                                    <span className="text-xs text-text-muted font-mono">
-                                        {format(new Date(work.timestamp), 'MMM d, HH:mm')}
-                                    </span>
+            <div className="flex flex-col md:flex-row h-full gap-6 overflow-hidden">
+                {/* Section 1: Latest Work Input */}
+                <div className={`${activeMobileTab === 'add' ? 'flex' : 'hidden'} md:flex w-full md:w-1/3 flex-col order-2 md:order-1 overflow-y-auto`}>
+                    <div className="bg-card p-4 md:p-6 rounded-xl border border-border shadow-lg">
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <Send size={24} className="text-accent" />
+                            Add Latest Work
+                        </h2>
+                        <form onSubmit={addWork} className="space-y-4">
+                            <div>
+                                <label className="block text-xs uppercase font-black tracking-widest text-text-muted mb-2">Description</label>
+                                <RichTextEditor
+                                    value={note}
+                                    onChange={setNote}
+                                    placeholder="What happened today?"
+                                    minHeight="150px"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs uppercase font-black tracking-widest text-text-muted mb-2">Priority</label>
+                                    <select
+                                        className="w-full bg-background border border-border rounded-xl p-3 text-sm text-text focus:border-accent"
+                                        value={priority}
+                                        onChange={(e) => setPriority(e.target.value)}
+                                    >
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
                                 </div>
-
-                                <div className="flex items-center gap-2 mt-1 mb-2">
-                                    <span className={`text-xs px-2 py-0.5 rounded border ${work.priority === 'High' ? 'border-red-500 text-red-500 bg-red-500/10' :
-                                        work.priority === 'Low' ? 'border-green-500 text-green-500 bg-green-500/10' :
-                                            'border-yellow-500 text-yellow-500 bg-yellow-500/10'
-                                        }`}>
-                                        {work.priority || 'Medium'}
-                                    </span>
-                                    {work.deadline && (
-                                        <span className="text-xs text-text-muted flex items-center gap-1">
-                                            <Calendar size={12} />
-                                            {format(new Date(work.deadline), 'MMM d, yyyy')}
-                                        </span>
-                                    )}
+                                <div>
+                                    <label className="block text-xs uppercase font-black tracking-widest text-text-muted mb-2">Deadline</label>
+                                    <input
+                                        type="date"
+                                        className="w-full bg-background border border-border rounded-xl p-3 text-sm text-text focus:border-accent [color-scheme:dark]"
+                                        value={deadline}
+                                        onChange={(e) => setDeadline(e.target.value)}
+                                    />
                                 </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase font-black tracking-widest text-text-muted mb-2">Assign To</label>
+                                <div className="relative">
+                                    <select
+                                        className="w-full bg-background border border-border rounded-xl p-3 text-sm text-text appearance-none focus:border-accent"
+                                        value={assignedTo}
+                                        onChange={(e) => setAssignedTo(e.target.value)}
+                                    >
+                                        <option value="Ansh">Ansh</option>
+                                        <option value="Navtej">Navtej</option>
+                                    </select>
+                                    <User className="absolute right-3 top-3 text-text-muted pointer-events-none" size={18} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase font-black tracking-widest text-text-muted mb-2">Progress: {progress}%</label>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    value={progress}
+                                    onChange={(e) => setProgress(Number(e.target.value))}
+                                    className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-4 rounded-xl transition-all shadow-lg shadow-accent/20 flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {loading ? 'Adding...' : 'Add Update'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
 
-                                <div className="flex justify-between items-start gap-2">
-                                    {editingId === work._id ? (
-                                        <div className="flex-1">
-                                            <RichTextEditor
-                                                value={editContent}
-                                                onChange={setEditContent}
-                                                minHeight="80px"
-                                                className="mb-2"
-                                            />
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-                                                <div>
-                                                    <label className="text-xs text-text-muted mb-1 block">Priority</label>
-                                                    <select
-                                                        className="w-full bg-background border border-border rounded p-2 text-text text-sm"
-                                                        value={editPriority}
-                                                        onChange={(e) => setEditPriority(e.target.value)}
-                                                    >
-                                                        <option value="High">High</option>
-                                                        <option value="Medium">Medium</option>
-                                                        <option value="Low">Low</option>
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs text-text-muted mb-1 block">Deadline</label>
-                                                    <input
-                                                        type="date"
-                                                        className="w-full bg-background border border-border rounded p-2 text-text text-sm"
-                                                        value={editDeadline}
-                                                        onChange={(e) => setEditDeadline(e.target.value)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="mb-2">
-                                                <label className="text-xs text-text-muted mb-1 block">
-                                                    Progress: {editProgress}%
-                                                    {work.hasTodos && <span className="ml-2 text-accent italic">(Auto-calculated from Tasks)</span>}
-                                                </label>
-                                                <input
-                                                    type="range"
-                                                    min="0"
-                                                    max="100"
-                                                    value={editProgress}
-                                                    onChange={(e) => setEditProgress(Number(e.target.value))}
-                                                    disabled={work.hasTodos}
-                                                    className={`w-full h-1 bg-border rounded-lg appearance-none ${work.hasTodos ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} accent-accent`}
-                                                />
-                                            </div>
-                                            <div className="flex justify-end gap-2 mt-2">
-                                                <span className="text-xs text-text-muted self-center">
-                                                    {saving ? 'Auto-saving...' : 'Saved'}
-                                                </span>
-                                                <button onClick={cancelEditing} className="text-xs bg-red-500/10 text-red-500 px-2 py-1 rounded hover:bg-red-500/20">
-                                                    Done
-                                                </button>
-                                            </div>
+                {/* Section 2: Work Progress Feed */}
+                <div className={`${activeMobileTab === 'feed' ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-card rounded-xl border border-border p-4 md:p-6 shadow-lg overflow-hidden order-1 md:order-2 h-full`}>
+                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <Clock size={24} className="text-accent" />
+                        Updates Feed
+                    </h2>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2 pb-10">
+                        {works.length === 0 ? (
+                            <div className="text-center text-text-muted opacity-50 py-20">No updates yet.</div>
+                        ) : (
+                            works.map((work) => (
+                                <div key={work._id} className="bg-background/40 backdrop-blur-sm border border-border/50 p-4 rounded-2xl flex flex-col gap-3 hover:border-accent/40 transition-all group relative overflow-hidden">
+                                    <div className="flex justify-between items-start z-10">
+                                        <div className="flex items-center gap-2">
+                                            <span className="bg-accent/10 text-accent text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-widest">
+                                                {work.assignedTo}
+                                            </span>
+                                            <span className={`text-[10px] px-2 py-1 rounded-lg font-black uppercase tracking-widest ${work.priority === 'High' ? 'bg-red-500/10 text-red-500 border border-red-500/20' :
+                                                work.priority === 'Low' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                                                    'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
+                                                }`}>
+                                                {work.priority || 'Medium'}
+                                            </span>
                                         </div>
-                                    ) : (
-                                        <div className="flex-1 flex flex-col gap-2">
-                                            <div
-                                                className="text-text leading-relaxed mt-1 whitespace-pre-wrap prose prose-invert max-w-none prose-p:my-0 prose-headings:my-1"
-                                                dangerouslySetInnerHTML={{ __html: work.note }}
-                                            />
-                                            {work.progress !== undefined && (
-                                                <div className="flex items-center gap-2 mt-2">
-                                                    <div className="w-full bg-border/30 h-1.5 rounded-full overflow-hidden">
+                                        <span className="text-[10px] text-text-muted font-black uppercase tracking-tighter">
+                                            {format(new Date(work.timestamp), 'MMM d, HH:mm')}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-start gap-4 z-10">
+                                        {editingId === work._id ? (
+                                            <div className="flex-1 space-y-3">
+                                                <RichTextEditor
+                                                    value={editContent}
+                                                    onChange={setEditContent}
+                                                    minHeight="100px"
+                                                />
+                                                <div className="flex justify-end gap-2">
+                                                    <span className="text-[10px] text-text-muted self-center uppercase font-black">
+                                                        {saving ? 'Saving...' : 'Auto-Saved'}
+                                                    </span>
+                                                    <button onClick={cancelEditing} className="text-xs bg-accent text-white px-4 py-2 rounded-lg font-bold">
+                                                        Close Editor
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex-1 flex flex-col gap-3">
+                                                <div
+                                                    className="text-sm md:text-base text-text/90 leading-relaxed prose prose-invert max-w-none prose-p:my-0"
+                                                    dangerouslySetInnerHTML={{ __html: work.note }}
+                                                />
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex-1 bg-border/20 h-2 rounded-full overflow-hidden">
                                                         <div
-                                                            className="h-full bg-accent transition-all duration-500"
+                                                            className="h-full bg-accent transition-all duration-1000 ease-out"
                                                             style={{ width: `${work.progress}%` }}
                                                         />
                                                     </div>
-                                                    <span
-                                                        className="text-2xl font-bold text-accent"
-                                                        style={{
-                                                            textShadow: '0 0 10px rgba(var(--accent-rgb), 0.5), 0 0 20px rgba(var(--accent-rgb), 0.3)'
-                                                        }}
-                                                    >
-                                                        {work.progress}%
-                                                    </span>
-                                                    {work.hasTodos && (
-                                                        <span className="text-[10px] bg-accent/20 text-accent px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">
-                                                            AUTO
-                                                        </span>
-                                                    )}
+                                                    <span className="text-xl font-black text-accent">{work.progress}%</span>
                                                 </div>
-                                            )}
+                                            </div>
+                                        )}
+
+                                        <div className="flex flex-col gap-2">
+                                            <button
+                                                onClick={() => editingId === work._id ? cancelEditing() : startEditing(work)}
+                                                className={`p-3 rounded-xl transition-all ${editingId === work._id ? 'bg-accent text-white' : 'bg-background/50 text-text-muted hover:text-accent border border-border/50'}`}
+                                            >
+                                                {editingId === work._id ? <X size={18} /> : <Edit2 size={18} />}
+                                            </button>
+                                            <button
+                                                onClick={() => setActiveTodoWorkId(work._id)}
+                                                className="p-3 bg-background/50 rounded-xl text-text-muted hover:text-accent border border-border/50 transition-all"
+                                            >
+                                                <CheckSquare size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => deleteWork(work._id)}
+                                                className="p-3 bg-background/50 rounded-xl text-text-muted hover:text-red-500 border border-border/50 transition-all"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </div>
-                                    )}
-                                    <div className="flex flex-col gap-1">
-                                        <button
-                                            onClick={() => editingId === work._id ? cancelEditing() : startEditing(work)}
-                                            className={`text-text-muted transition-colors p-1 ${editingId === work._id ? 'text-accent' : 'hover:text-accent'}`}
-                                        >
-                                            {editingId === work._id ? <X size={16} /> : <Edit2 size={16} />}
-                                        </button>
-                                        <button
-                                            onClick={() => setActiveTodoWorkId(work._id)}
-                                            className="text-text-muted hover:text-accent transition-colors p-1"
-                                            title="To-Do List"
-                                        >
-                                            <CheckSquare size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() => deleteWork(work._id)}
-                                            className="text-text-muted hover:text-red-500 transition-colors p-1"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                        ))
-                    )}
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
-            {/* Todo List Modal */}
+
+            {/* Todo List Modal - Mobile Drawer Style */}
             {activeTodoWorkId && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                    <div className="bg-card w-full max-w-4xl h-[90vh] rounded-xl overflow-hidden relative border border-border shadow-2xl flex flex-col">
-                        <div className="absolute top-4 right-4 z-10">
+                <div className="fixed inset-0 bg-black/90 flex items-end md:items-center justify-center z-[100] backdrop-blur-md">
+                    <div className="bg-card w-full md:max-w-4xl h-[95vh] md:h-[90vh] rounded-t-3xl md:rounded-3xl overflow-hidden relative border-t md:border border-border shadow-2xl flex flex-col">
+                        <div className="w-12 h-1.5 bg-border rounded-full mx-auto mt-3 md:hidden" />
+                        <div className="absolute top-4 right-4 z-[110]">
                             <button
                                 onClick={() => setActiveTodoWorkId(null)}
-                                className="bg-background/80 hover:bg-red-500 text-text-muted hover:text-white rounded-full p-2 transition-all border border-border hover:border-red-500"
+                                className="bg-background/80 hover:bg-red-500 text-text-muted hover:text-white rounded-full p-3 transition-all border border-border shadow-xl"
                             >
-                                <X size={20} />
+                                <X size={24} />
                             </button>
                         </div>
-                        <div className="flex-1 p-2 h-full">
+                        <div className="flex-1 p-2 md:p-6 h-full overflow-hidden">
                             <TodoList
                                 agencyWorkId={activeTodoWorkId}
-                                title="Work Tasks"
+                                title="Task Manager"
                                 onUpdate={fetchWorks}
                             />
                         </div>

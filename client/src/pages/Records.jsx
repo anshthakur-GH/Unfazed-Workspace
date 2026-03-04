@@ -234,40 +234,45 @@ const Records = () => {
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-auto overflow-x-auto custom-scrollbar p-1">
-                            <div className="inline-block min-w-full">
-                                <table className="w-full border-collapse">
+                        <div className="flex-1 overflow-auto custom-scrollbar bg-background">
+                            <div className="min-w-max">
+                                <table className="w-full border-separate border-spacing-0">
                                     <thead>
                                         <tr>
                                             {/* Row Number Header */}
-                                            <th className="w-10 bg-card border border-border sticky top-0 left-0 z-20"></th>
-                                            {/* Column Headers (A-J for 10 cols) */}
+                                            <th className="w-12 bg-card border-b border-r border-border sticky top-0 left-0 z-30 p-3 text-[10px] font-black uppercase text-text-muted">#</th>
+                                            {/* Column Headers */}
                                             {Array.from({ length: 10 }).map((_, i) => (
-                                                <th key={i} className="min-w-[150px] p-2 bg-card border border-border text-xs text-text-muted font-mono sticky top-0 z-10">
-                                                    {String.fromCharCode(65 + i)}
+                                                <th key={i} className="min-w-[140px] md:min-w-[180px] p-3 bg-card border-b border-r border-border text-xs text-accent font-black sticky top-0 z-20">
+                                                    COL {String.fromCharCode(65 + i)}
                                                 </th>
                                             ))}
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {selectedRecord.data.map((row, rowIndex) => (
-                                            <tr key={rowIndex}>
+                                            <tr key={rowIndex} className="group hover:bg-white/[0.02] transition-colors">
                                                 {/* Row Number */}
-                                                <td className="p-2 bg-card border border-border text-xs text-text-muted font-mono text-center sticky left-0 z-10 w-10">
+                                                <td className="p-3 bg-card/80 backdrop-blur-sm border-b border-r border-border text-[11px] text-text-muted font-mono text-center sticky left-0 z-20 w-12 group-hover:text-accent group-hover:bg-card">
                                                     {rowIndex + 1}
                                                 </td>
                                                 {/* Cells */}
                                                 {row.map((cell, colIndex) => (
-                                                    <td key={`${rowIndex}-${colIndex}`} className="p-0 border border-border min-w-[150px]">
+                                                    <td key={`${rowIndex}-${colIndex}`} className="p-0 border-b border-r border-border focus-within:ring-2 focus-within:ring-accent/50 focus-within:z-10 transition-all relative">
                                                         <input
                                                             type="text"
                                                             value={cell || ''}
                                                             onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                                                            className={`w-full h-full px-3 py-2 bg-transparent text-sm focus:outline-none focus:bg-accent/5 focus:ring-1 focus:ring-accent inset-0 border-none
-                                                                ${rowIndex === 0 ? 'font-bold text-accent bg-accent/5' : 'text-text'}
+                                                            className={`w-full min-h-[50px] px-4 py-3 bg-transparent text-sm focus:outline-none transition-colors
+                                                                ${rowIndex === 0 ? 'font-black text-white bg-accent/10 placeholder:text-accent/30' : 'text-text focus:bg-accent/5'}
                                                             `}
-                                                            placeholder={rowIndex === 0 ? "Header" : ""}
+                                                            placeholder={rowIndex === 0 ? `Header ${String.fromCharCode(64 + colIndex + 1)}` : ""}
                                                         />
+                                                        {rowIndex === 0 && (
+                                                            <div className="absolute top-0 right-0 p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <Table size={12} className="text-accent/30" />
+                                                            </div>
+                                                        )}
                                                     </td>
                                                 ))}
                                             </tr>
@@ -276,6 +281,17 @@ const Records = () => {
                                 </table>
                             </div>
                         </div>
+
+                        {/* Mobile Quick Action: Scroll to start */}
+                        <button
+                            onClick={() => {
+                                const container = document.querySelector('.overflow-auto');
+                                if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
+                            }}
+                            className="fixed bottom-24 right-6 md:hidden bg-accent text-white p-4 rounded-full shadow-2xl z-50 active:scale-95 transition-transform"
+                        >
+                            <ChevronLeft size={24} />
+                        </button>
                     </>
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-text-muted opacity-50 space-y-4">

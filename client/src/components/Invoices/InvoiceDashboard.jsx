@@ -143,9 +143,10 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                 )}
             </div>
 
-            {/* Invoices Table */}
-            <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-                <div className="overflow-x-auto">
+            {/* Invoices Table (Desktop) / Card View (Mobile) */}
+            <div className="bg-card border border-border rounded-xl md:overflow-hidden shadow-sm">
+                {/* Desktop Table */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full min-w-[800px] text-left border-collapse">
                         <thead>
                             <tr className="bg-background/50 border-b border-border">
@@ -180,53 +181,67 @@ const InvoiceDashboard = ({ invoices, onCreateNew, onEdit, onDelete, onDuplicate
                                         {isAdmin && (
                                             <td className="p-4 text-right">
                                                 <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <button
-                                                        onClick={() => onDuplicate && onDuplicate(inv)}
-                                                        className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
-                                                        title="Duplicate"
-                                                    >
-                                                        <Copy className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onDownloadPDF(inv)}
-                                                        className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"
-                                                        title="Download PDF"
-                                                    >
-                                                        <Download className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onEdit(inv)}
-                                                        className="p-1.5 text-text-muted hover:text-blue-500 hover:bg-blue-500/10 rounded-md transition-colors"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onDelete(inv.id)}
-                                                        className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                                                    <button onClick={() => onDuplicate && onDuplicate(inv)} className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"><Copy className="w-4 h-4" /></button>
+                                                    <button onClick={() => onDownloadPDF(inv)} className="p-1.5 text-text-muted hover:text-accent hover:bg-accent/10 rounded-md transition-colors"><Download className="w-4 h-4" /></button>
+                                                    <button onClick={() => onEdit(inv)} className="p-1.5 text-text-muted hover:text-blue-500 hover:bg-blue-500/10 rounded-md transition-colors"><Edit className="w-4 h-4" /></button>
+                                                    <button onClick={() => onDelete(inv.id)} className="p-1.5 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors"><Trash2 className="w-4 h-4" /></button>
                                                 </div>
                                             </td>
                                         )}
                                     </tr>
                                 ))
                             ) : (
-                                <tr>
-                                    <td colSpan={isAdmin ? "6" : "5"} className="p-12 text-center text-text-muted">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="p-4 bg-background rounded-full">
-                                                <FileText className="w-6 h-6 opacity-50" />
-                                            </div>
-                                            <p>No invoices found</p>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <tr><td colSpan={isAdmin ? "6" : "5"} className="p-12 text-center text-text-muted">No invoices found</td></tr>
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden divide-y divide-border">
+                    {filteredInvoices.length > 0 ? (
+                        filteredInvoices.map((inv) => (
+                            <div key={inv.id} className="p-4 space-y-3 bg-secondary/10 active:bg-secondary/20 transition-colors">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-xs font-black text-accent uppercase tracking-widest">#{inv.invoiceNumber}</p>
+                                        <h4 className="text-base font-bold text-white mt-1">{inv.billTo?.name || 'Unknown Client'}</h4>
+                                        <p className="text-xs text-text-muted mt-0.5">{formatDate(inv.date)}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-lg font-black text-white">{formatCurrency(inv.total)}</p>
+                                        <button
+                                            onClick={() => isAdmin && onStatusChange && onStatusChange(inv.id, inv.status === 'paid' ? 'unpaid' : 'paid')}
+                                            className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider mt-2 border ${inv.status === 'paid'
+                                                ? 'bg-green-500/10 text-green-500 border-green-500/20'
+                                                : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
+                                                }`}
+                                        >
+                                            {inv.status}
+                                        </button>
+                                    </div>
+                                </div>
+                                {isAdmin && (
+                                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                        <div className="flex gap-1">
+                                            <button onClick={() => onDownloadPDF(inv)} className="p-2.5 text-text-muted bg-background border border-border rounded-xl"><Download size={16} /></button>
+                                            <button onClick={() => onDuplicate && onDuplicate(inv)} className="p-2.5 text-text-muted bg-background border border-border rounded-xl ml-2"><Copy size={16} /></button>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => onEdit(inv)} className="flex items-center gap-2 px-4 py-2.5 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-xl text-xs font-black uppercase tracking-widest">
+                                                <Edit size={14} /> Edit
+                                            </button>
+                                            <button onClick={() => onDelete(inv.id)} className="p-2.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl transition-colors">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-12 text-center text-text-muted">No invoices found</div>
+                    )}
                 </div>
             </div>
         </div>

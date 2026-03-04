@@ -139,11 +139,13 @@ const Subspaces = () => {
         }
     };
 
+    const [showList, setShowList] = useState(true);
+
     return (
-        <div className="flex flex-col md:flex-row h-full gap-6">
+        <div className="flex flex-col md:flex-row h-full gap-6 relative">
             {/* List of Subspaces */}
-            <div className="w-full md:w-1/3 flex flex-col gap-4 h-[40vh] md:h-auto">
-                <div className="bg-card p-4 rounded-xl border border-border">
+            <div className={`${showList ? 'flex' : 'hidden'} md:flex w-full md:w-1/3 flex-col gap-4 h-full`}>
+                <div className="bg-card p-4 rounded-xl border border-border h-full flex flex-col">
                     <h2 className="text-xl font-bold text-white mb-4">Subspaces</h2>
                     <form onSubmit={createSubspace} className="flex flex-col gap-2 mb-4">
                         <div className="flex gap-2">
@@ -178,29 +180,32 @@ const Subspaces = () => {
                             ))}
                         </div>
                     </form>
-                    <div className="space-y-2 overflow-y-auto max-h-[60vh] custom-scrollbar pr-2">
+                    <div className="space-y-2 overflow-y-auto custom-scrollbar pr-2 flex-1">
                         {subspaces.map(sub => (
                             <div
                                 key={sub._id}
-                                onClick={() => setSelectedSubspace(sub)}
-                                className={`p-3 rounded-lg cursor-pointer transition-all border ${selectedSubspace?._id === sub._id
+                                onClick={() => {
+                                    setSelectedSubspace(sub);
+                                    if (window.innerWidth < 768) setShowList(false);
+                                }}
+                                className={`p-4 rounded-xl cursor-pointer transition-all border ${selectedSubspace?._id === sub._id
                                     ? 'bg-accent/10 border-accent text-accent'
                                     : 'bg-background hover:bg-border/50 border-transparent text-text-muted'
                                     }`}
                             >
-                                <div className="font-medium flex items-center justify-between">
+                                <div className="font-bold flex items-center justify-between">
                                     <span className="truncate">{sub.title}</span>
                                     <div className="flex gap-1">
                                         {sub.assignedTo?.map(user => (
                                             <span key={user} className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded border border-border">
-                                                {user}
+                                                {user.charAt(0)}
                                             </span>
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="flex justify-between items-center mt-1">
-                                    <div className="text-xs opacity-70">
+                                <div className="flex justify-between items-center mt-2">
+                                    <div className="text-[10px] opacity-50 uppercase tracking-widest font-black">
                                         {new Date(sub.createdAt).toLocaleDateString()}
                                     </div>
                                     <button
@@ -217,53 +222,62 @@ const Subspaces = () => {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 bg-card rounded-xl border border-border p-6 flex flex-col">
+            <div className={`${!showList ? 'flex' : 'hidden'} md:flex flex-1 bg-card rounded-xl border border-border p-4 md:p-6 flex flex-col h-full`}>
                 {selectedSubspace ? (
                     <>
-                        <div className="flex justify-between items-center mb-6">
-                            {isEditingTitle ? (
-                                <input
-                                    type="text"
-                                    value={editedTitle}
-                                    onChange={(e) => setEditedTitle(e.target.value)}
-                                    onBlur={updateTitle}
-                                    onKeyDown={(e) => e.key === 'Enter' && updateTitle()}
-                                    autoFocus
-                                    className="text-2xl font-bold text-white bg-transparent border-b border-accent focus:outline-none"
-                                />
-                            ) : (
-                                <h2
-                                    className="text-2xl font-bold text-white cursor-pointer hover:text-accent transition-colors"
-                                    onClick={() => setIsEditingTitle(true)}
-                                    title="Click to rename"
+                        <div className="flex justify-between items-center mb-6 gap-3">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                                <button
+                                    onClick={() => setShowList(true)}
+                                    className="md:hidden p-2 -ml-2 text-accent"
                                 >
-                                    {selectedSubspace.title}
-                                </h2>
-                            )}
+                                    <Plus className="rotate-45" size={24} />
+                                </button>
+                                {isEditingTitle ? (
+                                    <input
+                                        type="text"
+                                        value={editedTitle}
+                                        onChange={(e) => setEditedTitle(e.target.value)}
+                                        onBlur={updateTitle}
+                                        onKeyDown={(e) => e.key === 'Enter' && updateTitle()}
+                                        autoFocus
+                                        className="text-xl md:text-2xl font-bold text-white bg-transparent border-b border-accent focus:outline-none w-full"
+                                    />
+                                ) : (
+                                    <h2
+                                        className="text-xl md:text-2xl font-bold text-white cursor-pointer hover:text-accent transition-colors truncate"
+                                        onClick={() => setIsEditingTitle(true)}
+                                        title="Click to rename"
+                                    >
+                                        {selectedSubspace.title}
+                                    </h2>
+                                )}
+                            </div>
                             <button
                                 onClick={updateContent}
                                 disabled={loading}
-                                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+                                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-3 py-2 rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
                             >
                                 <Save size={18} />
-                                {loading ? 'Saving...' : 'Save Notes'}
+                                <span className="hidden sm:inline">{loading ? 'Saving...' : 'Save'}</span>
                             </button>
                         </div>
                         <RichTextEditor
                             value={noteContent}
                             onChange={setNoteContent}
-                            placeholder="Type your notes here... (Simulated file uploads: just type '[File: name.pdf]')"
-                            className="flex-1 overflow-hidden flex flex-col"
+                            placeholder="Type notes..."
+                            className="flex-1 overflow-hidden"
                             minHeight="100%"
                         />
-                        <div className="mt-2 text-xs text-text-muted">
-                            Auto-fetch enabled. Last saved: {new Date().toLocaleTimeString()}
+                        <div className="mt-2 text-[10px] text-text-muted flex justify-between uppercase font-black tracking-widest">
+                            <span>Auto-fetch enabled</span>
+                            <span>{new Date().toLocaleTimeString()}</span>
                         </div>
                     </>
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-text-muted opacity-50">
-                        <FileText size={48} className="mb-4" />
-                        <p>Select a subspace to view notes</p>
+                    <div className="flex flex-col items-center justify-center h-full text-text-muted opacity-50 p-10 text-center">
+                        <FileText size={64} className="mb-4" />
+                        <p>Select or create a subspace</p>
                     </div>
                 )}
             </div>

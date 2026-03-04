@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock } from 'lucide-react';
+import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X } from 'lucide-react';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
 import CustomCalendar from './CustomCalendar';
 
@@ -18,6 +18,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [editingText, setEditingText] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
+    const [showMobileForm, setShowMobileForm] = useState(false);
     const [isAdmin, setIsAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
 
     useEffect(() => {
@@ -239,81 +240,113 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
 
 
             {(!readOnly || isAdmin) && (
-                <form onSubmit={addTodo} className="flex flex-col gap-4 mb-8">
-                    <div className="flex flex-col md:flex-row gap-4">
-                        <input
-                            type="text"
-                            placeholder="Add a new task..."
-                            className="flex-1 bg-background border border-border rounded-lg px-4 py-3 text-text focus:outline-none focus:border-accent"
-                            value={newTask}
-                            onChange={(e) => setNewTask(e.target.value)}
-                        />
-                        <div className="relative">
-                            <button type="button" onClick={() => setShowCalendar(!showCalendar)} className="w-full md:w-auto flex items-center justify-center gap-2 bg-background border border-border rounded-lg px-4 py-3 text-text hover:border-accent transition-colors min-w-[160px]">
-                                <Calendar size={20} className="text-accent" />
-                                <span>{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
-                            </button>
-                            {showCalendar && (
-                                <div className="absolute top-full left-0 mt-2 z-50">
-                                    <CustomCalendar
-                                        selectedDate={newDate}
-                                        onChange={(date) => {
-                                            setNewDate(date);
-                                            setShowCalendar(false);
-                                        }}
-                                        onClose={() => setShowCalendar(false)}
-                                    />
+                <div className="mb-8">
+                    {/* Mobile: Toggle Button for Form */}
+                    <button
+                        onClick={() => setShowMobileForm(!showMobileForm)}
+                        className="w-full md:hidden bg-accent/10 border border-accent/20 text-accent font-black py-4 rounded-2xl flex items-center justify-center gap-2 mb-4 active:scale-95 transition-all"
+                    >
+                        {showMobileForm ? <X size={20} /> : <Plus size={20} />}
+                        {showMobileForm ? 'Close Form' : 'Add New Task'}
+                    </button>
+
+                    <form
+                        onSubmit={addTodo}
+                        className={`flex flex-col gap-4 ${!showMobileForm ? 'hidden md:flex' : 'flex'} bg-secondary/10 p-4 md:p-0 rounded-2xl md:bg-transparent border border-border md:border-0`}
+                    >
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1 relative group">
+                                <input
+                                    type="text"
+                                    placeholder="What needs to be done?"
+                                    className="w-full bg-background border border-border rounded-xl px-4 py-4 md:py-3 text-white focus:outline-none focus:border-accent transition-all pl-12"
+                                    value={newTask}
+                                    onChange={(e) => setNewTask(e.target.value)}
+                                />
+                                <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-accent transition-colors" size={20} />
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="relative flex-1 sm:flex-none">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCalendar(!showCalendar)}
+                                        className="w-full sm:w-auto flex items-center justify-between sm:justify-center gap-3 bg-background border border-border rounded-xl px-5 py-4 md:py-3 text-text hover:border-accent transition-colors min-w-[180px]"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <Calendar size={18} className="text-accent" />
+                                            <span className="font-bold">{newDate === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(parseISO(newDate), 'MMM d, yyyy')}</span>
+                                        </div>
+                                        <div className="sm:hidden text-text-muted">▼</div>
+                                    </button>
+                                    {showCalendar && (
+                                        <div className="fixed sm:absolute inset-0 sm:inset-auto sm:top-full sm:left-0 z-[60] flex items-center justify-center sm:block p-4 sm:p-0 bg-black/60 sm:bg-transparent backdrop-blur-sm sm:backdrop-blur-0">
+                                            <div className="bg-card border border-border rounded-2xl shadow-2xl p-2 scale-110 sm:scale-100">
+                                                <CustomCalendar
+                                                    selectedDate={newDate}
+                                                    onChange={(date) => {
+                                                        setNewDate(date);
+                                                        setShowCalendar(false);
+                                                    }}
+                                                    onClose={() => setShowCalendar(false)}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
 
-                        {/* Priority Selection */}
-                        <div className="flex gap-2 bg-background border border-border rounded-lg p-1">
-                            {['High', 'Medium', 'Low'].map((p) => (
-                                <button
-                                    key={p}
-                                    type="button"
-                                    onClick={() => setPriority(p)}
-                                    className={`px-3 py-2 rounded-md text-xs font-bold transition-all ${priority === p
-                                        ? (p === 'High' ? 'bg-red-500/20 text-red-500 border border-red-500/50' :
-                                            p === 'Medium' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' :
-                                                'bg-green-500/20 text-green-500 border-green-500/50')
-                                        : 'text-text-muted hover:text-text'
-                                        }`}
-                                >
-                                    {p}
-                                </button>
-                            ))}
-                        </div>
+                                {/* Priority Selection - Mobile Optimized */}
+                                <div className="flex items-center gap-2 bg-background border border-border rounded-xl p-1.5 flex-1 sm:flex-none">
+                                    {['High', 'Medium', 'Low'].map((p) => (
+                                        <button
+                                            key={p}
+                                            type="button"
+                                            onClick={() => setPriority(p)}
+                                            className={`flex-1 sm:px-4 py-3 sm:py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${priority === p
+                                                ? (p === 'High' ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' :
+                                                    p === 'Medium' ? 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/20' :
+                                                        'bg-green-500 text-white shadow-lg shadow-green-500/20')
+                                                : 'text-text-muted hover:text-text hover:bg-secondary/20'
+                                                }`}
+                                        >
+                                            {p}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
 
-                        <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-bold transition-colors w-full md:w-auto">
-                            Add Task
-                        </button>
-                    </div>
-
-                    {/* Tags Selection */}
-                    <div className="flex flex-wrap gap-2">
-                        {AVAILABLE_TAGS.map(tag => (
-                            <button
-                                key={tag}
-                                type="button"
-                                onClick={() => {
-                                    if (selectedTags.includes(tag)) {
-                                        setSelectedTags(selectedTags.filter(t => t !== tag));
-                                    } else {
-                                        setSelectedTags([...selectedTags, tag]);
-                                    }
-                                }}
-                                className={`px-3 py-1 rounded-full text-xs font-medium transition-all border ${selectedTags.includes(tag)
-                                    ? 'bg-accent text-white border-accent'
-                                    : 'bg-background text-text-muted border-border hover:border-accent'
-                                    }`}
-                            >
-                                {tag}
+                            <button type="submit" className="bg-accent hover:bg-accent-hover text-white px-8 py-4 md:py-3 rounded-xl font-black uppercase tracking-widest transition-all shadow-lg shadow-accent/20">
+                                Add Task
                             </button>
-                        ))}
-                    </div>
-                </form>
+                        </div>
+
+                        {/* Tags Selection - Mobile Scroll */}
+                        <div className="flex flex-col gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Assign Tags</span>
+                            <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+                                {AVAILABLE_TAGS.map(tag => (
+                                    <button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => {
+                                            if (selectedTags.includes(tag)) {
+                                                setSelectedTags(selectedTags.filter(t => t !== tag));
+                                            } else {
+                                                setSelectedTags([...selectedTags, tag]);
+                                            }
+                                        }}
+                                        className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all border whitespace-nowrap ${selectedTags.includes(tag)
+                                            ? 'bg-accent text-white border-accent shadow-md shadow-accent/10'
+                                            : 'bg-background text-text-muted border-border hover:border-accent'
+                                            }`}
+                                    >
+                                        {tag}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </form>
+                </div>
             )}
 
             <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
