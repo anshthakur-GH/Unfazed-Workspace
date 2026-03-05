@@ -97,65 +97,65 @@ input[type=number]::-webkit-outer-spin-button {
 /* Mobile Scalability Resets */
 @media (max-width: 768px) {
   h1 {
-    @apply text-2xl !important;
+    @apply !text-2xl;
   }
 
   h2 {
-    @apply text-xl !important;
+    @apply !text-xl;
   }
 
   h3 {
-    @apply text-lg !important;
+    @apply !text-lg;
   }
 
   /* Scale down common text sizes */
   .text-4xl {
-    @apply text-2xl !important;
+    @apply !text-2xl;
   }
 
   .text-3xl {
-    @apply text-xl !important;
+    @apply !text-xl;
   }
 
   .text-2xl {
-    @apply text-lg !important;
+    @apply !text-lg;
   }
 
   .text-xl {
-    @apply text-base !important;
+    @apply !text-base;
   }
 
   .text-base {
-    @apply text-sm !important;
+    @apply !text-sm;
   }
 
   .text-sm {
-    @apply text-[11px] !important;
+    @apply !text-[11px];
   }
 
   /* Scale down buttons and interactive elements */
   button {
-    @apply scale-95 transition-transform active:scale-90 !important;
+    @apply !scale-95 !transition-transform active:!scale-90;
   }
 
   .py-4 {
-    @apply py-2.5 !important;
+    @apply !py-2.5;
   }
 
   .px-6 {
-    @apply px-4 !important;
+    @apply !px-4;
   }
 
   .px-8 {
-    @apply px-5 !important;
+    @apply !px-5;
   }
 
   .p-6 {
-    @apply p-4 !important;
+    @apply !p-4;
   }
 
   .p-8 {
-    @apply p-5 !important;
+    @apply !p-5;
   }
 }
 

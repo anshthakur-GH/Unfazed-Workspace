@@ -141,39 +141,35 @@ export const generateInvoicePDF = (invoice) => {
     });
 
     // Totals & Adjustments
-    const labelX = 105;  // Base position for labels
-    const maxX = 190;    // Maximum right edge for values
+    const labelColumnX = 135; // Shifted further left to 135 to definitively prevent overlap
+    const valueColumnX = 190; // Right-align values at this position (right margin)
     let currentYz = doc.lastAutoTable.finalY + 10;
 
     const safeDiscount = invoice.discount || { type: 'percentage', value: 0 };
     const safeTax = invoice.tax || { type: 'percentage', value: 0 };
 
-    const drawValueRight = (text, y) => {
-        const textWidth = doc.getTextWidth(text);
-        doc.text(text, maxX - textWidth, y);
-    };
-
     // Subtotal
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80);
-    doc.text('Subtotal:', labelX, currentYz);
-    drawValueRight(formatCurrencyPDF(invoice.subtotal || 0), currentYz);
+    doc.text('Subtotal:', labelColumnX, currentYz, { align: 'right' });
+    doc.text(formatCurrencyPDF(invoice.subtotal || 0), valueColumnX, currentYz, { align: 'right' });
     currentYz += 7;
 
     // Discount
     if (safeDiscount.value > 0) {
-        doc.text(`Discount (${safeDiscount.type === 'percentage' ? safeDiscount.value + '%' : 'Fixed'}):`, labelX, currentYz);
+        const discountLabel = `Discount (${safeDiscount.type === 'percentage' ? safeDiscount.value + '%' : 'Fixed'}):`;
+        doc.text(discountLabel, labelColumnX, currentYz, { align: 'right' });
         const discountAmount = safeDiscount.type === 'percentage'
             ? ((invoice.subtotal || 0) * safeDiscount.value / 100)
             : safeDiscount.value;
-        drawValueRight(`- ${formatCurrencyPDF(discountAmount)}`, currentYz);
+        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, valueColumnX, currentYz, { align: 'right' });
         currentYz += 7;
     }
 
     // Tax
     if (safeTax.value > 0) {
-        doc.text(`Tax (${safeTax.value}%):`, labelX, currentYz);
+        doc.text(`Tax (${safeTax.value}%):`, labelColumnX, currentYz, { align: 'right' });
 
         let taxable = (invoice.subtotal || 0);
         if (safeDiscount.value > 0) {
@@ -183,29 +179,29 @@ export const generateInvoicePDF = (invoice) => {
         }
         const taxAmount = taxable * (safeTax.value / 100);
 
-        drawValueRight(`+ ${formatCurrencyPDF(taxAmount)}`, currentYz);
+        doc.text(`+ ${formatCurrencyPDF(taxAmount)}`, valueColumnX, currentYz, { align: 'right' });
         currentYz += 7;
     }
 
     // Shipping
     if ((invoice.shipping || 0) > 0) {
-        doc.text('Shipping:', labelX, currentYz);
-        drawValueRight(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, currentYz);
+        doc.text('Shipping:', labelColumnX, currentYz, { align: 'right' });
+        doc.text(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, valueColumnX, currentYz, { align: 'right' });
         currentYz += 7;
     }
 
     // Divider
     doc.setDrawColor(200);
     doc.setLineWidth(0.3);
-    doc.line(labelX, currentYz, maxX, currentYz);
+    doc.line(labelColumnX - 45, currentYz, valueColumnX, currentYz);
     currentYz += 8;
 
     // Total
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...DARK_GRAY);
-    doc.text('Total:', labelX, currentYz);
-    drawValueRight(formatCurrencyPDF(invoice.total), currentYz);
+    doc.text('Total:', labelColumnX, currentYz, { align: 'right' });
+    doc.text(formatCurrencyPDF(invoice.total), valueColumnX, currentYz, { align: 'right' });
     currentYz += 8;
 
     // Amount Paid
@@ -213,8 +209,8 @@ export const generateInvoicePDF = (invoice) => {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(80);
-        doc.text('Amount Paid:', labelX, currentYz);
-        drawValueRight(`- ${formatCurrencyPDF(invoice.amountPaid)}`, currentYz);
+        doc.text('Amount Paid:', labelColumnX, currentYz, { align: 'right' });
+        doc.text(`- ${formatCurrencyPDF(invoice.amountPaid)}`, valueColumnX, currentYz, { align: 'right' });
         currentYz += 7;
     }
 
@@ -223,8 +219,8 @@ export const generateInvoicePDF = (invoice) => {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...ORANGE);
-        doc.text('Balance Due:', labelX, currentYz);
-        drawValueRight(formatCurrencyPDF(invoice.balanceDue), currentYz);
+        doc.text('Balance Due:', labelColumnX, currentYz, { align: 'right' });
+        doc.text(formatCurrencyPDF(invoice.balanceDue), valueColumnX, currentYz, { align: 'right' });
     }
 
     // --- FOOTER / NOTES (Dynamic Height Boxes) ---
