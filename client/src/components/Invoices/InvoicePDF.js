@@ -141,19 +141,24 @@ export const generateInvoicePDF = (invoice) => {
     });
 
     // Totals & Adjustments
-    const labelX = 130;  // Shifted left from 150 to avoid overlap
-    const valueX = 190;
+    const labelX = 105;  // Base position for labels
+    const maxX = 190;    // Maximum right edge for values
     let currentYz = doc.lastAutoTable.finalY + 10;
 
     const safeDiscount = invoice.discount || { type: 'percentage', value: 0 };
     const safeTax = invoice.tax || { type: 'percentage', value: 0 };
+
+    const drawValueRight = (text, y) => {
+        const textWidth = doc.getTextWidth(text);
+        doc.text(text, maxX - textWidth, y);
+    };
 
     // Subtotal
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80);
     doc.text('Subtotal:', labelX, currentYz);
-    doc.text(formatCurrencyPDF(invoice.subtotal || 0), valueX, currentYz, { align: 'right' });
+    drawValueRight(formatCurrencyPDF(invoice.subtotal || 0), currentYz);
     currentYz += 7;
 
     // Discount
@@ -162,7 +167,7 @@ export const generateInvoicePDF = (invoice) => {
         const discountAmount = safeDiscount.type === 'percentage'
             ? ((invoice.subtotal || 0) * safeDiscount.value / 100)
             : safeDiscount.value;
-        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, valueX, currentYz, { align: 'right' });
+        drawValueRight(`- ${formatCurrencyPDF(discountAmount)}`, currentYz);
         currentYz += 7;
     }
 
@@ -178,21 +183,21 @@ export const generateInvoicePDF = (invoice) => {
         }
         const taxAmount = taxable * (safeTax.value / 100);
 
-        doc.text(`+ ${formatCurrencyPDF(taxAmount)}`, valueX, currentYz, { align: 'right' });
+        drawValueRight(`+ ${formatCurrencyPDF(taxAmount)}`, currentYz);
         currentYz += 7;
     }
 
     // Shipping
     if ((invoice.shipping || 0) > 0) {
         doc.text('Shipping:', labelX, currentYz);
-        doc.text(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, valueX, currentYz, { align: 'right' });
+        drawValueRight(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, currentYz);
         currentYz += 7;
     }
 
     // Divider
     doc.setDrawColor(200);
     doc.setLineWidth(0.3);
-    doc.line(labelX, currentYz, valueX, currentYz);
+    doc.line(labelX, currentYz, maxX, currentYz);
     currentYz += 8;
 
     // Total
@@ -200,7 +205,7 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...DARK_GRAY);
     doc.text('Total:', labelX, currentYz);
-    doc.text(formatCurrencyPDF(invoice.total), valueX, currentYz, { align: 'right' });
+    drawValueRight(formatCurrencyPDF(invoice.total), currentYz);
     currentYz += 8;
 
     // Amount Paid
@@ -209,7 +214,7 @@ export const generateInvoicePDF = (invoice) => {
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(80);
         doc.text('Amount Paid:', labelX, currentYz);
-        doc.text(`- ${formatCurrencyPDF(invoice.amountPaid)}`, valueX, currentYz, { align: 'right' });
+        drawValueRight(`- ${formatCurrencyPDF(invoice.amountPaid)}`, currentYz);
         currentYz += 7;
     }
 
@@ -219,7 +224,7 @@ export const generateInvoicePDF = (invoice) => {
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...ORANGE);
         doc.text('Balance Due:', labelX, currentYz);
-        doc.text(formatCurrencyPDF(invoice.balanceDue), valueX, currentYz, { align: 'right' });
+        drawValueRight(formatCurrencyPDF(invoice.balanceDue), currentYz);
     }
 
     // --- FOOTER / NOTES (Dynamic Height Boxes) ---
