@@ -141,31 +141,34 @@ export const generateInvoicePDF = (invoice) => {
     });
 
     // Totals & Adjustments
-    const rightColX = 150;
-    const valColX = 190;
+    const labelX = 130;  // Shifted left from 150 to avoid overlap
+    const valueX = 190;
     let currentYz = doc.lastAutoTable.finalY + 10;
 
     const safeDiscount = invoice.discount || { type: 'percentage', value: 0 };
     const safeTax = invoice.tax || { type: 'percentage', value: 0 };
 
     // Subtotal
-    doc.text('Subtotal:', rightColX, currentYz);
-    doc.text(formatCurrencyPDF(invoice.subtotal || 0), valColX, currentYz, { align: 'right' });
-    currentYz += 6;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80);
+    doc.text('Subtotal:', labelX, currentYz);
+    doc.text(formatCurrencyPDF(invoice.subtotal || 0), valueX, currentYz, { align: 'right' });
+    currentYz += 7;
 
     // Discount
     if (safeDiscount.value > 0) {
-        doc.text(`Discount (${safeDiscount.type === 'percentage' ? safeDiscount.value + '%' : 'Fixed'}):`, rightColX, currentYz);
+        doc.text(`Discount (${safeDiscount.type === 'percentage' ? safeDiscount.value + '%' : 'Fixed'}):`, labelX, currentYz);
         const discountAmount = safeDiscount.type === 'percentage'
             ? ((invoice.subtotal || 0) * safeDiscount.value / 100)
             : safeDiscount.value;
-        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, valColX, currentYz, { align: 'right' });
-        currentYz += 6;
+        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, valueX, currentYz, { align: 'right' });
+        currentYz += 7;
     }
 
     // Tax
     if (safeTax.value > 0) {
-        doc.text(`Tax (${safeTax.value}%):`, rightColX, currentYz);
+        doc.text(`Tax (${safeTax.value}%):`, labelX, currentYz);
 
         let taxable = (invoice.subtotal || 0);
         if (safeDiscount.value > 0) {
@@ -175,36 +178,39 @@ export const generateInvoicePDF = (invoice) => {
         }
         const taxAmount = taxable * (safeTax.value / 100);
 
-        doc.text(`+ ${formatCurrencyPDF(taxAmount)}`, valColX, currentYz, { align: 'right' });
-        currentYz += 6;
+        doc.text(`+ ${formatCurrencyPDF(taxAmount)}`, valueX, currentYz, { align: 'right' });
+        currentYz += 7;
     }
 
     // Shipping
     if ((invoice.shipping || 0) > 0) {
-        doc.text('Shipping:', rightColX, currentYz);
-        doc.text(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, valColX, currentYz, { align: 'right' });
-        currentYz += 6;
+        doc.text('Shipping:', labelX, currentYz);
+        doc.text(`+ ${formatCurrencyPDF(invoice.shipping || 0)}`, valueX, currentYz, { align: 'right' });
+        currentYz += 7;
     }
 
     // Divider
-    doc.setLineWidth(0.5);
-    doc.line(rightColX, currentYz, 190, currentYz);
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.3);
+    doc.line(labelX, currentYz, valueX, currentYz);
     currentYz += 8;
 
     // Total
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Total:', rightColX, currentYz);
-    doc.text(formatCurrencyPDF(invoice.total), valColX, currentYz, { align: 'right' });
+    doc.setTextColor(...DARK_GRAY);
+    doc.text('Total:', labelX, currentYz);
+    doc.text(formatCurrencyPDF(invoice.total), valueX, currentYz, { align: 'right' });
     currentYz += 8;
 
     // Amount Paid
     if (invoice.type !== 'quotation' && invoice.amountPaid > 0) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
-        doc.text('Amount Paid:', rightColX, currentYz);
-        doc.text(`- ${formatCurrencyPDF(invoice.amountPaid)}`, valColX, currentYz, { align: 'right' });
-        currentYz += 6;
+        doc.setTextColor(80);
+        doc.text('Amount Paid:', labelX, currentYz);
+        doc.text(`- ${formatCurrencyPDF(invoice.amountPaid)}`, valueX, currentYz, { align: 'right' });
+        currentYz += 7;
     }
 
     // Balance Due
@@ -212,8 +218,8 @@ export const generateInvoicePDF = (invoice) => {
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...ORANGE);
-        doc.text('Balance Due:', rightColX, currentYz);
-        doc.text(formatCurrencyPDF(invoice.balanceDue), valColX, currentYz, { align: 'right' });
+        doc.text('Balance Due:', labelX, currentYz);
+        doc.text(formatCurrencyPDF(invoice.balanceDue), valueX, currentYz, { align: 'right' });
     }
 
     // --- FOOTER / NOTES (Dynamic Height Boxes) ---

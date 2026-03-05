@@ -20,6 +20,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         notes: 'Includes complete workflow setup, API integrations, custom logic, testing, deployment, and 7-day support.',
         terms: 'https://unfazed-ai.online/policies',
     });
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (existingInvoice) {
@@ -94,15 +95,22 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         // Validation removed as per request
-        onSave({
-            ...formData,
-            subtotal,
-            total,
-            balanceDue,
-        });
+        setIsSaving(true);
+        try {
+            await onSave({
+                ...formData,
+                subtotal,
+                total,
+                balanceDue,
+            });
+        } catch (error) {
+            console.error("Error in onSave:", error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -488,9 +496,19 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                     </button>
                     <button
                         type="submit"
-                        className="flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium shadow-lg shadow-accent/20 transition-all"
+                        disabled={isSaving}
+                        className="flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent-hover text-white rounded-lg font-medium shadow-lg shadow-accent/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <Save className="w-5 h-5" /> Save Invoice
+                        {isSaving ? (
+                            <span className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                Saving...
+                            </span>
+                        ) : (
+                            <>
+                                <Save className="w-5 h-5" /> Save Invoice
+                            </>
+                        )}
                     </button>
                 </div>
             </form>
