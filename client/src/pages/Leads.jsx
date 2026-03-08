@@ -188,12 +188,30 @@ const Leads = () => {
         if (!a.reminderDate) return 1;
         if (!b.reminderDate) return -1;
 
-        // Sort the remaining leads by how close their reminder date is to TODAY (nearest first)
-        const now = new Date();
-        const diffA = Math.abs(new Date(a.reminderDate) - now);
-        const diffB = Math.abs(new Date(b.reminderDate) - now);
+        const dateA = startOfDay(parseISO(a.reminderDate));
+        const dateB = startOfDay(parseISO(b.reminderDate));
+        const today = startOfDay(new Date());
 
-        return diffA - diffB;
+        const isMissedA = dateA < today;
+        const isMissedB = dateB < today;
+
+        // Both missed: Sort descending (most recent missed first)
+        if (isMissedA && isMissedB) {
+            return dateB - dateA;
+        }
+
+        // A missed, B not: A comes first
+        if (isMissedA && !isMissedB) {
+            return -1;
+        }
+
+        // B missed, A not: B comes first
+        if (!isMissedA && isMissedB) {
+            return 1;
+        }
+
+        // Both upcoming: Sort ascending (nearest first)
+        return dateA - dateB;
     });
 
     return (

@@ -86,12 +86,22 @@ const Subspaces = () => {
     const [subspaces, setSubspaces] = useState([]);
     const [selectedSubspace, setSelectedSubspace] = useState(null);
     const [newTitle, setNewTitle] = useState('');
-    const [assignedTo, setAssignedTo] = useState([]); // ['Ansh', 'Navtej']
     const [noteContent, setNoteContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [editedTitle, setEditedTitle] = useState('');
-    const [isAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
+
+    // User Mapping for automation
+    const currentUsername = localStorage.getItem('username');
+    const USER_MAP = {
+        'Ansh_Unfazed': 'Ansh',
+        'Navtej_unfazed': 'Navtej',
+        'Ayush_Unfazed': 'Ayush',
+        'AnshSaxena_Unfazed': 'Ansh Saxena'
+    };
+    const friendlyName = USER_MAP[currentUsername] || 'Unknown';
+
+    const [isAdmin] = useState(currentUsername === 'Ansh_Unfazed');
     const [showList, setShowList] = useState(true);
     const lastSubspaceIdRef = useRef(null);
 
@@ -191,11 +201,10 @@ const Subspaces = () => {
         try {
             const res = await axios.post(`${API_URL}/api/subspaces`, {
                 title: newTitle,
-                assignedTo
+                assignedTo: [friendlyName] // Auto-assigned
             });
             setSubspaces([res.data, ...subspaces]);
             setNewTitle('');
-            setAssignedTo([]);
             setSelectedSubspace(res.data);
         } catch (err) {
             console.error(err);
@@ -265,25 +274,6 @@ const Subspaces = () => {
                             <button type="submit" className="bg-accent hover:bg-accent-hover text-white p-2 rounded-lg transition-colors">
                                 <Plus size={20} />
                             </button>
-                        </div>
-                        <div className="flex gap-2 text-xs flex-wrap">
-                            {['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'].map((user) => (
-                                <label
-                                    key={user}
-                                    className={`cursor-pointer px-2 py-1 rounded border border-border transition-colors ${assignedTo.includes(user) ? 'bg-accent/20 border-accent text-accent' : 'bg-background text-text-muted hover:bg-border/50'}`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        className="hidden"
-                                        checked={assignedTo.includes(user)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) setAssignedTo([...assignedTo, user]);
-                                            else setAssignedTo(assignedTo.filter(u => u !== user));
-                                        }}
-                                    />
-                                    {user}
-                                </label>
-                            ))}
                         </div>
                     </form>
                     <div className="overflow-y-auto custom-scrollbar pr-2 flex-1">

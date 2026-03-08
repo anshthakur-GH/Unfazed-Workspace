@@ -22,7 +22,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
-const AVAILABLE_TAGS = ['CC', 'SEO', 'Website', 'Lead', 'Meet', 'Outreach', 'Personal'];
+const AVAILABLE_TAGS = ['CC', 'Follow-up', 'Project', 'Website', 'Lead', 'Meet', 'Outreach', 'Personal'];
 
 const SortableTodoItem = ({ todo, toggleTodo, startEditing, editingTodoId, editingText, setEditingText, updateTodoTask, readOnly, isAdmin, view, reschedulingId, setReschedulingId, rescheduleTodo, deleteTodo }) => {
     const {

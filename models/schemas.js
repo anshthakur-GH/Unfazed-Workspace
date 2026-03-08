@@ -23,7 +23,7 @@ const todoSchema = new mongoose.Schema({
 
 const agencyWorkSchema = new mongoose.Schema({
     note: { type: String, required: true },
-    assignedTo: { type: String, enum: ['Ansh', 'Navtej'], required: true },
+    assignedTo: { type: String, enum: ['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'], required: true },
     progress: { type: Number, default: 0, min: 0, max: 100 },
     priority: { type: String, enum: ['High', 'Medium', 'Low'], default: 'Medium' },
     deadline: { type: Date },

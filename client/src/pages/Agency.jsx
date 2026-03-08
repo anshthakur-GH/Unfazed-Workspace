@@ -15,6 +15,7 @@ const Agency = () => {
     const [deadline, setDeadline] = useState('');
     const [loading, setLoading] = useState(false);
     const [activeTodoWorkId, setActiveTodoWorkId] = useState(null);
+    const [showAssignDropdown, setShowAssignDropdown] = useState(false);
 
     useEffect(() => {
         fetchWorks();
@@ -179,16 +180,45 @@ const Agency = () => {
                             </div>
                             <div>
                                 <label className="block text-xs uppercase font-black tracking-widest text-text-muted mb-2">Assign To</label>
-                                <div className="relative">
-                                    <select
-                                        className="w-full bg-background border border-border rounded-xl p-3 text-sm text-text appearance-none focus:border-accent"
-                                        value={assignedTo}
-                                        onChange={(e) => setAssignedTo(e.target.value)}
+                                <div className="relative group">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAssignDropdown(!showAssignDropdown)}
+                                        className="w-full bg-background border border-border rounded-xl p-3 text-sm text-text flex items-center justify-between hover:border-accent transition-all group-focus-within:border-accent"
                                     >
-                                        <option value="Ansh">Ansh</option>
-                                        <option value="Navtej">Navtej</option>
-                                    </select>
-                                    <User className="absolute right-3 top-3 text-text-muted pointer-events-none" size={18} />
+                                        <div className="flex items-center gap-2">
+                                            <User size={16} className="text-accent" />
+                                            <span className="font-medium">{assignedTo}</span>
+                                        </div>
+                                        <div className={`transition-transform duration-300 ${showAssignDropdown ? 'rotate-180' : ''}`}>
+                                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </div>
+                                    </button>
+
+                                    {showAssignDropdown && (
+                                        <>
+                                            <div className="fixed inset-0 z-[80]" onClick={() => setShowAssignDropdown(false)} />
+                                            <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-[90] animate-scale-up origin-top">
+                                                {['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'].map((user) => (
+                                                    <button
+                                                        key={user}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setAssignedTo(user);
+                                                            setShowAssignDropdown(false);
+                                                        }}
+                                                        className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center gap-2 ${assignedTo === user ? 'bg-accent/20 text-accent font-bold' : 'text-text-muted hover:bg-white/5 hover:text-white'
+                                                            }`}
+                                                    >
+                                                        <div className={`w-1.5 h-1.5 rounded-full ${assignedTo === user ? 'bg-accent' : 'bg-transparent'}`} />
+                                                        {user}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <div>
