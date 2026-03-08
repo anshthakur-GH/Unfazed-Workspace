@@ -1,11 +1,150 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X } from 'lucide-react';
+import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X, GripVertical } from 'lucide-react';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
 import CustomCalendar from './CustomCalendar';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 const AVAILABLE_TAGS = ['CC', 'SEO', 'Website', 'Lead', 'Meet', 'Outreach', 'Personal'];
+
+const SortableTodoItem = ({ todo, toggleTodo, startEditing, editingTodoId, editingText, setEditingText, updateTodoTask, readOnly, isAdmin, view, reschedulingId, setReschedulingId, rescheduleTodo, deleteTodo }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: todo._id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 100 : 'auto',
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            className={`flex items-center justify-between p-3 md:p-4 rounded-lg border transition-all ${todo.isCompleted ? 'bg-background/50 border-border opacity-60' : 'bg-background border-border hover:border-accent/50'
+                } ${isDragging ? 'shadow-2xl border-accent' : ''}`}
+        >
+            <div className="flex items-center gap-4 flex-1">
+                {(!readOnly || isAdmin) && (
+                    <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-text-muted hover:text-accent p-1">
+                        <GripVertical size={20} />
+                    </div>
+                )}
+                <button
+                    onClick={() => toggleTodo(todo._id, todo.isCompleted)}
+                    className={`text-accent transition-transform hover:scale-110`}
+                >
+                    {todo.isCompleted ? <CheckCircle2 size={24} /> : <Circle size={24} />}
+                </button>
+                {editingTodoId === todo._id ? (
+                    <input
+                        type="text"
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onBlur={updateTodoTask}
+                        onKeyDown={(e) => e.key === 'Enter' && updateTodoTask()}
+                        autoFocus
+                        className="text-lg bg-transparent border-b border-accent focus:outline-none flex-1 min-w-[200px]"
+                    />
+                ) : (
+                    <span
+                        className={`text-base md:text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
+                        onDoubleClick={() => startEditing(todo)}
+                        title={(readOnly && !isAdmin) ? "" : "Double click to edit"}
+                    >
+                        {todo.task}
+                    </span>
+                )}
+                {todo.author && (
+                    <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2">
+                        {todo.author}
+                    </span>
+                )}
+                {todo.priority && (
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2 border ${todo.priority === 'High' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
+                        todo.priority === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                            'bg-green-500/10 text-green-500 border-green-500/20'
+                        }`}>
+                        {todo.priority}
+                    </span>
+                )}
+                {todo.tags && todo.tags.length > 0 && (
+                    <div className="flex gap-1 ml-2">
+                        {todo.tags.map(tag => (
+                            <span key={tag} className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full border border-border">
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                    {view === 'today' && parseISO(todo.date) < new Date().setHours(0, 0, 0, 0) && !todo.isCompleted && (
+                        <span className="text-xs text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded-full border border-red-500/20">Overdue</span>
+                    )}
+                    <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border flex items-center gap-2">
+                        {format(parseISO(todo.date), 'MMM d, yyyy')}
+                    </div>
+
+                    {(!readOnly || isAdmin) && (
+                        <div className="relative">
+                            <button
+                                onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
+                                className="text-text-muted hover:text-accent transition-colors p-1"
+                                title="Reschedule"
+                            >
+                                <CalendarClock size={16} />
+                            </button>
+                            {reschedulingId === todo._id && (
+                                <div className="absolute top-full right-0 mt-2 z-50">
+                                    <CustomCalendar
+                                        selectedDate={todo.date}
+                                        onChange={(date) => rescheduleTodo(todo._id, date)}
+                                        onClose={() => setReschedulingId(null)}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+                {(!readOnly || isAdmin) && (
+                    <button
+                        onClick={() => deleteTodo(todo._id)}
+                        className="text-text-muted hover:text-red-500 transition-colors p-2"
+                    >
+                        <Trash2 size={18} />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
 
 const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOnly = false }) => {
     const [todos, setTodos] = useState([]);
@@ -20,6 +159,13 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const [showCalendar, setShowCalendar] = useState(false);
     const [showMobileForm, setShowMobileForm] = useState(false);
     const [isAdmin, setIsAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     useEffect(() => {
         fetchTodos();
@@ -46,6 +192,39 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
         }
     };
 
+    const handleDragEnd = async (event) => {
+        const { active, over } = event;
+
+        if (active.id !== over.id) {
+            const oldIndex = sortedTodos.findIndex((item) => item._id === active.id);
+            const newIndex = sortedTodos.findIndex((item) => item._id === over.id);
+
+            const newSortedTodos = arrayMove(sortedTodos, oldIndex, newIndex);
+
+            // Calculate new orders for todos that moved
+            const reorderedTodos = newSortedTodos.map((todo, index) => ({
+                _id: todo._id,
+                order: index
+            }));
+
+            // Optimistic update
+            const updatedTodos = todos.map(t => {
+                const reorderMatch = reorderedTodos.find(rt => rt._id === t._id);
+                return reorderMatch ? { ...t, order: reorderMatch.order } : t;
+            });
+            setTodos(updatedTodos);
+
+            try {
+                await axios.put(`${API_URL}/api/todos/reorder`, {
+                    todos: reorderedTodos
+                });
+            } catch (err) {
+                console.error("Failed to reorder:", err);
+                fetchTodos(); // Rollback on error
+            }
+        }
+    };
+
     const addTodo = async (e) => {
         e.preventDefault();
         if (!newTask.trim()) return;
@@ -54,12 +233,10 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
             return;
         }
 
-        // Extract author from token - frontend decoding (optional, handled by backend usually but good for consistency with original)
         const token = localStorage.getItem('token');
         const author = token ? token.replace('fake-jwt-token-', '') : 'Unknown';
 
         try {
-            // Only date is needed now
             const res = await axios.post(`${API_URL}/api/todos`, {
                 task: newTask,
                 date: new Date(newDate).toISOString(),
@@ -140,7 +317,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const filteredTodos = todos.filter(t => {
         const taskDate = parseISO(t.date);
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Normalize today to midnight for comparison
+        today.setHours(0, 0, 0, 0);
 
         if (view === 'previous') {
             return taskDate < today;
@@ -155,59 +332,17 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     });
 
     const sortedTodos = [...filteredTodos].sort((a, b) => {
-        // Primary sort by order
         if (a.order !== undefined && b.order !== undefined) {
             return a.order - b.order;
         }
-
-        // Priority Sorting Map
         const priorityMap = { 'High': 3, 'Medium': 2, 'Low': 1 };
         const priorityA = priorityMap[a.priority] || 0;
         const priorityB = priorityMap[b.priority] || 0;
-
         if (priorityA !== priorityB) {
-            return priorityB - priorityA; // Descending order (High > Medium > Low)
+            return priorityB - priorityA;
         }
-
-        // Then sort by date
         return new Date(a.date) - new Date(b.date);
     });
-
-    const moveTodoUp = async (todoId) => {
-        if (readOnly && !isAdmin) return;
-
-        const currentIndex = sortedTodos.findIndex(t => t._id === todoId);
-        if (currentIndex <= 0) return; // Already at top or not found
-
-        const currentTodo = sortedTodos[currentIndex];
-        const prevTodo = sortedTodos[currentIndex - 1];
-
-        const newOrderCurrent = prevTodo.order;
-        const newOrderPrev = currentTodo.order;
-
-        console.log(`Swapping: ${currentTodo.task} (${currentTodo.order}) with ${prevTodo.task} (${prevTodo.order})`);
-
-        // Update local state by swapping orders
-        const updatedTodos = todos.map(t => {
-            if (t._id === currentTodo._id) return { ...t, order: newOrderCurrent };
-            if (t._id === prevTodo._id) return { ...t, order: newOrderPrev };
-            return t;
-        });
-
-        setTodos(updatedTodos);
-
-        try {
-            await axios.put(`${API_URL}/api/todos/reorder`, {
-                todos: [
-                    { _id: currentTodo._id, order: newOrderCurrent },
-                    { _id: prevTodo._id, order: newOrderPrev }
-                ]
-            });
-        } catch (err) {
-            console.error("Failed to reorder:", err);
-            fetchTodos();
-        }
-    };
 
     return (
         <div className="bg-card rounded-xl border border-border p-6 h-full flex flex-col">
@@ -241,7 +376,6 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
 
             {(!readOnly || isAdmin) && (
                 <div className="mb-8">
-                    {/* Mobile: Toggle Button for Form */}
                     <button
                         onClick={() => setShowMobileForm(!showMobileForm)}
                         className="w-full md:hidden bg-accent/10 border border-accent/20 text-accent font-black py-4 rounded-2xl flex items-center justify-center gap-2 mb-4 active:scale-95 transition-all"
@@ -295,7 +429,6 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                     )}
                                 </div>
 
-                                {/* Priority Selection - Mobile Optimized */}
                                 <div className="flex items-center gap-2 bg-background border border-border rounded-xl p-1.5 flex-1 sm:flex-none">
                                     {['High', 'Medium', 'Low'].map((p) => (
                                         <button
@@ -320,7 +453,6 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                             </button>
                         </div>
 
-                        {/* Tags Selection - Mobile Scroll */}
                         <div className="flex flex-col gap-2">
                             <span className="text-[10px] font-black uppercase tracking-widest text-text-muted ml-1">Assign Tags</span>
                             <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
@@ -353,115 +485,39 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                 {sortedTodos.length === 0 ? (
                     <div className="text-center text-text-muted opacity-50 py-10">No tasks found for this view.</div>
                 ) : (
-                    sortedTodos.map((todo, index) => (
-                        <div
-                            key={todo._id}
-                            className={`flex items-center justify-between p-3 md:p-4 rounded-lg border transition-all ${todo.isCompleted ? 'bg-background/50 border-border opacity-60' : 'bg-background border-border hover:border-accent/50'
-                                }`}
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                        modifiers={[restrictToVerticalAxis]}
+                    >
+                        <SortableContext
+                            items={sortedTodos.map(t => t._id)}
+                            strategy={verticalListSortingStrategy}
                         >
-                            <div className="flex items-center gap-4">
-                                <button
-                                    onClick={() => toggleTodo(todo._id, todo.isCompleted)}
-                                    className={`text-accent transition-transform hover:scale-110`}
-                                >
-                                    {todo.isCompleted ? <CheckCircle2 size={24} /> : <Circle size={24} />}
-                                </button>
-                                {editingTodoId === todo._id ? (
-                                    <input
-                                        type="text"
-                                        value={editingText}
-                                        onChange={(e) => setEditingText(e.target.value)}
-                                        onBlur={updateTodoTask}
-                                        onKeyDown={(e) => e.key === 'Enter' && updateTodoTask()}
-                                        autoFocus
-                                        className="text-lg bg-transparent border-b border-accent focus:outline-none flex-1 min-w-[200px]"
+                            <div className="space-y-3">
+                                {sortedTodos.map((todo) => (
+                                    <SortableTodoItem
+                                        key={todo._id}
+                                        todo={todo}
+                                        toggleTodo={toggleTodo}
+                                        startEditing={startEditing}
+                                        editingTodoId={editingTodoId}
+                                        editingText={editingText}
+                                        setEditingText={setEditingText}
+                                        updateTodoTask={updateTodoTask}
+                                        readOnly={readOnly}
+                                        isAdmin={isAdmin}
+                                        view={view}
+                                        reschedulingId={reschedulingId}
+                                        setReschedulingId={setReschedulingId}
+                                        rescheduleTodo={rescheduleTodo}
+                                        deleteTodo={deleteTodo}
                                     />
-                                ) : (
-                                    <span
-                                        className={`text-base md:text-lg cursor-pointer ${todo.isCompleted ? 'line-through text-text-muted' : 'text-text'}`}
-                                        onDoubleClick={() => startEditing(todo)}
-                                        title={(readOnly && !isAdmin) ? "" : "Double click to edit"}
-                                    >
-                                        {todo.task}
-                                    </span>
-                                )}
-                                {todo.author && (
-                                    <span className="text-[10px] bg-accent/20 text-accent px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2">
-                                        {todo.author}
-                                    </span>
-                                )}
-                                {todo.priority && (
-                                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold ml-2 border ${todo.priority === 'High' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                                        todo.priority === 'Medium' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                                            'bg-green-500/10 text-green-500 border-green-500/20'
-                                        }`}>
-                                        {todo.priority}
-                                    </span>
-                                )}
-                                {todo.tags && todo.tags.length > 0 && (
-                                    <div className="flex gap-1 ml-2">
-                                        {todo.tags.map(tag => (
-                                            <span key={tag} className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full border border-border">
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                )}
+                                ))}
                             </div>
-
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2">
-                                    {view === 'today' && parseISO(todo.date) < new Date().setHours(0, 0, 0, 0) && !todo.isCompleted && (
-                                        <span className="text-xs text-red-500 font-bold bg-red-500/10 px-2 py-1 rounded-full border border-red-500/20">Overdue</span>
-                                    )}
-                                    <div className="text-sm text-text-muted bg-card px-3 py-1 rounded-full border border-border flex items-center gap-2">
-                                        {format(parseISO(todo.date), 'MMM d, yyyy')}
-                                    </div>
-
-                                    {(!readOnly || isAdmin) && index > 0 && (
-                                        <button
-                                            onClick={() => moveTodoUp(todo._id)}
-                                            className="text-text-muted hover:text-accent transition-colors p-1 mr-1"
-                                            title="Move Up"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                <path d="m18 15-6-6-6 6" />
-                                            </svg>
-                                        </button>
-                                    )}
-
-                                    {(!readOnly || isAdmin) && (
-                                        <div className="relative">
-                                            <button
-                                                onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
-                                                className="text-text-muted hover:text-accent transition-colors p-1"
-                                                title="Reschedule"
-                                            >
-                                                <CalendarClock size={16} />
-                                            </button>
-                                            {reschedulingId === todo._id && (
-                                                <div className="absolute top-full right-0 mt-2 z-50">
-                                                    <CustomCalendar
-                                                        selectedDate={todo.date}
-                                                        onChange={(date) => rescheduleTodo(todo._id, date)}
-                                                        onClose={() => setReschedulingId(null)}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                                {(!readOnly || isAdmin) && (
-                                    <button
-                                        onClick={() => deleteTodo(todo._id)}
-                                        className="text-text-muted hover:text-red-500 transition-colors p-2"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))
+                        </SortableContext>
+                    </DndContext>
                 )}
             </div>
         </div >

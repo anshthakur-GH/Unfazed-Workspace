@@ -6,8 +6,25 @@ const auth = require('../middleware/auth');
 // Get all subspaces
 router.get('/', async (req, res) => {
     try {
-        const subspaces = await Subspace.find().sort({ createdAt: -1 });
+        const subspaces = await Subspace.find().sort({ order: 1 });
         res.json(subspaces);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Reorder subspaces
+router.put('/reorder', auth, async (req, res) => {
+    try {
+        const { subspaces } = req.body; // Array of { _id, order }
+        if (!Array.isArray(subspaces)) {
+            return res.status(400).json({ message: 'Invalid data format' });
+        }
+        const updates = subspaces.map(({ _id, order }) => {
+            return Subspace.findByIdAndUpdate(_id, { order });
+        });
+        await Promise.all(updates);
+        res.json({ message: 'Subspaces reordered successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -18,10 +35,13 @@ router.get('/', async (req, res) => {
 router.post('/', auth, async (req, res) => {
     try {
         const { title, assignedTo } = req.body;
+        const lastSubspace = await Subspace.findOne().sort({ order: -1 });
+        const newOrder = lastSubspace && lastSubspace.order !== undefined ? lastSubspace.order + 1 : 0;
         const subspace = new Subspace({
             title,
             assignedTo,
-            createdBy: req.user.name
+            createdBy: req.user.name,
+            order: newOrder
         });
         await subspace.save();
         res.json(subspace);

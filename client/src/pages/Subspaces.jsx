@@ -1,8 +1,86 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { Plus, FileText, Save, Trash2 } from 'lucide-react';
+import { Plus, FileText, Save, Trash2, GripVertical } from 'lucide-react';
 import RichTextEditor from '../components/RichTextEditor';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+    useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+
+const SortableSubspaceItem = ({ sub, selectedSubspace, setSelectedSubspace, setShowList, deleteSubspace }) => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({ id: sub._id });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        zIndex: isDragging ? 100 : 'auto',
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+        <div
+            ref={setNodeRef}
+            style={style}
+            onClick={() => {
+                setSelectedSubspace(sub);
+                if (window.innerWidth < 768) setShowList(false);
+            }}
+            className={`p-3 md:p-4 rounded-xl cursor-pointer transition-all border flex items-center gap-3 ${selectedSubspace?._id === sub._id
+                ? 'bg-accent/10 border-accent text-accent'
+                : 'bg-background hover:bg-border/50 border-transparent text-text-muted'
+                } ${isDragging ? 'shadow-2xl border-accent' : ''}`}
+        >
+            <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing text-text-muted hover:text-accent p-1">
+                <GripVertical size={16} />
+            </div>
+            <div className="flex-1 min-w-0">
+                <div className="font-bold flex items-center justify-between">
+                    <span className="truncate">{sub.title}</span>
+                    <div className="flex gap-1">
+                        {sub.assignedTo?.map(user => (
+                            <span key={user} className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded border border-border">
+                                {user.charAt(0)}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex justify-between items-center mt-2">
+                    <div className="text-[10px] opacity-50 uppercase tracking-widest font-black">
+                        {new Date(sub.createdAt).toLocaleDateString()}
+                    </div>
+                    <button
+                        onClick={(e) => deleteSubspace(e, sub._id)}
+                        className="text-text-muted hover:text-red-500 transition-colors p-1"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const Subspaces = () => {
     const [subspaces, setSubspaces] = useState([]);
@@ -14,7 +92,15 @@ const Subspaces = () => {
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [editedTitle, setEditedTitle] = useState('');
     const [isAdmin] = useState(localStorage.getItem('username') === 'Ansh_Unfazed');
+    const [showList, setShowList] = useState(true);
     const lastSubspaceIdRef = useRef(null);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
 
     useEffect(() => {
         fetchSubspaces();
@@ -26,7 +112,6 @@ const Subspaces = () => {
             setEditedTitle(selectedSubspace.title);
             lastSubspaceIdRef.current = selectedSubspace._id;
         } else if (selectedSubspace && selectedSubspace._id === lastSubspaceIdRef.current && !isEditingTitle) {
-            // Keep title in sync if it changes externally or after save, but not while editing
             setEditedTitle(selectedSubspace.title);
         }
     }, [selectedSubspace, isEditingTitle]);
@@ -47,10 +132,6 @@ const Subspaces = () => {
     // Auto-Save (Debounced)
     useEffect(() => {
         if (!selectedSubspace) return;
-
-        // Don't auto-save if content matches what we just loaded (prevents initial save loop)
-        // actually, logic is simpler: just debounce every change. 
-        // If user is typing, we wait.
 
         const timer = setTimeout(() => {
             if (selectedSubspace && noteContent !== selectedSubspace.content) {
@@ -73,6 +154,34 @@ const Subspaces = () => {
         } catch (err) {
             console.error(err);
             setSubspaces([]);
+        }
+    };
+
+    const handleDragEnd = async (event) => {
+        const { active, over } = event;
+
+        if (active.id !== over.id) {
+            const oldIndex = subspaces.findIndex((item) => item._id === active.id);
+            const newIndex = subspaces.findIndex((item) => item._id === over.id);
+
+            const newSubspaces = arrayMove(subspaces, oldIndex, newIndex);
+
+            // Calculate new orders
+            const reorderedSubspaces = newSubspaces.map((sub, index) => ({
+                _id: sub._id,
+                order: index
+            }));
+
+            setSubspaces(newSubspaces);
+
+            try {
+                await axios.put(`${API_URL}/api/subspaces/reorder`, {
+                    subspaces: reorderedSubspaces
+                });
+            } catch (err) {
+                console.error("Failed to reorder subspaces:", err);
+                fetchSubspaces();
+            }
         }
     };
 
@@ -100,7 +209,6 @@ const Subspaces = () => {
             const res = await axios.put(`${API_URL}/api/subspaces/${selectedSubspace._id}`, {
                 content: noteContent
             });
-            // Update local state
             setSubspaces(subspaces.map(s => s._id === res.data._id ? res.data : s));
             setSelectedSubspace(res.data);
             setLoading(false);
@@ -125,7 +233,7 @@ const Subspaces = () => {
     };
 
     const deleteSubspace = async (e, id) => {
-        e.stopPropagation(); // Prevent selection when clicking delete
+        e.stopPropagation();
         if (!window.confirm("Are you sure you want to delete this subspace?")) return;
 
         try {
@@ -138,8 +246,6 @@ const Subspaces = () => {
             console.error(err);
         }
     };
-
-    const [showList, setShowList] = useState(true);
 
     return (
         <div className="flex flex-col md:flex-row h-full gap-6 relative">
@@ -180,43 +286,31 @@ const Subspaces = () => {
                             ))}
                         </div>
                     </form>
-                    <div className="space-y-2 overflow-y-auto custom-scrollbar pr-2 flex-1">
-                        {subspaces.map(sub => (
-                            <div
-                                key={sub._id}
-                                onClick={() => {
-                                    setSelectedSubspace(sub);
-                                    if (window.innerWidth < 768) setShowList(false);
-                                }}
-                                className={`p-3 md:p-4 rounded-xl cursor-pointer transition-all border ${selectedSubspace?._id === sub._id
-                                    ? 'bg-accent/10 border-accent text-accent'
-                                    : 'bg-background hover:bg-border/50 border-transparent text-text-muted'
-                                    }`}
+                    <div className="overflow-y-auto custom-scrollbar pr-2 flex-1">
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                            modifiers={[restrictToVerticalAxis]}
+                        >
+                            <SortableContext
+                                items={subspaces.map(s => s._id)}
+                                strategy={verticalListSortingStrategy}
                             >
-                                <div className="font-bold flex items-center justify-between">
-                                    <span className="truncate">{sub.title}</span>
-                                    <div className="flex gap-1">
-                                        {sub.assignedTo?.map(user => (
-                                            <span key={user} className="text-[10px] bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded border border-border">
-                                                {user.charAt(0)}
-                                            </span>
-                                        ))}
-                                    </div>
+                                <div className="space-y-2">
+                                    {subspaces.map(sub => (
+                                        <SortableSubspaceItem
+                                            key={sub._id}
+                                            sub={sub}
+                                            selectedSubspace={selectedSubspace}
+                                            setSelectedSubspace={setSelectedSubspace}
+                                            setShowList={setShowList}
+                                            deleteSubspace={deleteSubspace}
+                                        />
+                                    ))}
                                 </div>
-
-                                <div className="flex justify-between items-center mt-2">
-                                    <div className="text-[10px] opacity-50 uppercase tracking-widest font-black">
-                                        {new Date(sub.createdAt).toLocaleDateString()}
-                                    </div>
-                                    <button
-                                        onClick={(e) => deleteSubspace(e, sub._id)}
-                                        className="text-text-muted hover:text-red-500 transition-colors p-1"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                            </SortableContext>
+                        </DndContext>
                     </div>
                 </div>
             </div>

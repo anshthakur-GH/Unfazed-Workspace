@@ -6,25 +6,38 @@ import { API_URL } from '../config';
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setError('');
         try {
             const res = await axios.post(`${API_URL}/api/auth/login`, { username, password });
             if (res.data.success) {
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('username', res.data.username);
                 navigate('/dashboard/leads');
+            } else {
+                setLoading(false);
+                setError('Invalid credentials');
             }
         } catch (err) {
+            setLoading(false);
             setError('Invalid credentials');
         }
     };
 
     return (
         <div className="flex flex-col items-center justify-start pt-32 h-screen" style={{ backgroundColor: '#080508' }}>
+            {loading && (
+                <div className="loading-overlay">
+                    <div className="loader"></div>
+                    <p className="mt-4 text-accent font-bold animate-pulse">Authenticating...</p>
+                </div>
+            )}
             <div className="mb-8">
                 <img
                     src="/Logo GIF.gif"

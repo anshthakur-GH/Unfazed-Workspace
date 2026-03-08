@@ -5,6 +5,7 @@ const subspaceSchema = new mongoose.Schema({
     content: { type: String, default: '' },
     assignedTo: { type: [String], default: [] },
     createdBy: { type: String, required: true },
+    order: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 
