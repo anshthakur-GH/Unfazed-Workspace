@@ -43,7 +43,7 @@ const Login = () => {
                 <img
                     src="/Logo GIF.gif"
                     alt="Unfazed Logo"
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[166.67%] h-[166.67%] max-w-none object-cover filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[125%] h-[125%] max-w-none object-cover filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
                 />
             </div>
 
