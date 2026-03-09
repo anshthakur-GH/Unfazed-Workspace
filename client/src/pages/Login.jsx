@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
-import InteractiveBackground from '../components/InteractiveBackground';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -10,26 +9,6 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const cardRef = useRef(null);
-
-    const handleMouseMove = (e) => {
-        if (!cardRef.current) return;
-        const card = cardRef.current;
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    };
-
-    const handleMouseLeave = () => {
-        if (!cardRef.current) return;
-        cardRef.current.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -53,18 +32,16 @@ const Login = () => {
 
     return (
         <div className="relative flex flex-col items-center justify-start pt-32 h-screen overflow-hidden" style={{ backgroundColor: '#080508' }}>
-            <InteractiveBackground />
-
             {loading && (
                 <div className="loading-overlay">
                     <div className="loader"></div>
-                    <p className="mt-4 text-accent font-bold animate-pulse">Authenticating...</p>
+                    <p className="mt-4 text-accent font-bold">Authenticating...</p>
                 </div>
             )}
 
-            <div className="mb-12 relative z-10 animate-fade-in" style={{ animation: 'float 6s ease-in-out infinite' }}>
+            <div className="mb-12 relative z-10">
                 <img
-                    src="/Logo GIF.gif"
+                    src="/Logo.png"
                     alt="Unfazed Logo"
                     className="w-48 md:w-64 object-contain filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
                     style={{ clipPath: 'inset(0 10% 0 10%)' }}
@@ -72,10 +49,7 @@ const Login = () => {
             </div>
 
             <div
-                ref={cardRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
-                className="w-full max-w-md p-8 bg-card/80 backdrop-blur-xl rounded-[2rem] border border-white/10 shadow-2xl relative z-10 transition-transform duration-200 ease-out"
+                className="w-full max-w-md p-8 bg-card/80 backdrop-blur-xl rounded-[2rem] border border-white/10 shadow-2xl relative z-10"
             >
                 <div className="flex flex-col items-center mb-8">
                     <h1 className="text-5xl font-black text-accent tracking-tighter leading-none mb-1">Unfazed</h1>
@@ -83,7 +57,7 @@ const Login = () => {
                 </div>
 
                 {error && (
-                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-center text-sm mb-6 animate-shake">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-center text-sm mb-6">
                         {error}
                     </div>
                 )}
@@ -118,20 +92,9 @@ const Login = () => {
                 </form>
             </div>
 
-            <style>{`
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-20px); }
-                }
-                @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    25% { transform: translateX(-5px); }
-                    75% { transform: translateX(5px); }
-                }
-                .animate-shake {
-                    animation: shake 0.5s ease-in-out;
-                }
-            `}</style>
+            <p className="mt-12 text-white/40 font-medium italic relative z-10">
+                "Unfazed Workspace for Team Unfazed"
+            </p>
         </div>
     );
 };

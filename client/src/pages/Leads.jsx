@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Target, Users, Calendar, Plus, X, Edit2, Trash2, Search, ExternalLink, Filter, Copy, Check } from 'lucide-react';
-import { format, isToday, parseISO, startOfDay } from 'date-fns';
+import { format, isToday, parseISO, startOfDay, addDays } from 'date-fns';
 import { API_URL } from '../config';
 
 const Leads = () => {
@@ -138,6 +138,27 @@ const Leads = () => {
         navigator.clipboard.writeText(text);
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const handleReschedule = async (e, lead) => {
+        e.stopPropagation();
+        try {
+            const nextWeek = addDays(new Date(lead.reminderDate), 7);
+            await axios.put(`${API_URL}/api/leads/${lead._id}`, {
+                reminderDate: nextWeek.toISOString()
+            });
+            fetchLeads();
+        } catch (error) {
+            console.error('Error rescheduling lead:', error);
+            alert('Failed to reschedule lead');
+        }
+    };
+
+    const isMissedFollowUp = (dateStr) => {
+        if (!dateStr) return false;
+        const date = startOfDay(parseISO(dateStr));
+        const today = startOfDay(new Date());
+        return date < today;
     };
 
     const getStatusColor = (status) => {
@@ -379,9 +400,17 @@ const Leads = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {lead.reminderDate ? (
-                                                        <div className={`flex flex-col ${isToday(parseISO(lead.reminderDate)) ? 'text-accent' : 'text-text-muted'}`}>
+                                                        <div className={`flex flex-col ${isToday(parseISO(lead.reminderDate)) ? 'text-accent' : isMissedFollowUp(lead.reminderDate) ? 'text-red-400' : 'text-text-muted'}`}>
                                                             <span className="text-sm font-bold">{format(parseISO(lead.reminderDate), 'MMM d, yyyy')}</span>
                                                             {isToday(parseISO(lead.reminderDate)) && <span className="text-[10px] uppercase font-black">Action Today</span>}
+                                                            {isMissedFollowUp(lead.reminderDate) && (
+                                                                <button
+                                                                    onClick={(e) => handleReschedule(e, lead)}
+                                                                    className="mt-2 text-[9px] bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-2 py-1 rounded-lg font-black uppercase tracking-widest transition-all"
+                                                                >
+                                                                    reschedule to next week
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     ) : (
                                                         <span className="text-xs text-text-muted italic">No reminder</span>
@@ -441,9 +470,19 @@ const Leads = () => {
                                         </div>
                                         <div className="bg-background/50 p-3 rounded-xl border border-border/50 flex flex-col gap-1">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-text-muted">Next Follow Up</span>
-                                            <span className={`text-xs font-bold ${lead.reminderDate && isToday(parseISO(lead.reminderDate)) ? 'text-accent' : 'text-white'}`}>
-                                                {lead.reminderDate ? format(parseISO(lead.reminderDate), 'MMM d') : 'Not set'}
-                                            </span>
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`text-xs font-bold ${lead.reminderDate && isToday(parseISO(lead.reminderDate)) ? 'text-accent' : lead.reminderDate && isMissedFollowUp(lead.reminderDate) ? 'text-red-400' : 'text-white'}`}>
+                                                    {lead.reminderDate ? format(parseISO(lead.reminderDate), 'MMM d') : 'Not set'}
+                                                </span>
+                                                {lead.reminderDate && isMissedFollowUp(lead.reminderDate) && (
+                                                    <button
+                                                        onClick={(e) => handleReschedule(e, lead)}
+                                                        className="text-[9px] bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-1 rounded-lg font-black uppercase tracking-widest"
+                                                    >
+                                                        reschedule to next week
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
