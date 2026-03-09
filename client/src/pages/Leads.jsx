@@ -490,26 +490,26 @@ const Leads = () => {
                         {/* Mobile Drag Handle */}
                         <div className="w-12 h-1.5 bg-border rounded-full mx-auto mt-4 md:hidden" />
 
-                        <div className="p-6 md:p-8 flex flex-col h-full overflow-y-auto custom-scrollbar no-scrollbar">
-                            <div className="flex justify-between items-center mb-8">
+                        <div className="p-4 md:p-6 flex flex-col h-full overflow-y-auto custom-scrollbar no-scrollbar">
+                            <div className="flex justify-between items-center mb-4">
                                 <div>
-                                    <h2 className="text-2xl font-black text-white tracking-tighter uppercase">{currentLead ? 'Edit Lead' : 'New Prospect'}</h2>
-                                    <p className="text-text-muted text-[10px] font-black uppercase tracking-widest mt-1">Pipeline & Information details</p>
+                                    <h2 className="text-xl font-black text-white tracking-tighter uppercase">{currentLead ? 'Edit Lead' : 'New Prospect'}</h2>
+                                    <p className="text-text-muted text-[10px] font-black uppercase tracking-widest mt-0.5">Pipeline details</p>
                                 </div>
-                                <button onClick={handleCloseModal} className="bg-secondary/10 hover:bg-red-500/20 p-3 rounded-full text-text-muted hover:text-red-500 border border-border transition-all">
-                                    <X size={24} />
+                                <button onClick={handleCloseModal} className="bg-secondary/10 hover:bg-red-500/20 p-2 rounded-full text-text-muted hover:text-red-500 border border-border transition-all">
+                                    <X size={20} />
                                 </button>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-2">
+                            <form onSubmit={handleSubmit} className="space-y-3">
+                                <div className="space-y-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Lead Name *</label>
                                     <div className="relative">
-                                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
                                         <input
                                             type="text"
                                             required
-                                            className="w-full bg-background border border-border rounded-2xl p-4 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
                                             placeholder="Enter lead name..."
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -517,11 +517,11 @@ const Leads = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Platform</label>
                                         <select
-                                            className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
                                             value={formData.platform}
                                             onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
                                         >
@@ -533,10 +533,10 @@ const Leads = () => {
                                             <option value="Phone Call">Phone Call</option>
                                         </select>
                                     </div>
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Status</label>
                                         <select
-                                            className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent appearance-none"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent appearance-none"
                                             value={formData.status}
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                         >
@@ -548,36 +548,36 @@ const Leads = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Email (Optional)</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Email</label>
                                         <input
                                             type="email"
-                                            className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent"
-                                            placeholder="email@example.com"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent"
+                                            placeholder="email@..."
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Phone / WhatsApp</label>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Phone</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent"
-                                            placeholder="+1234567890"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent"
+                                            placeholder="+123..."
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                         />
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Profile URL (Social)</label>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Profile URL</label>
                                     <div className="relative">
-                                        <ExternalLink className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+                                        <ExternalLink className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
                                         <input
                                             type="url"
-                                            className="w-full bg-background border border-border rounded-2xl p-4 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
                                             placeholder="https://..."
                                             value={formData.profileUrl}
                                             onChange={(e) => setFormData({ ...formData, profileUrl: e.target.value })}
@@ -585,20 +585,20 @@ const Leads = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Next Follow-Up</label>
                                         <input
                                             type="date"
-                                            className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-white focus:outline-none focus:border-accent [color-scheme:dark]"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-accent [color-scheme:dark]"
                                             value={formData.reminderDate}
                                             onChange={(e) => setFormData({ ...formData, reminderDate: e.target.value })}
                                         />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Assigned To</label>
                                         <select
-                                            className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
                                             value={formData.assignedTo}
                                             onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
                                         >
@@ -610,39 +610,39 @@ const Leads = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Next Message Content</label>
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Next Message</label>
                                     <textarea
-                                        className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent min-h-[100px] resize-none"
-                                        placeholder="Script or message for next follow up..."
+                                        className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent min-h-[60px] resize-none"
+                                        placeholder="Next message..."
                                         value={formData.nextMessage}
                                         onChange={(e) => setFormData({ ...formData, nextMessage: e.target.value })}
                                     />
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Lead Notes</label>
                                     <textarea
-                                        className="w-full bg-background border border-border rounded-2xl p-4 text-sm text-text focus:outline-none focus:border-accent min-h-[120px] resize-none"
-                                        placeholder="Discovery notes, pain points, etc..."
+                                        className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent min-h-[80px] resize-none"
+                                        placeholder="Notes..."
                                         value={formData.notes}
                                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                                     />
                                 </div>
 
-                                <div className="flex gap-4 pt-4 pb-12">
+                                <div className="flex gap-3 pt-2 pb-8 md:pb-4">
                                     <button
                                         type="button"
                                         onClick={handleCloseModal}
-                                        className="flex-1 bg-background border border-border text-text-muted font-black uppercase tracking-widest py-4 rounded-2xl hover:bg-secondary/20 transition-all"
+                                        className="flex-1 bg-background border border-border text-text-muted font-black uppercase tracking-widest py-3 rounded-xl hover:bg-secondary/20 transition-all text-xs"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-[2] bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-4 rounded-2xl transition-all shadow-lg shadow-accent/20"
+                                        className="flex-[2] bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-accent/20 text-xs"
                                     >
-                                        {currentLead ? 'Update Pipeline' : 'Create Record'}
+                                        {currentLead ? 'Update' : 'Create'}
                                     </button>
                                 </div>
                             </form>
