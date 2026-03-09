@@ -31,7 +31,7 @@ const Login = () => {
     };
 
     return (
-        <div className="relative flex flex-col items-center justify-start pt-32 h-screen overflow-hidden" style={{ backgroundColor: '#080508' }}>
+        <div className="relative flex flex-col items-center justify-center min-h-screen py-10" style={{ backgroundColor: '#080508' }}>
             {loading && (
                 <div className="loading-overlay">
                     <div className="loader"></div>
@@ -39,21 +39,20 @@ const Login = () => {
                 </div>
             )}
 
-            <div className="mb-12 relative z-10">
+            <div className="mb-8 relative z-10">
                 <img
-                    src="/Logo.png"
+                    src="/Logo GIF.gif"
                     alt="Unfazed Logo"
-                    className="w-48 md:w-64 object-contain filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
-                    style={{ clipPath: 'inset(0 10% 0 10%)' }}
+                    className="w-20 md:w-24 object-contain filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
                 />
             </div>
 
             <div
-                className="w-full max-w-md p-8 bg-card/80 backdrop-blur-xl rounded-[2rem] border border-white/10 shadow-2xl relative z-10"
+                className="w-[90%] max-w-[400px] p-8 bg-card/80 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl relative z-10"
             >
-                <div className="flex flex-col items-center mb-8">
-                    <h1 className="text-5xl font-black text-accent tracking-tighter leading-none mb-1">Unfazed</h1>
-                    <span className="text-xs uppercase font-black tracking-[0.3em] text-white opacity-40">Workspace</span>
+                <div className="flex flex-col items-center mb-6">
+                    <h1 className="text-4xl font-black text-accent tracking-tighter leading-none mb-1">Unfazed</h1>
+                    <span className="text-[10px] uppercase font-black tracking-[0.3em] text-white opacity-40">Workspace</span>
                 </div>
 
                 {error && (
@@ -92,7 +91,7 @@ const Login = () => {
                 </form>
             </div>
 
-            <p className="mt-12 text-white/40 font-medium italic relative z-10">
+            <p className="mt-8 text-white/30 text-xs font-medium italic relative z-10">
                 "Unfazed Workspace for Team Unfazed"
             </p>
         </div>
