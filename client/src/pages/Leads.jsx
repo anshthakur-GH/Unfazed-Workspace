@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Target, Users, Calendar, Plus, X, Edit2, Trash2, Search, ExternalLink, Filter, Copy, Check } from 'lucide-react';
+import { Target, Users, Calendar, Plus, X, Edit2, Trash2, Search, ExternalLink, Filter, Copy, Check, FileText } from 'lucide-react';
 import { format, isToday, parseISO, startOfDay, addDays } from 'date-fns';
 import { API_URL } from '../config';
 
@@ -358,6 +358,7 @@ const Leads = () => {
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Contact Info</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Platform</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Status</th>
+                                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Lead Notes</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Next Follow Up</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted text-right">Actions</th>
                                         </tr>
@@ -397,6 +398,13 @@ const Leads = () => {
                                                     <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getStatusColor(lead.status)}`}>
                                                         {lead.status}
                                                     </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="max-w-xs transition-all duration-300">
+                                                        <p className="text-xs text-text-muted line-clamp-2 hover:line-clamp-none transition-all cursor-default">
+                                                            {lead.notes || <span className="italic opacity-30">No notes</span>}
+                                                        </p>
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {lead.reminderDate ? (
@@ -485,6 +493,18 @@ const Leads = () => {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {lead.notes && (
+                                        <div className="bg-background/20 p-4 rounded-xl border border-border/30 flex flex-col gap-2">
+                                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                                <FileText size={12} className="text-accent" />
+                                                Lead Notes
+                                            </div>
+                                            <p className="text-xs text-text/80 leading-relaxed italic">
+                                                {lead.notes}
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {lead.nextMessage && (
                                         <div className="bg-background/30 p-4 rounded-xl border border-border/40 relative group">
