@@ -39,11 +39,11 @@ const Login = () => {
                 </div>
             )}
 
-            <div className="mb-8 relative z-10">
+            <div className="mb-8 relative z-10 w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-[2rem] border border-white/5 shadow-2xl">
                 <img
                     src="/Logo GIF.gif"
                     alt="Unfazed Logo"
-                    className="w-20 md:w-24 object-contain filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[166.67%] h-[166.67%] max-w-none object-cover filter drop-shadow-[0_0_15px_rgba(255,107,0,0.3)]"
                 />
             </div>
 
