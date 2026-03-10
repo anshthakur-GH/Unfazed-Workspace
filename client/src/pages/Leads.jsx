@@ -355,7 +355,7 @@ const Leads = () => {
                                     <thead>
                                         <tr className="bg-secondary/20 border-b border-border">
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Lead Name</th>
-                                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Contact Info</th>
+                                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted w-40">Contact Info</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Platform</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Status</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Lead Notes</th>
@@ -377,10 +377,10 @@ const Leads = () => {
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col text-xs space-y-1">
-                                                        {lead.email && <span className="text-white opacity-80">{lead.email}</span>}
-                                                        {lead.phone && <span className="text-text-muted">{lead.phone}</span>}
+                                                <td className="px-6 py-4 max-w-[160px]">
+                                                    <div className="flex flex-col text-xs space-y-1 overflow-hidden">
+                                                        {lead.email && <span className="text-white opacity-80 truncate" title={lead.email}>{lead.email}</span>}
+                                                        {lead.phone && <span className="text-text-muted truncate">{lead.phone}</span>}
                                                         {!lead.email && !lead.phone && <span className="italic text-text-muted/50">No contact info</span>}
                                                     </div>
                                                 </td>
@@ -394,7 +394,7 @@ const Leads = () => {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getStatusColor(lead.status)}`}>
                                                         {lead.status}
                                                     </span>
