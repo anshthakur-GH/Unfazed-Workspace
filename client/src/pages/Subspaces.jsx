@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { Plus, FileText, Save, Trash2, GripVertical } from 'lucide-react';
+import { Plus, FileText, Save, Trash2, GripVertical, Download } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 import RichTextEditor from '../components/RichTextEditor';
 import {
     DndContext,
@@ -256,6 +257,74 @@ const Subspaces = () => {
         }
     };
 
+    const downloadAsPdf = () => {
+        if (!selectedSubspace) return;
+
+        const title = selectedSubspace.title || 'Subspace';
+        const safeFilename = title.replace(/[^a-z0-9_\-\s]/gi, '').trim() || 'subspace';
+
+        const htmlContent = `
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                        font-size: 13px;
+                        color: #1a1a2e;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    h1 {
+                        font-size: 22px;
+                        font-weight: 700;
+                        color: #1a1a2e;
+                        margin: 0 0 10px 0;
+                        padding-bottom: 10px;
+                        border-bottom: 2px solid #7c3aed;
+                    }
+                    .meta {
+                        font-size: 10px;
+                        color: #888;
+                        margin-bottom: 20px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        font-weight: 600;
+                    }
+                    .content {
+                        line-height: 1.7;
+                        color: #1a1a2e;
+                    }
+                    b, strong { font-weight: 700; }
+                    i, em { font-style: italic; }
+                    s { text-decoration: line-through; }
+                </style>
+            </head>
+            <body>
+                <h1>${title}</h1>
+                <div class="meta">Generated on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
+                <div class="content">${noteContent || '<p>No content</p>'}</div>
+            </body>
+            </html>
+        `;
+
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4',
+        });
+
+        pdf.html(htmlContent, {
+            callback: (doc) => {
+                doc.save(`${safeFilename}.pdf`);
+            },
+            x: 12,
+            y: 12,
+            width: 186,
+            windowWidth: 750,
+            autoPaging: 'text',
+        });
+    };
+
     return (
         <div className="flex flex-col md:flex-row h-full gap-6 relative">
             {/* List of Subspaces */}
@@ -337,14 +406,24 @@ const Subspaces = () => {
                                     </h2>
                                 )}
                             </div>
-                            <button
-                                onClick={updateContent}
-                                disabled={loading}
-                                className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-3 py-2 rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
-                            >
-                                <Save size={18} />
-                                <span className="hidden sm:inline">{loading ? 'Saving...' : 'Save'}</span>
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={updateContent}
+                                    disabled={loading}
+                                    className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-3 py-2 rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+                                >
+                                    <Save size={18} />
+                                    <span className="hidden sm:inline">{loading ? 'Saving...' : 'Save'}</span>
+                                </button>
+                                <button
+                                    onClick={downloadAsPdf}
+                                    title="Download as PDF"
+                                    className="flex items-center gap-2 bg-background hover:bg-border/60 border border-border text-text-muted hover:text-accent px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+                                >
+                                    <Download size={18} />
+                                    <span className="hidden sm:inline">PDF</span>
+                                </button>
+                            </div>
                         </div>
                         <RichTextEditor
                             value={noteContent}
