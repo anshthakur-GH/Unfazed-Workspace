@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import { Plus, FileText, Save, Trash2, GripVertical, Download } from 'lucide-react';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import RichTextEditor from '../components/RichTextEditor';
 import {
     DndContext,
@@ -257,72 +258,77 @@ const Subspaces = () => {
         }
     };
 
-    const downloadAsPdf = () => {
+    const downloadAsPdf = async () => {
         if (!selectedSubspace) return;
 
         const title = selectedSubspace.title || 'Subspace';
         const safeFilename = title.replace(/[^a-z0-9_\-\s]/gi, '').trim() || 'subspace';
+        const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 
-        const htmlContent = `
-            <html>
-            <head>
-                <style>
-                    body {
-                        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-                        font-size: 13px;
-                        color: #1a1a2e;
-                        margin: 0;
-                        padding: 0;
-                    }
-                    h1 {
-                        font-size: 22px;
-                        font-weight: 700;
-                        color: #1a1a2e;
-                        margin: 0 0 10px 0;
-                        padding-bottom: 10px;
-                        border-bottom: 2px solid #7c3aed;
-                    }
-                    .meta {
-                        font-size: 10px;
-                        color: #888;
-                        margin-bottom: 20px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.08em;
-                        font-weight: 600;
-                    }
-                    .content {
-                        line-height: 1.7;
-                        color: #1a1a2e;
-                    }
-                    b, strong { font-weight: 700; }
-                    i, em { font-style: italic; }
-                    s { text-decoration: line-through; }
-                </style>
-            </head>
-            <body>
-                <h1>${title}</h1>
-                <div class="meta">Generated on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
-                <div class="content">${noteContent || '<p>No content</p>'}</div>
-            </body>
-            </html>
+        // Build an off-screen container with explicit colors (no CSS vars)
+        const container = document.createElement('div');
+        container.style.cssText = `
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            width: 794px;
+            background: #ffffff;
+            color: #1a1a2e;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            padding: 48px 56px;
+            box-sizing: border-box;
         `;
 
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4',
+        container.innerHTML = `
+            <div style="border-bottom: 2px solid #7c3aed; padding-bottom: 10px; margin-bottom: 8px;">
+                <h1 style="font-size: 24px; font-weight: 700; color: #1a1a2e; margin: 0;">${title}</h1>
+            </div>
+            <div style="font-size: 10px; color: #888888; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 24px;">
+                Generated on ${dateStr}
+            </div>
+            <div style="line-height: 1.75; color: #1a1a2e;">
+                ${noteContent || '<p>No content</p>'}
+            </div>
+        `;
+
+        // Force all child text to be dark so nothing is invisible
+        document.body.appendChild(container);
+        container.querySelectorAll('*').forEach(el => {
+            el.style.color = el.style.color || '#1a1a2e';
+            el.style.backgroundColor = el.style.backgroundColor || 'transparent';
         });
 
-        pdf.html(htmlContent, {
-            callback: (doc) => {
-                doc.save(`${safeFilename}.pdf`);
-            },
-            x: 12,
-            y: 12,
-            width: 186,
-            windowWidth: 750,
-            autoPaging: 'text',
-        });
+        try {
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                logging: false,
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            let yOffset = 0;
+            let remainingHeight = imgHeight;
+
+            while (remainingHeight > 0) {
+                if (yOffset > 0) pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, -yOffset, imgWidth, imgHeight);
+                yOffset += pageHeight;
+                remainingHeight -= pageHeight;
+            }
+
+            pdf.save(`${safeFilename}.pdf`);
+        } finally {
+            document.body.removeChild(container);
+        }
     };
 
     return (
