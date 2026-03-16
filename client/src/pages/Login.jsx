@@ -92,7 +92,7 @@ const Login = () => {
             </div>
 
             <p className="mt-8 text-white/30 text-xs font-medium italic relative z-10">
-                "Unfazed Workspace for Team Unfazed"
+                "Unfazed Workspace for Team Unfazed."
             </p>
         </div>
     );
