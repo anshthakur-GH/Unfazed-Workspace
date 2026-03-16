@@ -98,7 +98,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
     };
 
     return (
-        <div className={`relative rich-text-editor ${className}`}>
+        <div className={`relative rich-text-editor flex flex-col ${className || ''}`}>
             {showToolbar && !readOnly && (
                 <div
                     ref={toolbarRef}
@@ -151,7 +151,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, minHeight = "
                 ref={editorRef}
                 contentEditable={!readOnly}
                 onInput={handleInput}
-                className={`w-full bg-background border border-border rounded-xl p-4 text-text focus:outline-none focus:border-accent overflow-y-auto ${!readOnly ? 'cursor-text' : ''}`}
+                className={`flex-1 w-full bg-background border border-border rounded-xl p-4 text-text focus:outline-none focus:border-accent overflow-y-auto ${!readOnly ? 'cursor-text' : ''}`}
                 style={{ minHeight: minHeight }}
                 placeholder={placeholder} // CSS empty:before needed for true placeholder behavior on contentEditable
                 onKeyDown={(e) => {
