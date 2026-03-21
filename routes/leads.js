@@ -31,7 +31,8 @@ router.post('/', async (req, res) => {
         lastContactDate: req.body.lastContactDate,
         reminderDate: req.body.reminderDate,
         nextMessage: req.body.nextMessage,
-        notes: req.body.notes
+        notes: req.body.notes,
+        companyWebsite: req.body.companyWebsite
     });
 
     try {
@@ -59,6 +60,7 @@ router.put('/:id', async (req, res) => {
         if (req.body.reminderDate !== undefined) lead.reminderDate = req.body.reminderDate; // Allow nulling out
         if (req.body.nextMessage != null) lead.nextMessage = req.body.nextMessage;
         if (req.body.notes != null) lead.notes = req.body.notes;
+        if (req.body.companyWebsite != null) lead.companyWebsite = req.body.companyWebsite;
 
         const updatedLead = await lead.save();
         res.json(updatedLead);

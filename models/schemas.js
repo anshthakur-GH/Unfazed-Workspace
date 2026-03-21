@@ -79,6 +79,7 @@ const leadSchema = new mongoose.Schema({
     reminderDate: { type: Date }, // Date when a follow-up is required
     nextMessage: { type: String, default: '' },
     notes: { type: String, default: '' },
+    companyWebsite: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
 

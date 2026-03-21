@@ -18,6 +18,7 @@ const Leads = () => {
         status: 'Interested',
         platform: 'WhatsApp',
         profileUrl: '',
+        companyWebsite: '',
         email: '',
         phone: '',
         reminderDate: '',
@@ -62,6 +63,7 @@ const Leads = () => {
                 status: mappedStatus,
                 platform: mappedPlatform,
                 profileUrl: lead.profileUrl || '',
+                companyWebsite: lead.companyWebsite || '',
                 email: lead.email || '',
                 phone: lead.phone || '',
                 reminderDate: lead.reminderDate ? new Date(lead.reminderDate).toISOString().split('T')[0] : '',
@@ -76,6 +78,7 @@ const Leads = () => {
                 status: 'Interested',
                 platform: 'WhatsApp',
                 profileUrl: '',
+                companyWebsite: '',
                 email: '',
                 phone: '',
                 reminderDate: '',
@@ -358,6 +361,7 @@ const Leads = () => {
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted w-40">Contact Info</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Platform</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Status</th>
+                                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Website</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Lead Notes</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted">Next Follow Up</th>
                                             <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-text-muted text-right">Actions</th>
@@ -398,6 +402,16 @@ const Leads = () => {
                                                     <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getStatusColor(lead.status)}`}>
                                                         {lead.status}
                                                     </span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {lead.companyWebsite ? (
+                                                        <a href={lead.companyWebsite.startsWith('http') ? lead.companyWebsite : `https://${lead.companyWebsite}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-accent hover:text-white transition-colors group/link">
+                                                            <ExternalLink size={14} />
+                                                            <span className="text-xs font-bold truncate max-w-[120px]">{lead.companyWebsite.replace(/^https?:\/\//, '')}</span>
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-[10px] text-text-muted italic opacity-30 uppercase font-black">Not Set</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <div className="max-w-xs transition-all duration-300">
@@ -532,6 +546,11 @@ const Leads = () => {
                                                     <ExternalLink size={18} />
                                                 </a>
                                             )}
+                                            {lead.companyWebsite && (
+                                                <a href={lead.companyWebsite.startsWith('http') ? lead.companyWebsite : `https://${lead.companyWebsite}`} target="_blank" rel="noopener noreferrer" className="text-text-muted hover:text-accent p-1 transition-colors">
+                                                    <FileText size={18} />
+                                                </a>
+                                            )}
                                         </div>
                                         <button onClick={() => handleDelete(lead._id)} className="text-red-500/60 text-xs font-black uppercase tracking-widest p-1">Delete Lead</button>
                                     </div>
@@ -631,15 +650,29 @@ const Leads = () => {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Profile URL</label>
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Profile URL (Social)</label>
                                     <div className="relative">
                                         <ExternalLink className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
                                         <input
                                             type="url"
                                             className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
-                                            placeholder="https://..."
+                                            placeholder="https://linkedin.com/in/..."
                                             value={formData.profileUrl}
                                             onChange={(e) => setFormData({ ...formData, profileUrl: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Company Website</label>
+                                    <div className="relative">
+                                        <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
+                                        <input
+                                            type="text"
+                                            className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
+                                            placeholder="www.company.com"
+                                            value={formData.companyWebsite}
+                                            onChange={(e) => setFormData({ ...formData, companyWebsite: e.target.value })}
                                         />
                                     </div>
                                 </div>
