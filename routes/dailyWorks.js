@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 // GET all daily works (sorted by date desc)
 router.get('/', async (req, res) => {
     try {
-        const works = await DailyWork.find().sort({ date: -1 }).lean();
+        const works = await DailyWork.find().sort({ date: -1 });
         res.json(works);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -34,7 +34,7 @@ router.post('/', auth, async (req, res) => {
 // PUT update daily work (content or label)
 router.put('/:id', auth, async (req, res) => {
     try {
-        const workToCheck = await DailyWork.findById(req.params.id).lean();
+        const workToCheck = await DailyWork.findById(req.params.id);
         if (!workToCheck) return res.status(404).json({ message: 'Daily work not found' });
 
         if (workToCheck.createdBy && workToCheck.createdBy !== req.user.name) {
@@ -62,7 +62,7 @@ router.put('/:id', auth, async (req, res) => {
 // DELETE daily work
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const workToCheck = await DailyWork.findById(req.params.id).lean();
+        const workToCheck = await DailyWork.findById(req.params.id);
         if (!workToCheck) return res.status(404).json({ message: 'Daily work not found' });
 
         if (workToCheck.createdBy && workToCheck.createdBy !== req.user.name) {

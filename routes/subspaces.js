@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 // Get all subspaces
 router.get('/', async (req, res) => {
     try {
-        const subspaces = await Subspace.find().sort({ order: 1 }).lean();
+        const subspaces = await Subspace.find().sort({ order: 1 });
         res.json(subspaces);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -54,7 +54,7 @@ router.post('/', auth, async (req, res) => {
 // Update subspace (add content/files represented as text)
 router.put('/:id', auth, async (req, res) => {
     try {
-        const subspaceToCheck = await Subspace.findById(req.params.id).lean();
+        const subspaceToCheck = await Subspace.findById(req.params.id);
         if (!subspaceToCheck) return res.status(404).json({ message: 'Subspace not found' });
 
         if (subspaceToCheck.createdBy && subspaceToCheck.createdBy !== req.user.name && req.user.username !== 'Ansh_Unfazed') {
@@ -82,7 +82,7 @@ router.put('/:id', auth, async (req, res) => {
 // Delete subspace
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const subspaceToCheck = await Subspace.findById(req.params.id).lean();
+        const subspaceToCheck = await Subspace.findById(req.params.id);
         if (!subspaceToCheck) return res.status(404).json({ message: 'Subspace not found' });
 
         if (subspaceToCheck.createdBy && subspaceToCheck.createdBy !== req.user.name && req.user.username !== 'Ansh_Unfazed') {

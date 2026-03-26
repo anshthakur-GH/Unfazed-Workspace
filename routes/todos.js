@@ -8,7 +8,7 @@ const updateAgencyWorkProgress = async (agencyWorkId) => {
     try {
         if (!agencyWorkId) return;
 
-        const todos = await Todo.find({ agencyWork: agencyWorkId }).lean();
+        const todos = await Todo.find({ agencyWork: agencyWorkId });
         const total = todos.length;
 
         if (total === 0) {
@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
             query.goal = { $exists: false };
         }
 
-        const todos = await Todo.find(query).sort({ order: 1 }).lean();
+        const todos = await Todo.find(query).sort({ order: 1 });
         res.json(todos);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -117,7 +117,7 @@ router.post('/', auth, async (req, res) => {
 // Toggle completion
 router.put('/:id', auth, async (req, res) => {
     try {
-        const todoToCheck = await Todo.findById(req.params.id).lean();
+        const todoToCheck = await Todo.findById(req.params.id);
         if (!todoToCheck) return res.status(404).json({ message: 'Todo not found' });
 
         if (todoToCheck.author && todoToCheck.author !== req.user.name && req.user.username !== 'Ansh_Unfazed') {
@@ -151,7 +151,7 @@ router.put('/:id', auth, async (req, res) => {
 // Delete todo
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const todoToCheck = await Todo.findById(req.params.id).lean();
+        const todoToCheck = await Todo.findById(req.params.id);
         if (!todoToCheck) return res.status(404).json({ message: 'Todo not found' });
 
         if (todoToCheck.author && todoToCheck.author !== req.user.name && req.user.username !== 'Ansh_Unfazed') {

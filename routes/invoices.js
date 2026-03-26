@@ -15,10 +15,7 @@ const adminCheck = (req, res, next) => {
 // Get all invoices
 router.get('/', auth, async (req, res) => {
     try {
-        const invoices = await Invoice.find()
-            .select('type invoiceNumber billTo date dueDate total status createdBy createdAt')
-            .sort({ date: -1 })
-            .lean();
+        const invoices = await Invoice.find().sort({ date: -1 });
         res.json(invoices);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -28,7 +25,7 @@ router.get('/', auth, async (req, res) => {
 // Get single invoice
 router.get('/:id', auth, async (req, res) => {
     try {
-        const invoice = await Invoice.findById(req.params.id).lean();
+        const invoice = await Invoice.findOne({ id: req.params.id });
         // Note: Frontend generates UUID for 'id'. 
         // If migrating to MongoDB _id, we should decide. 
         // The existing frontend uses randomUUID for 'id'. 
