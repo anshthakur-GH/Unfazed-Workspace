@@ -91,7 +91,14 @@ const Login = () => {
                 </form>
             </div>
 
-            <p className="mt-8 text-white/30 text-xs font-medium italic relative z-10">
+            <div className="max-w-[700px] mt-12 px-8 text-center animate-slide-up relative z-10">
+                <p className="text-xs md:text-sm leading-relaxed text-white/40 font-sans tracking-wide">
+                    <span className="text-accent font-black uppercase tracking-[0.2em] mr-2 text-[10px]"></span>
+                    <span className="text-accent font-semibold">Unfazed AI</span> becomes a global leader in AI powered business automation within <span className="text-accent font-bold">7</span> years by building the AI operational layer that enables companies to run continuously through autonomous workflows. Businesses worldwide operate with significantly reduced manual work while more than <span className="text-accent font-bold">1M</span> autonomous workflows run through <span className="text-accent font-semibold">Unfazed AI</span>.
+                </p>
+            </div>
+
+            <p className="mt-12 text-white/20 text-[10px] uppercase tracking-[0.3em] font-black relative z-10">
                 "Unfazed Workspace for Team Unfazed."
             </p>
         </div>
