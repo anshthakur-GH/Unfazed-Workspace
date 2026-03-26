@@ -391,7 +391,7 @@ const Subspaces = () => {
                 {selectedSubspace ? (
                     <>
                         <div className="flex justify-between items-center mb-6 gap-3">
-                            <div className="flex items-center gap-3 overflow-hidden">
+                            <div className="flex-1 flex items-center gap-3 overflow-hidden">
                                 <button
                                     onClick={() => setShowList(true)}
                                     className="md:hidden p-2 -ml-2 text-accent"
@@ -422,7 +422,7 @@ const Subspaces = () => {
                                 <button
                                     onClick={updateContent}
                                     disabled={loading}
-                                    className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white px-3 py-2 rounded-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+                                    className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white px-3 py-2 rounded-lg transition-all disabled:opacity-50 whitespace-nowrap min-w-[100px] md:min-w-[120px]"
                                 >
                                     <Save size={18} />
                                     <span className="hidden sm:inline">{loading ? 'Saving...' : 'Save'}</span>
