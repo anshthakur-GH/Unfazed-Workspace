@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 // Get all records
 router.get('/', async (req, res) => {
     try {
-        const records = await Record.find().sort({ createdAt: -1 });
+        const records = await Record.find().select('title createdBy createdAt').sort({ createdAt: -1 }).lean();
         res.json(records);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 // Get single record
 router.get('/:id', async (req, res) => {
     try {
-        const record = await Record.findById(req.params.id);
+        const record = await Record.findById(req.params.id).lean();
         if (!record) return res.status(404).json({ message: 'Record not found' });
         res.json(record);
     } catch (err) {

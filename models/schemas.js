@@ -9,6 +9,10 @@ const subspaceSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+subspaceSchema.index({ order: 1 });
+subspaceSchema.index({ createdBy: 1 });
+subspaceSchema.index({ createdAt: -1 });
+
 const todoSchema = new mongoose.Schema({
     task: { type: String, required: true },
     date: { type: Date },
@@ -21,6 +25,12 @@ const todoSchema = new mongoose.Schema({
     goal: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }
 });
 
+todoSchema.index({ agencyWork: 1 });
+todoSchema.index({ goal: 1 });
+todoSchema.index({ order: 1 });
+todoSchema.index({ author: 1 });
+todoSchema.index({ isCompleted: 1 });
+
 const agencyWorkSchema = new mongoose.Schema({
     note: { type: String, required: true },
     assignedTo: { type: String, enum: ['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'], required: true },
@@ -30,6 +40,11 @@ const agencyWorkSchema = new mongoose.Schema({
     createdBy: { type: String, required: true },
     timestamp: { type: Date, default: Date.now }
 });
+
+agencyWorkSchema.index({ assignedTo: 1 });
+agencyWorkSchema.index({ createdBy: 1 });
+agencyWorkSchema.index({ deadline: 1 });
+agencyWorkSchema.index({ priority: 1 });
 
 const recordSchema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -42,6 +57,9 @@ const recordSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+recordSchema.index({ createdBy: 1 });
+recordSchema.index({ createdAt: -1 });
+
 const dailyWorkSchema = new mongoose.Schema({
     dateLabel: { type: String, required: true },
     createdBy: { type: String }, // 'Ansh' or 'Navtej'
@@ -51,6 +69,10 @@ const dailyWorkSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now }
 });
 
+dailyWorkSchema.index({ date: 1 });
+dailyWorkSchema.index({ createdBy: 1 });
+dailyWorkSchema.index({ dateLabel: 1 });
+
 const goalSchema = new mongoose.Schema({
     title: { type: String, required: true },
     targetDate: { type: Date },
@@ -58,6 +80,10 @@ const goalSchema = new mongoose.Schema({
     createdBy: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
+
+goalSchema.index({ assignedTo: 1 });
+goalSchema.index({ createdBy: 1 });
+goalSchema.index({ targetDate: 1 });
 
 const leadSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -82,6 +108,12 @@ const leadSchema = new mongoose.Schema({
     companyWebsite: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
+
+leadSchema.index({ assignedTo: 1 });
+leadSchema.index({ status: 1 });
+leadSchema.index({ reminderDate: 1 });
+leadSchema.index({ createdAt: -1 });
+leadSchema.index({ name: 'text', notes: 'text' }); // Added text index for better searching
 
 const invoiceSchema = new mongoose.Schema({
     type: { type: String, enum: ['invoice', 'quotation'], default: 'invoice' },
@@ -116,6 +148,11 @@ const invoiceSchema = new mongoose.Schema({
     createdBy: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
+
+invoiceSchema.index({ invoiceNumber: 1 });
+invoiceSchema.index({ createdBy: 1 });
+invoiceSchema.index({ status: 1 });
+invoiceSchema.index({ date: -1 });
 
 module.exports = {
     Subspace: mongoose.model('Subspace', subspaceSchema),

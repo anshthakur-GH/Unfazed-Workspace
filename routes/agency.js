@@ -10,10 +10,19 @@ router.get('/', auth, async (req, res) => {
         const works = await AgencyWork.find().lean(); // Use lean() for better performance and easier modification
 
         // Attach hasTodos flag
-        const worksWithTodosStatus = await Promise.all(works.map(async (work) => {
-            const todoCount = await require('../models/schemas').Todo.countDocuments({ agencyWork: work._id });
-            return { ...work, hasTodos: todoCount > 0 };
-        }));
+        // Optimized: Get all todo counts in one aggregation to avoid N+1 queries
+        const todoCounts = await require('../models/schemas').Todo.aggregate([
+            { $group: { _id: '$agencyWork', count: { $sum: 1 } } }
+        ]);
+        const countsMap = todoCounts.reduce((acc, curr) => {
+            if (curr._id) acc[curr._id.toString()] = curr.count;
+            return acc;
+        }, {});
+ 
+        // Attach hasTodos flag
+        const worksWithTodosStatus = works.map((work) => {
+            return { ...work, hasTodos: (countsMap[work._id.toString()] || 0) > 0 };
+        });
 
         // Helper for sorting
         const getVal = (w) => w;
@@ -74,7 +83,7 @@ router.post('/', auth, async (req, res) => {
 // Update work
 router.put('/:id', auth, async (req, res) => {
     try {
-        const workToCheck = await AgencyWork.findById(req.params.id);
+        const workToCheck = await AgencyWork.findById(req.params.id).lean();
         if (!workToCheck) return res.status(404).json({ message: 'Work not found' });
 
         if (workToCheck.createdBy && workToCheck.createdBy !== req.user.name && req.user.username !== 'Ansh_Unfazed') {
@@ -104,7 +113,7 @@ router.put('/:id', auth, async (req, res) => {
 // Delete work
 router.delete('/:id', auth, async (req, res) => {
     try {
-        const workToCheck = await AgencyWork.findById(req.params.id);
+        const workToCheck = await AgencyWork.findById(req.params.id).lean();
         if (!workToCheck) return res.status(404).json({ message: 'Work not found' });
 
         if (workToCheck.createdBy && workToCheck.createdBy !== req.user.name && req.user.username !== 'Ansh_Unfazed') {
