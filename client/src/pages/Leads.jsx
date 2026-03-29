@@ -568,18 +568,18 @@ const Leads = () => {
                         {/* Mobile Drag Handle */}
                         <div className="w-12 h-1.5 bg-border rounded-full mx-auto mt-4 md:hidden" />
 
-                        <div className="p-4 md:p-6 flex flex-col h-full overflow-y-auto custom-scrollbar no-scrollbar">
-                            <div className="flex justify-between items-center mb-4">
+                        <div className="p-3 md:p-5 flex flex-col h-full overflow-y-auto custom-scrollbar no-scrollbar">
+                            <div className="flex justify-between items-center mb-3">
                                 <div>
-                                    <h2 className="text-xl font-black text-white tracking-tighter uppercase">{currentLead ? 'Edit Lead' : 'New Prospect'}</h2>
+                                    <h2 className="text-lg md:text-xl font-black text-white tracking-tighter uppercase">{currentLead ? 'Edit Lead' : 'New Prospect'}</h2>
                                     <p className="text-text-muted text-[10px] font-black uppercase tracking-widest mt-0.5">Pipeline details</p>
                                 </div>
                                 <button onClick={handleCloseModal} className="bg-secondary/10 hover:bg-red-500/20 p-2 rounded-full text-text-muted hover:text-red-500 border border-border transition-all">
-                                    <X size={20} />
+                                    <X size={18} />
                                 </button>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="space-y-3">
+                            <form onSubmit={handleSubmit} className="space-y-2">
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Lead Name *</label>
                                     <div className="relative">
@@ -587,7 +587,7 @@ const Leads = () => {
                                         <input
                                             type="text"
                                             required
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
+                                            className="w-full bg-background border border-border rounded-xl p-2 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
                                             placeholder="Enter lead name..."
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -599,7 +599,7 @@ const Leads = () => {
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Platform</label>
                                         <select
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
+                                            className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
                                             value={formData.platform}
                                             onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
                                         >
@@ -614,7 +614,7 @@ const Leads = () => {
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Status</label>
                                         <select
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent appearance-none"
+                                            className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent appearance-none"
                                             value={formData.status}
                                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                         >
@@ -631,7 +631,7 @@ const Leads = () => {
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Email</label>
                                         <input
                                             type="email"
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent"
+                                            className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent"
                                             placeholder="email@..."
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -641,7 +641,7 @@ const Leads = () => {
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Phone</label>
                                         <input
                                             type="text"
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent"
+                                            className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent"
                                             placeholder="+123..."
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -649,31 +649,32 @@ const Leads = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Profile URL (Social)</label>
-                                    <div className="relative">
-                                        <ExternalLink className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
-                                        <input
-                                            type="url"
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
-                                            placeholder="https://linkedin.com/in/..."
-                                            value={formData.profileUrl}
-                                            onChange={(e) => setFormData({ ...formData, profileUrl: e.target.value })}
-                                        />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Profile URL</label>
+                                        <div className="relative">
+                                            <ExternalLink className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={14} />
+                                            <input
+                                                type="url"
+                                                className="w-full bg-background border border-border rounded-xl p-2 pl-10 text-sm text-text focus:outline-none focus:border-accent transition-all"
+                                                placeholder="Social URL..."
+                                                value={formData.profileUrl}
+                                                onChange={(e) => setFormData({ ...formData, profileUrl: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Company Website</label>
-                                    <div className="relative">
-                                        <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={16} />
-                                        <input
-                                            type="text"
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 pl-12 text-sm text-text focus:outline-none focus:border-accent transition-all"
-                                            placeholder="www.company.com"
-                                            value={formData.companyWebsite}
-                                            onChange={(e) => setFormData({ ...formData, companyWebsite: e.target.value })}
-                                        />
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Website</label>
+                                        <div className="relative">
+                                            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" size={14} />
+                                            <input
+                                                type="text"
+                                                className="w-full bg-background border border-border rounded-xl p-2 pl-10 text-sm text-text focus:outline-none focus:border-accent transition-all"
+                                                placeholder="company.com"
+                                                value={formData.companyWebsite}
+                                                onChange={(e) => setFormData({ ...formData, companyWebsite: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -682,7 +683,7 @@ const Leads = () => {
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Next Follow-Up</label>
                                         <input
                                             type="date"
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-accent [color-scheme:dark]"
+                                            className="w-full bg-background border border-border rounded-xl p-2 text-sm text-white focus:outline-none focus:border-accent [color-scheme:dark]"
                                             value={formData.reminderDate}
                                             onChange={(e) => setFormData({ ...formData, reminderDate: e.target.value })}
                                         />
@@ -690,7 +691,7 @@ const Leads = () => {
                                     <div className="space-y-1">
                                         <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Assigned To</label>
                                         <select
-                                            className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
+                                            className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent appearance-none capitalize"
                                             value={formData.assignedTo}
                                             onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
                                         >
@@ -705,7 +706,7 @@ const Leads = () => {
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Next Message</label>
                                     <textarea
-                                        className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent min-h-[60px] resize-none"
+                                        className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent min-h-[45px] max-h-[80px] resize-none"
                                         placeholder="Next message..."
                                         value={formData.nextMessage}
                                         onChange={(e) => setFormData({ ...formData, nextMessage: e.target.value })}
@@ -715,7 +716,7 @@ const Leads = () => {
                                 <div className="space-y-1">
                                     <label className="text-[10px] font-black uppercase tracking-widest text-text-muted px-1">Lead Notes</label>
                                     <textarea
-                                        className="w-full bg-background border border-border rounded-xl p-2.5 text-sm text-text focus:outline-none focus:border-accent min-h-[80px] resize-none"
+                                        className="w-full bg-background border border-border rounded-xl p-2 text-sm text-text focus:outline-none focus:border-accent min-h-[60px] max-h-[100px] resize-none"
                                         placeholder="Notes..."
                                         value={formData.notes}
                                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -726,13 +727,13 @@ const Leads = () => {
                                     <button
                                         type="button"
                                         onClick={handleCloseModal}
-                                        className="flex-1 bg-background border border-border text-text-muted font-black uppercase tracking-widest py-3 rounded-xl hover:bg-secondary/20 transition-all text-xs"
+                                        className="flex-1 bg-background border border-border text-text-muted font-black uppercase tracking-widest py-2.5 rounded-xl hover:bg-secondary/20 transition-all text-xs"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
-                                        className="flex-[2] bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-accent/20 text-xs"
+                                        className="flex-[2] bg-accent hover:bg-accent-hover text-white font-black uppercase tracking-widest py-2.5 rounded-xl transition-all shadow-lg shadow-accent/20 text-xs"
                                     >
                                         {currentLead ? 'Update' : 'Create'}
                                     </button>
