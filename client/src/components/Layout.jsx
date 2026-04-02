@@ -49,6 +49,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Subspaces' },
         { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily Work' },
         { path: '/dashboard/records', icon: Table, label: 'Records - sheet' },
+        { path: '/dashboard/goals', icon: Target, label: 'Goals' },
     ];
 
     return (

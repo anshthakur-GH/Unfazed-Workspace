@@ -43,6 +43,7 @@ app.use('/api/records', recordRoutes);
 app.use('/api/daily-works', dailyWorkRoutes);
 app.use('/api/invoices', require('../routes/invoices'));
 app.use('/api/leads', leadRoutes);
+app.use('/api/goals', require('../routes/goals'));
 
 
 // Auth Route (Hardcoded)

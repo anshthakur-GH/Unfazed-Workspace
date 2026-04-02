@@ -9,6 +9,7 @@ import Records from './pages/Records';
 import DailyWorks from './pages/DailyWorks';
 import Invoices from './pages/Invoices';
 import Leads from './pages/Leads';
+import Goals from './pages/Goals';
 
 function App() {
   const isAuthenticated = () => {
@@ -50,6 +51,7 @@ function App() {
           <Route path="agency" element={<Agency />} />
           <Route path="daily-works" element={<DailyWorks />} />
           <Route path="records" element={<Records />} />
+          <Route path="goals" element={<Goals />} />
 
           <Route path="" element={<Navigate to="leads" replace />} />
         </Route>

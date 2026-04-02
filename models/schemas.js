@@ -53,9 +53,13 @@ const dailyWorkSchema = new mongoose.Schema({
 
 const goalSchema = new mongoose.Schema({
     title: { type: String, required: true },
-    targetDate: { type: Date },
-    assignedTo: { type: String, required: true },
-    createdBy: { type: String, required: true },
+    type: { type: String, enum: ['global', 'individual'], default: 'individual' },
+    member: { type: String }, // 'Ansh Thakur', 'Navtej', 'Ansh Saxena', 'Ayush'
+    author: { type: String, required: true },
+    isCompleted: { type: Boolean, default: false },
+    month: { type: String },
+    year: { type: String },
+    date: { type: Date },
     createdAt: { type: Date, default: Date.now }
 });
 
