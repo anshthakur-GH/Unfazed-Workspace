@@ -47,7 +47,7 @@ const MemberGoalContainer = ({ member, goals, onAdd, onToggle, onDelete, newTask
                                 >
                                     {goal.isCompleted ? <CheckCircle2 size={22} /> : <Circle size={22} />}
                                 </button>
-                                <span className={`text-sm font-medium truncate ${goal.isCompleted ? 'line-through text-text-muted' : 'text-white'}`}>
+                                <span className={`text-xs font-medium leading-relaxed ${goal.isCompleted ? 'line-through text-text-muted' : 'text-white'}`}>
                                     {goal.title}
                                 </span>
                             </div>
