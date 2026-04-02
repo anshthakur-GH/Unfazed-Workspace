@@ -53,7 +53,7 @@ function App() {
           <Route path="records" element={<Records />} />
           <Route path="goals" element={<Goals />} />
 
-          <Route path="" element={<Navigate to="leads" replace />} />
+          <Route path="" element={<Navigate to="goals" replace />} />
         </Route>
       </Routes>
     </Router>
