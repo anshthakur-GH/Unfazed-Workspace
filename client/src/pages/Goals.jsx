@@ -34,11 +34,10 @@ const MemberGoalContainer = ({ member, goals, onAdd, onToggle, onDelete, newTask
                     goals.map((goal) => (
                         <div
                             key={goal._id}
-                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 group/item ${
-                                goal.isCompleted 
-                                ? 'bg-accent/5 border-accent/20 opacity-60' 
+                            className={`flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 group/item ${goal.isCompleted
+                                ? 'bg-accent/5 border-accent/20 opacity-60'
                                 : 'bg-background/40 border-border hover:border-accent/40'
-                            }`}
+                                }`}
                         >
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <button
@@ -62,7 +61,7 @@ const MemberGoalContainer = ({ member, goals, onAdd, onToggle, onDelete, newTask
                 )}
             </div>
 
-            <form 
+            <form
                 onSubmit={(e) => {
                     e.preventDefault();
                     onAdd(member);
@@ -94,11 +93,11 @@ const Goals = () => {
     const [memberGoals, setMemberGoals] = useState({});
     const [loading, setLoading] = useState(true);
     const [newTask, setNewTask] = useState({ member: '', title: '' });
-    
+
     const username = localStorage.getItem('username');
     const isAdmin = username === 'Ansh_Unfazed';
     const members = ['Ansh Thakur', 'Navtej', 'Ansh Saxena', 'Ayush'];
-    
+
     const currentMonth = format(new Date(), 'MMMM');
     const currentYear = format(new Date(), 'yyyy');
     const currentDate = format(new Date(), 'do MMM, yyyy');
@@ -113,18 +112,18 @@ const Goals = () => {
             const res = await axios.get(`${API_URL}/api/goals`, {
                 params: { month: currentMonth, year: currentYear }
             });
-            
+
             const goals = res.data;
             const global = goals.find(g => g.type === 'global');
             setGlobalGoal(global);
             if (global) setGlobalGoalText(global.title);
-            
+
             const grouped = {};
             members.forEach(m => {
                 grouped[m] = goals.filter(g => g.type === 'individual' && g.member === m);
             });
             setMemberGoals(grouped);
-            
+
             setLoading(false);
         } catch (err) {
             console.error('Error fetching goals:', err);
@@ -158,7 +157,7 @@ const Goals = () => {
     const handleAddMemberGoal = async (member) => {
         const text = newTask.title.trim();
         if (!text) return;
-        
+
         try {
             const res = await axios.post(`${API_URL}/api/goals`, {
                 title: text,
@@ -167,7 +166,7 @@ const Goals = () => {
                 month: currentMonth,
                 year: currentYear
             });
-            
+
             setMemberGoals(prev => ({
                 ...prev,
                 [member]: [...(prev[member] || []), res.data]
@@ -183,7 +182,7 @@ const Goals = () => {
             const res = await axios.put(`${API_URL}/api/goals/${goal._id}`, {
                 isCompleted: !goal.isCompleted
             });
-            
+
             setMemberGoals(prev => ({
                 ...prev,
                 [goal.member]: prev[goal.member].map(g => g._id === goal._id ? res.data : g)
@@ -221,7 +220,7 @@ const Goals = () => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-2">GOALS</h1>
+                    <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-2">Unfazed GOALS</h1>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 border border-accent/20 rounded-full">
                             <Calendar size={14} className="text-accent" />
@@ -239,15 +238,15 @@ const Goals = () => {
                     <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                         <Target size={300} />
                     </div>
-                    
+
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent text-white">
                                 <Target size={18} />
                             </div>
-                            <span className="text-sm font-black text-accent uppercase tracking-[0.3em]">Current Month Main Goal</span>
+                            <span className="text-sm font-black text-accent uppercase tracking-[0.3em]">Current Month Goal</span>
                         </div>
-                        
+
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                             <div className="flex-1">
                                 {isEditingGlobal && isAdmin ? (
@@ -282,7 +281,7 @@ const Goals = () => {
                                     </h2>
                                 )}
                             </div>
-                            
+
                             {!isEditingGlobal && isAdmin && (
                                 <button
                                     onClick={() => setIsEditingGlobal(true)}
@@ -300,7 +299,7 @@ const Goals = () => {
             {/* Member Containers Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {members.map((member) => (
-                    <MemberGoalContainer 
+                    <MemberGoalContainer
                         key={member}
                         member={member}
                         goals={memberGoals[member] || []}
