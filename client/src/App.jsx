@@ -6,7 +6,6 @@ import Subspaces from './pages/Subspaces';
 import Todos from './pages/Todos';
 import Agency from './pages/Agency';
 import Records from './pages/Records';
-import DailyWorks from './pages/DailyWorks';
 import Invoices from './pages/Invoices';
 import Leads from './pages/Leads';
 import Goals from './pages/Goals';
@@ -49,7 +48,6 @@ function App() {
           <Route path="todos" element={<Todos />} />
           <Route path="leads" element={<Leads />} />
           <Route path="agency" element={<Agency />} />
-          <Route path="daily-works" element={<DailyWorks />} />
           <Route path="records" element={<Records />} />
           <Route path="goals" element={<Goals />} />
 

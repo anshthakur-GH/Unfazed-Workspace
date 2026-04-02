@@ -7,7 +7,6 @@ const BottomNav = () => {
         { path: '/dashboard/todos', icon: CheckSquare, label: 'Tasks' },
         { path: '/dashboard/leads', icon: Target, label: 'Leads' },
         { path: '/dashboard/agency', icon: Briefcase, label: 'Agency' },
-        { path: '/dashboard/daily-works', icon: Calendar, label: 'Daily' },
         { path: '/dashboard/subspaces', icon: LayoutDashboard, label: 'Space' },
     ];
 

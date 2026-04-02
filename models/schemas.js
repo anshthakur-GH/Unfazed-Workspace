@@ -42,14 +42,6 @@ const recordSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-const dailyWorkSchema = new mongoose.Schema({
-    dateLabel: { type: String, required: true },
-    createdBy: { type: String }, // 'Ansh' or 'Navtej'
-    date: { type: Date, required: true },
-    content: { type: String, default: '' },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now }
-});
 
 const goalSchema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -126,7 +118,6 @@ module.exports = {
     Todo: mongoose.model('Todo', todoSchema),
     AgencyWork: mongoose.model('AgencyWork', agencyWorkSchema),
     Record: mongoose.model('Record', recordSchema),
-    DailyWork: mongoose.model('DailyWork', dailyWorkSchema),
     Goal: mongoose.model('Goal', goalSchema),
     Invoice: mongoose.model('Invoice', invoiceSchema),
     Lead: mongoose.model('Lead', leadSchema),

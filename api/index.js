@@ -32,7 +32,6 @@ const subspaceRoutes = require('../routes/subspaces');
 const todoRoutes = require('../routes/todos');
 const agencyRoutes = require('../routes/agency');
 const recordRoutes = require('../routes/records');
-const dailyWorkRoutes = require('../routes/dailyWorks');
 const leadRoutes = require('../routes/leads');
 
 
@@ -40,7 +39,6 @@ app.use('/api/subspaces', subspaceRoutes);
 app.use('/api/todos', todoRoutes);
 app.use('/api/agency', agencyRoutes);
 app.use('/api/records', recordRoutes);
-app.use('/api/daily-works', dailyWorkRoutes);
 app.use('/api/invoices', require('../routes/invoices'));
 app.use('/api/leads', leadRoutes);
 app.use('/api/goals', require('../routes/goals'));
