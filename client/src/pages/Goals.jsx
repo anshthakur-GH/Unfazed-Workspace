@@ -6,15 +6,15 @@ import { format } from 'date-fns';
 
 const MemberGoalContainer = ({ member, goals, onAdd, onToggle, onDelete, newTask, setNewTask }) => {
     return (
-        <div className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-6 flex flex-col h-[500px] hover:shadow-2xl hover:shadow-accent/5 transition-all duration-500 group">
+        <div className="bg-card/40 backdrop-blur-xl border border-border rounded-2xl md:rounded-3xl p-5 md:p-6 flex flex-col h-[380px] md:h-[450px] hover:shadow-2xl hover:shadow-accent/5 transition-all duration-500 group">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-accent/10 flex items-center justify-center text-accent group-hover:scale-110 transition-transform duration-500">
                         <User size={20} />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black text-white tracking-tight">{member}</h3>
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">Personal Goals</p>
+                        <h3 className="text-lg md:text-xl font-black text-white tracking-tight leading-none mb-1">{member}</h3>
+                        <p className="text-[9px] md:text-[10px] text-text-muted font-bold uppercase tracking-widest leading-none">Goal List</p>
                     </div>
                 </div>
                 <div className="bg-background/50 px-3 py-1 rounded-full border border-border">
@@ -71,10 +71,10 @@ const MemberGoalContainer = ({ member, goals, onAdd, onToggle, onDelete, newTask
             >
                 <input
                     type="text"
-                    placeholder="Add a new goal..."
+                    placeholder="Quick set goal..."
                     value={newTask.member === member ? newTask.title : ''}
                     onChange={(e) => setNewTask({ member: member, title: e.target.value })}
-                    className="w-full bg-background/60 border border-border rounded-2xl px-5 py-4 text-sm text-white focus:outline-none focus:border-accent transition-all pr-12 placeholder:text-text-muted/50"
+                    className="w-full bg-background/60 border border-border rounded-xl md:rounded-2xl px-4 py-3.5 md:px-5 md:py-4 text-xs md:text-sm text-white focus:outline-none focus:border-accent transition-all pr-12 placeholder:text-text-muted/50"
                 />
                 <button
                     type="submit"
@@ -217,7 +217,7 @@ const Goals = () => {
     }
 
     return (
-        <div className="max-w-[1400px] mx-auto space-y-8 animate-in fade-in duration-700">
+        <div className="max-w-[1400px] mx-auto flex flex-col gap-6 md:gap-8 pb-24 md:pb-8 animate-in fade-in duration-700">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
@@ -230,24 +230,12 @@ const Goals = () => {
                         <span className="text-xs font-bold text-text-muted uppercase tracking-widest">{currentDate}</span>
                     </div>
                 </div>
-                
-                <div className="flex gap-4">
-                    <div className="bg-card/50 border border-border rounded-2xl px-6 py-4 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
-                            <Trophy size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest leading-none mb-1">Company Goal</p>
-                            <p className="text-sm font-black text-white leading-none">TARGET ACHIEVER</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Global Goal Section */}
             <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative bg-card/60 backdrop-blur-2xl border border-border rounded-3xl p-8 md:p-10 overflow-hidden">
+                <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                <div className="relative bg-card/60 backdrop-blur-2xl border border-border rounded-2xl md:rounded-3xl p-6 md:p-10 overflow-hidden">
                     <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
                         <Target size={300} />
                     </div>
@@ -289,7 +277,7 @@ const Goals = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                                    <h2 className="text-xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
                                         {globalGoal?.title || "No main goal set yet for this month."}
                                     </h2>
                                 )}
