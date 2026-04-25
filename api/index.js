@@ -9,8 +9,18 @@ const app = express();
 connectDB();
 
 // Middleware
+const allowedOrigins = [
+    'https://workspace.unfazedai.in',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+app.use(cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 app.use(express.json());
-app.use(cors());
 
 // Request Timing Middleware
 app.use((req, res, next) => {
