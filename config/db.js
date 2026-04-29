@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 let isConnected = false;
 
 const connectDB = async () => {
-    if (isConnected) {
+    if (isConnected && mongoose.connection.readyState === 1) {
         return;
     }
 
@@ -14,13 +14,15 @@ const connectDB = async () => {
             maxPoolSize: 10,
             serverSelectionTimeoutMS: 5000,
             socketTimeoutMS: 45000,
-            family: 4 // Force IPv4 to avoid potential IPv6 resolution delays
+            family: 4,
+            heartbeatFrequencyMS: 10000, // Frequent heartbeats to keep connection alive
         });
 
-        isConnected = db.connections[0].readyState === 1;
+        isConnected = true;
         console.log('MongoDB Connected');
         console.timeEnd('DB Connection Time');
     } catch (error) {
+        isConnected = false;
         console.error('MongoDB connection error:', error.message);
     }
 };

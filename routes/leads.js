@@ -5,13 +5,15 @@ const { Lead } = require('../models/schemas');
 // Get all leads (optionally filtered by assignedTo)
 router.get('/', async (req, res) => {
     try {
+        console.time('Fetch Leads');
         const { assignedTo } = req.query;
         let query = {};
         if (assignedTo) {
             query.assignedTo = assignedTo;
         }
         // Sort by reminderDate ascending so upcoming reminders are first
-        const leads = await Lead.find(query).sort({ reminderDate: 1, createdAt: -1 });
+        const leads = await Lead.find(query).sort({ reminderDate: 1, createdAt: -1 }).lean();
+        console.timeEnd('Fetch Leads');
         res.json(leads);
     } catch (err) {
         res.status(500).json({ message: err.message });

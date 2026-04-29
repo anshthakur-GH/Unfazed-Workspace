@@ -6,13 +6,15 @@ const auth = require('../middleware/auth');
 // Get all goals
 router.get('/', async (req, res) => {
     try {
+        console.time('Fetch Goals');
         const { month, year, type } = req.query;
         let query = {};
         if (month) query.month = month;
         if (year) query.year = year;
         if (type) query.type = type;
         
-        const goals = await Goal.find(query).sort({ createdAt: -1 });
+        const goals = await Goal.find(query).sort({ createdAt: -1 }).lean();
+        console.timeEnd('Fetch Goals');
         res.json(goals);
     } catch (err) {
         res.status(500).json({ error: err.message });

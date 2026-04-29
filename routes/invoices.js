@@ -15,7 +15,9 @@ const adminCheck = (req, res, next) => {
 // Get all invoices
 router.get('/', auth, async (req, res) => {
     try {
-        const invoices = await Invoice.find().sort({ date: -1 });
+        console.time('Fetch Invoices');
+        const invoices = await Invoice.find().sort({ date: -1 }).lean();
+        console.timeEnd('Fetch Invoices');
         res.json(invoices);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -25,26 +27,7 @@ router.get('/', auth, async (req, res) => {
 // Get single invoice
 router.get('/:id', auth, async (req, res) => {
     try {
-        const invoice = await Invoice.findOne({ id: req.params.id });
-        // Note: Frontend generates UUID for 'id'. 
-        // If migrating to MongoDB _id, we should decide. 
-        // The existing frontend uses randomUUID for 'id'. 
-        // We can keep 'id' in schema or switch to _id.
-        // The Schema I added didn't specify a custom 'id' field, so it uses default _id.
-        // Frontend uses 'id' (UUID). 
-        // I should probably support the UUID from frontend or rely on _id.
-        // Let's use the MongoDB _id for new invoices, but frontend expects 'id'.
-        // I'll adjust the route to return _id as id or just use _id on frontend.
-        // Actually, easiest is to let frontend logic remain, but map 'id' to _id or store the UUID.
-        // Schema I added:
-        // const invoiceSchema = new mongoose.Schema({
-        //    invoiceNumber: { type: String, required: true },
-        // ...
-        // });
-        // It does NOT have an 'id' field (UUID).
-        // I should add 'id' to schema to matching frontend's UUID or update frontend to use _id.
-        // Update frontend is better (standard).
-        // So here I'll just return standard Mongoose docs which have _id.
+        const invoice = await Invoice.findById(req.params.id).lean();
         res.json(invoice);
     } catch (err) {
         res.status(500).json({ error: err.message });

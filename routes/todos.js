@@ -8,23 +8,18 @@ const updateAgencyWorkProgress = async (agencyWorkId) => {
     try {
         if (!agencyWorkId) return;
 
-        const todos = await Todo.find({ agencyWork: agencyWorkId });
-        const total = todos.length;
+        // Optimized: Use countDocuments instead of fetching all records
+        const [total, completed] = await Promise.all([
+            Todo.countDocuments({ agencyWork: agencyWorkId }),
+            Todo.countDocuments({ agencyWork: agencyWorkId, isCompleted: true })
+        ]);
 
         if (total === 0) {
-            // If no todos, we don't reset progress to 0 automatically because 
-            // the user might want to switch back to manual mode with their previous value,
-            // OR per requirement: "if that To Do List is created and not any work is completed... progress will be zero"
-            // AND "if any work does not contain any To Do List then the user can manually maintain"
-            // The requirement says: "if that To Do List is created and not any work is completed... progress will be zero".
-            // It implies if there ARE todos, progress is calculated. If there are NO todos, it's manual.
-            // So if total === 0, we do NOTHING to the progress, leaving it as manual.
+            // If no todos, it's manual mode
             return;
         }
 
-        const completed = todos.filter(t => t.isCompleted).length;
         const progress = Math.round((completed / total) * 100);
-
         await AgencyWork.findByIdAndUpdate(agencyWorkId, { progress });
     } catch (err) {
         console.error('Error updating agency work progress:', err);
@@ -34,6 +29,7 @@ const updateAgencyWorkProgress = async (agencyWorkId) => {
 // Get all todos
 router.get('/', async (req, res) => {
     try {
+        console.time('Fetch Todos');
         const { agencyWorkId } = req.query;
         let query = {};
 
@@ -47,7 +43,8 @@ router.get('/', async (req, res) => {
             query.goal = { $exists: false };
         }
 
-        const todos = await Todo.find(query).sort({ order: 1 });
+        const todos = await Todo.find(query).sort({ order: 1 }).lean();
+        console.timeEnd('Fetch Todos');
         res.json(todos);
     } catch (err) {
         res.status(500).json({ error: err.message });

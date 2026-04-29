@@ -6,7 +6,10 @@ const auth = require('../middleware/auth');
 // Get all records
 router.get('/', async (req, res) => {
     try {
-        const records = await Record.find().sort({ createdAt: -1 });
+        console.time('Fetch Records List');
+        // Projection: exclude 'data' field which is a heavy 50x10 array
+        const records = await Record.find({}, { data: 0 }).sort({ createdAt: -1 }).lean();
+        console.timeEnd('Fetch Records List');
         res.json(records);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -16,7 +19,7 @@ router.get('/', async (req, res) => {
 // Get single record
 router.get('/:id', async (req, res) => {
     try {
-        const record = await Record.findById(req.params.id);
+        const record = await Record.findById(req.params.id).lean();
         if (!record) return res.status(404).json({ message: 'Record not found' });
         res.json(record);
     } catch (err) {

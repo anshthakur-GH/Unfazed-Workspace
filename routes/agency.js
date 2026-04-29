@@ -4,48 +4,54 @@ const { AgencyWork } = require('../models/schemas');
 const auth = require('../middleware/auth');
 
 // Get all works
-// Get all works
 router.get('/', auth, async (req, res) => {
     try {
-        const works = await AgencyWork.find().lean(); // Use lean() for better performance and easier modification
+        console.time('Fetch Agency Works');
+        
+        // 1. Fetch all works using lean() for performance
+        const works = await AgencyWork.find().lean();
 
-        // Attach hasTodos flag
-        const worksWithTodosStatus = await Promise.all(works.map(async (work) => {
-            const todoCount = await require('../models/schemas').Todo.countDocuments({ agencyWork: work._id });
-            return { ...work, hasTodos: todoCount > 0 };
+        // 2. Efficiently check for todos using a single aggregation
+        const worksWithTodos = await require('../models/schemas').Todo.aggregate([
+            { $group: { _id: '$agencyWork', count: { $sum: 1 } } }
+        ]);
+
+        // Create a lookup map for faster access
+        const todoCountMap = worksWithTodos.reduce((acc, curr) => {
+            if (curr._id) acc[curr._id.toString()] = curr.count;
+            return acc;
+        }, {});
+
+        // 3. Attach hasTodos flag using the map
+        const worksWithTodosStatus = works.map(work => ({
+            ...work,
+            hasTodos: (todoCountMap[work._id.toString()] || 0) > 0
         }));
 
-        // Helper for sorting
-        const getVal = (w) => w;
-
-        // Custom Sorting Logic
+        // 4. Custom Sorting Logic
         worksWithTodosStatus.sort((a, b) => {
-            // 1. Completion: Non-100% before 100%
             const aDone = a.progress === 100;
             const bDone = b.progress === 100;
             if (aDone && !bDone) return 1;
             if (!aDone && bDone) return -1;
 
-            // 2. Priority: High(3) > Medium(2) > Low(1)
             const priorities = { 'High': 3, 'Medium': 2, 'Low': 1 };
-            const aPrio = priorities[a.priority] || 2; // Default to Medium
+            const aPrio = priorities[a.priority] || 2;
             const bPrio = priorities[b.priority] || 2;
             if (aPrio !== bPrio) return bPrio - aPrio;
 
-            // 3. Deadline: Ascending (Sooner deadline first). Items without deadline go last.
             const aDead = a.deadline ? new Date(a.deadline).getTime() : Number.MAX_SAFE_INTEGER;
             const bDead = b.deadline ? new Date(b.deadline).getTime() : Number.MAX_SAFE_INTEGER;
             if (aDead !== bDead) return aDead - bDead;
 
-            // 4. Progress: Descending (Higher progress first)
             if (a.progress !== b.progress) return b.progress - a.progress;
-
-            // 5. Timestamp: Descending (Newest first)
             return new Date(b.timestamp) - new Date(a.timestamp);
         });
 
+        console.timeEnd('Fetch Agency Works');
         res.json(worksWithTodosStatus);
     } catch (err) {
+        console.error('Fetch Agency Works Error:', err);
         res.status(500).json({ error: err.message });
     }
 });

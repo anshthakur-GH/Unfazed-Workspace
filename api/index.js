@@ -64,22 +64,26 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        console.time('Login Process');
-        console.time('DB Find User');
-        const user = await User.findOne({ username });
-        console.timeEnd('DB Find User');
+        console.time(`Login-${username}`);
+        
+        // Ensure DB is connected (mostly for serverless cold starts)
+        await connectDB();
+
+        console.time(`DB-FindUser-${username}`);
+        const user = await User.findOne({ username }).lean();
+        console.timeEnd(`DB-FindUser-${username}`);
 
         if (!user) {
-            console.timeEnd('Login Process');
+            console.timeEnd(`Login-${username}`);
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
-        console.time('Bcrypt Compare');
+        console.time(`Bcrypt-Compare-${username}`);
         const isMatch = await bcrypt.compare(password, user.password);
-        console.timeEnd('Bcrypt Compare');
+        console.timeEnd(`Bcrypt-Compare-${username}`);
 
         if (!isMatch) {
-            console.timeEnd('Login Process');
+            console.timeEnd(`Login-${username}`);
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
@@ -89,10 +93,10 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        console.timeEnd('Login Process');
+        console.timeEnd(`Login-${username}`);
         res.json({ success: true, token, username: user.username });
     } catch (err) {
-        console.timeEnd('Login Process');
+        console.timeEnd(`Login-${username}`);
         console.error("Login error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }

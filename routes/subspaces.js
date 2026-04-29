@@ -6,7 +6,10 @@ const auth = require('../middleware/auth');
 // Get all subspaces
 router.get('/', async (req, res) => {
     try {
-        const subspaces = await Subspace.find().sort({ order: 1 });
+        console.time('Fetch Subspaces List');
+        // Projection: exclude 'content' which can be large
+        const subspaces = await Subspace.find({}, { content: 0 }).sort({ order: 1 }).lean();
+        console.timeEnd('Fetch Subspaces List');
         res.json(subspaces);
     } catch (err) {
         res.status(500).json({ error: err.message });
