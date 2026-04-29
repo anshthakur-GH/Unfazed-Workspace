@@ -10,9 +10,11 @@ router.get('/', auth, async (req, res) => {
         
         // 1. Fetch all works using lean() for performance
         const works = await AgencyWork.find().lean();
+        const workIds = works.map(w => w._id);
 
-        // 2. Efficiently check for todos using a single aggregation
+        // 2. Efficiently check for todos using a single aggregation, filtered by workIds
         const worksWithTodos = await require('../models/schemas').Todo.aggregate([
+            { $match: { agencyWork: { $in: workIds } } },
             { $group: { _id: '$agencyWork', count: { $sum: 1 } } }
         ]);
 

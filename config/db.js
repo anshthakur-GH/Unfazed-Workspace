@@ -9,17 +9,21 @@ const connectDB = async () => {
 
     try {
         console.time('DB Connection Time');
-        const db = await mongoose.connect(process.env.MONGO_URI, {
-            // Optimized for MongoDB Atlas
-            maxPoolSize: 10,
-            serverSelectionTimeoutMS: 5000,
+        await mongoose.connect(process.env.MONGO_URI, {
+            // Optimized for MongoDB Atlas performance
+            maxPoolSize: 100,
+            minPoolSize: 5,
+            serverSelectionTimeoutMS: 3000, // Faster failure if DB is down
+            connectTimeoutMS: 10000,
             socketTimeoutMS: 45000,
             family: 4,
-            heartbeatFrequencyMS: 10000, // Frequent heartbeats to keep connection alive
+            heartbeatFrequencyMS: 10000,
+            retryWrites: true,
+            w: 'majority'
         });
 
         isConnected = true;
-        console.log('MongoDB Connected');
+        console.log('MongoDB Connected (Optimized Pool)');
         console.timeEnd('DB Connection Time');
     } catch (error) {
         isConnected = false;

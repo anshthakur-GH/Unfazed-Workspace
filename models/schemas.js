@@ -8,6 +8,7 @@ const subspaceSchema = new mongoose.Schema({
     order: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
+subspaceSchema.index({ order: 1 });
 
 const todoSchema = new mongoose.Schema({
     task: { type: String, required: true },
@@ -20,6 +21,9 @@ const todoSchema = new mongoose.Schema({
     agencyWork: { type: mongoose.Schema.Types.ObjectId, ref: 'AgencyWork' },
     goal: { type: mongoose.Schema.Types.ObjectId, ref: 'Goal' }
 });
+todoSchema.index({ agencyWork: 1, order: 1 });
+todoSchema.index({ goal: 1, order: 1 });
+todoSchema.index({ author: 1 });
 
 const agencyWorkSchema = new mongoose.Schema({
     note: { type: String, required: true },
@@ -30,6 +34,8 @@ const agencyWorkSchema = new mongoose.Schema({
     createdBy: { type: String, required: true },
     timestamp: { type: Date, default: Date.now }
 });
+agencyWorkSchema.index({ timestamp: -1 });
+agencyWorkSchema.index({ progress: 1 });
 
 const recordSchema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -41,7 +47,7 @@ const recordSchema = new mongoose.Schema({
     createdBy: { type: String, required: true },
     createdAt: { type: Date, default: Date.now }
 });
-
+recordSchema.index({ createdAt: -1 });
 
 const goalSchema = new mongoose.Schema({
     title: { type: String, required: true },
@@ -54,6 +60,8 @@ const goalSchema = new mongoose.Schema({
     date: { type: Date },
     createdAt: { type: Date, default: Date.now }
 });
+goalSchema.index({ month: 1, year: 1, type: 1 });
+goalSchema.index({ author: 1 });
 
 const leadSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -78,6 +86,8 @@ const leadSchema = new mongoose.Schema({
     companyWebsite: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
+leadSchema.index({ assignedTo: 1, reminderDate: 1 });
+leadSchema.index({ status: 1 });
 
 const invoiceSchema = new mongoose.Schema({
     type: { type: String, enum: ['invoice', 'quotation'], default: 'invoice' },
@@ -112,6 +122,8 @@ const invoiceSchema = new mongoose.Schema({
     createdBy: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
+invoiceSchema.index({ date: -1 });
+invoiceSchema.index({ invoiceNumber: 1 });
 
 module.exports = {
     Subspace: mongoose.model('Subspace', subspaceSchema),

@@ -18,16 +18,21 @@ app.use(cors({
     origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true,
+    maxAge: 86400 // Cache CORS preflight results for 24 hours
 }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' })); // Limit JSON size for faster parsing
 
 // Request Timing Middleware
 app.use((req, res, next) => {
     const start = Date.now();
     res.on('finish', () => {
         const duration = Date.now() - start;
-        console.log(`${req.method} ${req.originalUrl} - ${duration}ms`);
+        if (duration > 1000) {
+            console.log(`[SLOW] ${req.method} ${req.originalUrl} - ${duration}ms`);
+        } else {
+            console.log(`${req.method} ${req.originalUrl} - ${duration}ms`);
+        }
     });
     next();
 });
@@ -64,26 +69,22 @@ app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        console.time(`Login-${username}`);
+        const loginStart = Date.now();
         
-        // Ensure DB is connected (mostly for serverless cold starts)
-        await connectDB();
+        // Quick connection check
+        if (!mongoose.connection.readyState) {
+            await connectDB();
+        }
 
-        console.time(`DB-FindUser-${username}`);
-        const user = await User.findOne({ username }).lean();
-        console.timeEnd(`DB-FindUser-${username}`);
+        const user = await User.findOne({ username }).select('username password').lean();
 
         if (!user) {
-            console.timeEnd(`Login-${username}`);
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
-        console.time(`Bcrypt-Compare-${username}`);
         const isMatch = await bcrypt.compare(password, user.password);
-        console.timeEnd(`Bcrypt-Compare-${username}`);
 
         if (!isMatch) {
-            console.timeEnd(`Login-${username}`);
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
@@ -93,10 +94,11 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        console.timeEnd(`Login-${username}`);
+        const duration = Date.now() - loginStart;
+        console.log(`Login successful for ${username} in ${duration}ms`);
+
         res.json({ success: true, token, username: user.username });
     } catch (err) {
-        console.timeEnd(`Login-${username}`);
         console.error("Login error:", err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
