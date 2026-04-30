@@ -10,10 +10,10 @@ const connectDB = async () => {
     try {
         console.time('DB Connection Time');
         await mongoose.connect(process.env.MONGO_URI, {
-            // Optimized for MongoDB Atlas performance
-            maxPoolSize: 100,
-            minPoolSize: 5,
-            serverSelectionTimeoutMS: 3000, // Faster failure if DB is down
+            // Optimized for managed environments like Render/Atlas
+            maxPoolSize: 20,
+            minPoolSize: 2,
+            serverSelectionTimeoutMS: 5000,
             connectTimeoutMS: 10000,
             socketTimeoutMS: 45000,
             family: 4,

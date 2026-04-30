@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 
 const app = express();
@@ -99,8 +100,15 @@ app.post('/api/auth/login', async (req, res) => {
 
         res.json({ success: true, token, username: user.username });
     } catch (err) {
-        console.error("Login error:", err);
-        res.status(500).json({ success: false, message: 'Server error' });
+        const duration = Date.now() - loginStart;
+        console.error(`Login failed for ${username} after ${duration}ms:`, err.message);
+        
+        // Check if it's a connection error
+        if (err.name === 'MongooseServerSelectionError' || err.name === 'MongoNetworkError') {
+            return res.status(503).json({ success: false, message: 'Database connection failed' });
+        }
+        
+        res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
     }
 });
 
