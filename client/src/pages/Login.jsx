@@ -35,7 +35,7 @@ const Login = () => {
             {loading && (
                 <div className="loading-overlay">
                     <div className="loader"></div>
-                    <p className="mt-4 text-accent font-bold">Authenticating...</p>
+                    <p className="loading-text">Authenticating</p>
                 </div>
             )}
 

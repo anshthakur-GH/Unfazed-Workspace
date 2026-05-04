@@ -3,6 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const connectDB = require('../config/db');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { User } = require('../models/schemas');
 
 const app = express();
 
@@ -60,32 +63,28 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/goals', require('../routes/goals'));
 
 
-// Auth Route (Hardcoded)
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { User } = require('../models/schemas');
-
 // Auth Route
 app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
+    const loginStart = Date.now();
 
     try {
-        const loginStart = Date.now();
-        
-        // Quick connection check
-        if (!mongoose.connection.readyState) {
-            await connectDB();
-        }
+        // Ensure DB is connected (uses cached promise)
+        await connectDB();
 
-        const user = await User.findOne({ username }).select('username password').lean();
+        const user = await User.findOne({ username })
+            .select('username password')
+            .lean();
 
         if (!user) {
+            console.log(`Login failed for ${username}: User not found (${Date.now() - loginStart}ms)`);
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
+            console.log(`Login failed for ${username}: Password mismatch (${Date.now() - loginStart}ms)`);
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
@@ -95,20 +94,18 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
-        const duration = Date.now() - loginStart;
-        console.log(`Login successful for ${username} in ${duration}ms`);
+        console.log(`✅ Login successful for ${username} in ${Date.now() - loginStart}ms`);
 
         res.json({ success: true, token, username: user.username });
     } catch (err) {
         const duration = Date.now() - loginStart;
-        console.error(`Login failed for ${username} after ${duration}ms:`, err.message);
+        console.error(`❌ Login error for ${username} after ${duration}ms:`, err.message);
         
-        // Check if it's a connection error
         if (err.name === 'MongooseServerSelectionError' || err.name === 'MongoNetworkError') {
             return res.status(503).json({ success: false, message: 'Database connection failed' });
         }
         
-        res.status(500).json({ success: false, message: 'Internal server error', error: err.message });
+        res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
 

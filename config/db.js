@@ -1,34 +1,44 @@
 const mongoose = require('mongoose');
 
-let isConnected = false;
+// Cache the connection promise to prevent multiple concurrent connection attempts
+let cachedPromise = null;
 
 const connectDB = async () => {
-    if (isConnected && mongoose.connection.readyState === 1) {
-        return;
+    // If already connected, return immediately
+    if (mongoose.connection.readyState === 1) {
+        return mongoose.connection;
     }
 
-    try {
-        console.time('DB Connection Time');
-        await mongoose.connect(process.env.MONGO_URI, {
-            // Optimized for managed environments like Render/Atlas
-            maxPoolSize: 20,
-            minPoolSize: 2,
-            serverSelectionTimeoutMS: 5000,
-            connectTimeoutMS: 10000,
-            socketTimeoutMS: 45000,
-            family: 4,
-            heartbeatFrequencyMS: 10000,
-            retryWrites: true,
-            w: 'majority'
+    // If a connection attempt is already in progress, wait for it
+    if (cachedPromise) {
+        return cachedPromise;
+    }
+
+    const options = {
+        maxPoolSize: 10, // Reduced from 20 for faster cold starts
+        minPoolSize: 0,  // Set to 0 for serverless efficiency
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        family: 4,
+        retryWrites: true,
+        w: 'majority'
+    };
+
+    console.time('🚀 DB Connection Time');
+    
+    cachedPromise = mongoose.connect(process.env.MONGO_URI, options)
+        .then((mongoose) => {
+            console.log('✅ MongoDB Connected (Optimized)');
+            console.timeEnd('🚀 DB Connection Time');
+            return mongoose;
+        })
+        .catch((err) => {
+            console.error('❌ MongoDB Connection Error:', err.message);
+            cachedPromise = null; // Reset cache so next attempt can try again
+            throw err;
         });
 
-        isConnected = true;
-        console.log('MongoDB Connected (Optimized Pool)');
-        console.timeEnd('DB Connection Time');
-    } catch (error) {
-        isConnected = false;
-        console.error('MongoDB connection error:', error.message);
-    }
+    return cachedPromise;
 };
 
 module.exports = connectDB;
