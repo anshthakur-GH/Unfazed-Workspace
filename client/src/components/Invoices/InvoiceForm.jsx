@@ -17,8 +17,11 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         tax: { type: 'percentage', value: 0 },
         shipping: 0,
         amountPaid: 0,
-        notes: 'Includes complete workflow setup, API integrations, custom logic, testing, deployment, and 7-day support.',
-        terms: 'https://unfazed-ai.online/policies',
+        notes: 'Workflow setup, API integrations, custom business logic, full QA testing, deployment, and 7-day post-launch support.',
+        terms: 'Full Terms: unfazed-ai.online/policies 50% advance required to begin work. Balance due upon delivery. Revisions beyond scope billed separately.',
+        project: 'WhatsApp Marketing Automation',
+        paymentDetails: 'UPI: unfazedai@upi Bank: HDFC, A/C 00001234567, IFSC: HDFC0001234 Please include invoice number in payment reference.',
+        howToProceed: 'Reply to this quotation or reach out via LinkedIn / WhatsApp to confirm. We begin within 24 hours of confirmation.',
     });
     const [isSaving, setIsSaving] = useState(false);
 
@@ -192,6 +195,19 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none"
                         />
                     </div>
+                    {formData.type === 'quotation' && (
+                        <div>
+                            <label className="block text-xs font-semibold text-text-muted uppercase mb-1">Project Name</label>
+                            <input
+                                type="text"
+                                name="project"
+                                value={formData.project}
+                                onChange={handleInputChange}
+                                placeholder="e.g. WhatsApp Automation"
+                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none"
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Client Info */}
@@ -385,6 +401,30 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none text-sm resize-none"
                             />
                         </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-text-muted uppercase mb-1">Payment Details</label>
+                            <textarea
+                                name="paymentDetails"
+                                value={formData.paymentDetails}
+                                onChange={handleInputChange}
+                                placeholder="Bank details, UPI info, etc."
+                                rows="2"
+                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none text-sm resize-none"
+                            />
+                        </div>
+                        {formData.type === 'quotation' && (
+                            <div>
+                                <label className="block text-xs font-semibold text-text-muted uppercase mb-1">How to Proceed</label>
+                                <textarea
+                                    name="howToProceed"
+                                    value={formData.howToProceed}
+                                    onChange={handleInputChange}
+                                    placeholder="Next steps for the client..."
+                                    rows="2"
+                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none text-sm resize-none"
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="w-full md:w-1/3 space-y-3">

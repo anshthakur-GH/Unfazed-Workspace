@@ -119,6 +119,9 @@ const invoiceSchema = new mongoose.Schema({
     amountPaid: { type: Number, default: 0 },
     balanceDue: { type: Number, default: 0 },
     status: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' },
+    project: { type: String },
+    paymentDetails: { type: String },
+    howToProceed: { type: String },
     createdBy: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
