@@ -46,10 +46,6 @@ app.get("/health", (req, res) => {
     res.status(200).send("ok");
 });
 
-app.get("/api/test", (req, res) => {
-    res.json({ message: "API is working" });
-});
-
 // Routes
 const subspaceRoutes = require('../routes/subspaces');
 const todoRoutes = require('../routes/todos');

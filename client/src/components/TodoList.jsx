@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X, GripVertical, Repeat } from 'lucide-react';
+import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X, GripVertical, Repeat, ChevronDown, ChevronRight } from 'lucide-react';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
 import CustomCalendar from './CustomCalendar';
 import {
@@ -176,6 +176,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const [priority, setPriority] = useState(''); // 'High', 'Medium', 'Low'
     const [reschedulingId, setReschedulingId] = useState(null);
     const [repeatingId, setRepeatingId] = useState(null);
+    const [expandedGroups, setExpandedGroups] = useState(new Set());
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [editingText, setEditingText] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
@@ -521,42 +522,159 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                 {sortedTodos.length === 0 ? (
                     <div className="text-center text-text-muted opacity-50 py-10">No tasks found for this view.</div>
                 ) : (
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                        modifiers={[restrictToVerticalAxis]}
-                    >
-                        <SortableContext
-                            items={sortedTodos.map(t => t._id)}
-                            strategy={verticalListSortingStrategy}
+                    view === 'future' ? (
+                        <div className="space-y-4">
+                            {(() => {
+                                const groups = [];
+                                const processedTasks = new Set();
+
+                                sortedTodos.forEach(todo => {
+                                    if (processedTasks.has(todo._id)) return;
+
+                                    // Find all tasks with same name in the future
+                                    const sameTaskName = sortedTodos.filter(t => t.task === todo.task);
+                                    
+                                    if (sameTaskName.length > 1) {
+                                        groups.push({
+                                            type: 'group',
+                                            name: todo.task,
+                                            tasks: sameTaskName,
+                                            id: `group-${todo.task}`
+                                        });
+                                        sameTaskName.forEach(t => processedTasks.add(t._id));
+                                    } else {
+                                        groups.push({
+                                            type: 'single',
+                                            todo: todo,
+                                            id: todo._id
+                                        });
+                                        processedTasks.add(todo._id);
+                                    }
+                                });
+
+                                return groups.map(group => {
+                                    if (group.type === 'single') {
+                                        return (
+                                            <SortableTodoItem
+                                                key={group.todo._id}
+                                                todo={group.todo}
+                                                toggleTodo={toggleTodo}
+                                                startEditing={startEditing}
+                                                editingTodoId={editingTodoId}
+                                                editingText={editingText}
+                                                setEditingText={setEditingText}
+                                                updateTodoTask={updateTodoTask}
+                                                readOnly={readOnly}
+                                                isAdmin={isAdmin}
+                                                view={view}
+                                                reschedulingId={reschedulingId}
+                                                setReschedulingId={setReschedulingId}
+                                                rescheduleTodo={rescheduleTodo}
+                                                repeatingId={repeatingId}
+                                                setRepeatingId={setRepeatingId}
+                                                repeatTodo={repeatTodo}
+                                                deleteTodo={deleteTodo}
+                                            />
+                                        );
+                                    } else {
+                                        const isExpanded = expandedGroups.has(group.name);
+                                        const lastDate = group.tasks[group.tasks.length - 1].date;
+                                        
+                                        return (
+                                            <div key={group.id} className="space-y-2">
+                                                <button
+                                                    onClick={() => {
+                                                        const newExpanded = new Set(expandedGroups);
+                                                        if (isExpanded) newExpanded.delete(group.name);
+                                                        else newExpanded.add(group.name);
+                                                        setExpandedGroups(newExpanded);
+                                                    }}
+                                                    className="w-full flex items-center justify-between p-3 rounded-lg border border-accent/20 bg-accent/5 hover:bg-accent/10 transition-all group"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-accent">
+                                                            {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                                                        </div>
+                                                        <span className="font-bold text-white text-lg">{group.name}</span>
+                                                        <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">
+                                                            Repeats {group.tasks.length} days
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-sm text-text-muted">
+                                                        Until {format(parseISO(lastDate), 'MMM d, yyyy')}
+                                                    </div>
+                                                </button>
+                                                
+                                                {isExpanded && (
+                                                    <div className="pl-6 space-y-2 border-l-2 border-accent/10 ml-2 animate-in slide-in-from-top-2 duration-200">
+                                                        {group.tasks.map(t => (
+                                                            <SortableTodoItem
+                                                                key={t._id}
+                                                                todo={t}
+                                                                toggleTodo={toggleTodo}
+                                                                startEditing={startEditing}
+                                                                editingTodoId={editingTodoId}
+                                                                editingText={editingText}
+                                                                setEditingText={setEditingText}
+                                                                updateTodoTask={updateTodoTask}
+                                                                readOnly={readOnly}
+                                                                isAdmin={isAdmin}
+                                                                view={view}
+                                                                reschedulingId={reschedulingId}
+                                                                setReschedulingId={setReschedulingId}
+                                                                rescheduleTodo={rescheduleTodo}
+                                                                repeatingId={repeatingId}
+                                                                setRepeatingId={setRepeatingId}
+                                                                repeatTodo={repeatTodo}
+                                                                deleteTodo={deleteTodo}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+                                });
+                            })()}
+                        </div>
+                    ) : (
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                            modifiers={[restrictToVerticalAxis]}
                         >
-                            <div className="space-y-3">
-                                {sortedTodos.map((todo) => (
-                                    <SortableTodoItem
-                                        key={todo._id}
-                                        todo={todo}
-                                        toggleTodo={toggleTodo}
-                                        startEditing={startEditing}
-                                        editingTodoId={editingTodoId}
-                                        editingText={editingText}
-                                        setEditingText={setEditingText}
-                                        updateTodoTask={updateTodoTask}
-                                        readOnly={readOnly}
-                                        isAdmin={isAdmin}
-                                        view={view}
-                                        reschedulingId={reschedulingId}
-                                        setReschedulingId={setReschedulingId}
-                                        rescheduleTodo={rescheduleTodo}
-                                        repeatingId={repeatingId}
-                                        setRepeatingId={setRepeatingId}
-                                        repeatTodo={repeatTodo}
-                                        deleteTodo={deleteTodo}
-                                    />
-                                ))}
-                            </div>
-                        </SortableContext>
-                    </DndContext>
+                            <SortableContext
+                                items={sortedTodos.map(t => t._id)}
+                                strategy={verticalListSortingStrategy}
+                            >
+                                <div className="space-y-3">
+                                    {sortedTodos.map((todo) => (
+                                        <SortableTodoItem
+                                            key={todo._id}
+                                            todo={todo}
+                                            toggleTodo={toggleTodo}
+                                            startEditing={startEditing}
+                                            editingTodoId={editingTodoId}
+                                            editingText={editingText}
+                                            setEditingText={setEditingText}
+                                            updateTodoTask={updateTodoTask}
+                                            readOnly={readOnly}
+                                            isAdmin={isAdmin}
+                                            view={view}
+                                            reschedulingId={reschedulingId}
+                                            setReschedulingId={setReschedulingId}
+                                            rescheduleTodo={rescheduleTodo}
+                                            repeatingId={repeatingId}
+                                            setRepeatingId={setRepeatingId}
+                                            repeatTodo={repeatTodo}
+                                            deleteTodo={deleteTodo}
+                                        />
+                                    ))}
+                                </div>
+                            </SortableContext>
+                        </DndContext>
+                    )
                 )}
             </div>
         </div >

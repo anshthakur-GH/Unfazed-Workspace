@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-console.log('[DEBUG] routes/todos.js has been LOADED');
 const { Todo, AgencyWork } = require('../models/schemas');
 const auth = require('../middleware/auth');
 
@@ -114,14 +113,12 @@ router.post('/', auth, async (req, res) => {
 
 // Repeat a todo
 router.post('/:id/repeat', auth, async (req, res) => {
-    console.log(`[DEBUG] Repeat request received for ID: ${req.params.id}`);
     try {
         const { repeatUntil } = req.body;
         if (!repeatUntil) return res.status(400).json({ message: 'Repeat until date is required' });
 
         const originalTodo = await Todo.findById(req.params.id);
         if (!originalTodo) {
-            console.log(`[DEBUG] Todo with ID ${req.params.id} NOT FOUND in database`);
             return res.status(404).json({ message: 'Todo not found' });
         }
 
