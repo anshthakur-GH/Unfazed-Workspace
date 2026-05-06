@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../config';
-import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X, GripVertical } from 'lucide-react';
+import { Calendar, CheckCircle2, Circle, Trash2, Tag, CalendarClock, Plus, X, GripVertical, Repeat } from 'lucide-react';
 import { format, isToday, isFuture, parseISO } from 'date-fns';
 import CustomCalendar from './CustomCalendar';
 import {
@@ -24,7 +24,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 const AVAILABLE_TAGS = ['CC', 'Follow-up', 'Project', 'Website', 'Lead', 'Meet', 'Outreach', 'Personal', 'testing', 'development', 'DOC sharing'];
 
-const SortableTodoItem = ({ todo, toggleTodo, startEditing, editingTodoId, editingText, setEditingText, updateTodoTask, readOnly, isAdmin, view, reschedulingId, setReschedulingId, rescheduleTodo, deleteTodo }) => {
+const SortableTodoItem = ({ todo, toggleTodo, startEditing, editingTodoId, editingText, setEditingText, updateTodoTask, readOnly, isAdmin, view, reschedulingId, setReschedulingId, rescheduleTodo, repeatingId, setRepeatingId, repeatTodo, deleteTodo }) => {
     const {
         attributes,
         listeners,
@@ -113,24 +113,45 @@ const SortableTodoItem = ({ todo, toggleTodo, startEditing, editingTodoId, editi
                     </div>
 
                     {(!readOnly || isAdmin) && (
-                        <div className="relative">
-                            <button
-                                onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
-                                className="text-text-muted hover:text-accent transition-colors p-1"
-                                title="Reschedule"
-                            >
-                                <CalendarClock size={16} />
-                            </button>
-                            {reschedulingId === todo._id && (
-                                <div className="absolute top-full right-0 mt-2 z-50">
-                                    <CustomCalendar
-                                        selectedDate={todo.date}
-                                        onChange={(date) => rescheduleTodo(todo._id, date)}
-                                        onClose={() => setReschedulingId(null)}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                        <>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setReschedulingId(reschedulingId === todo._id ? null : todo._id)}
+                                    className="text-text-muted hover:text-accent transition-colors p-1"
+                                    title="Reschedule"
+                                >
+                                    <CalendarClock size={16} />
+                                </button>
+                                {reschedulingId === todo._id && (
+                                    <div className="absolute top-full right-0 mt-2 z-50">
+                                        <CustomCalendar
+                                            selectedDate={todo.date}
+                                            onChange={(date) => rescheduleTodo(todo._id, date)}
+                                            onClose={() => setReschedulingId(null)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="relative">
+                                <button
+                                    onClick={() => setRepeatingId(repeatingId === todo._id ? null : todo._id)}
+                                    className="text-text-muted hover:text-accent transition-colors p-1"
+                                    title="Repeat Task"
+                                >
+                                    <Repeat size={16} />
+                                </button>
+                                {repeatingId === todo._id && (
+                                    <div className="absolute top-full right-0 mt-2 z-50">
+                                        <CustomCalendar
+                                            selectedDate={todo.date}
+                                            onChange={(date) => repeatTodo(todo._id, date)}
+                                            onClose={() => setRepeatingId(null)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
                 {(!readOnly || isAdmin) && (
@@ -154,6 +175,7 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
     const [newDate, setNewDate] = useState(format(new Date(), 'yyyy-MM-dd'));
     const [priority, setPriority] = useState(''); // 'High', 'Medium', 'Low'
     const [reschedulingId, setReschedulingId] = useState(null);
+    const [repeatingId, setRepeatingId] = useState(null);
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [editingText, setEditingText] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
@@ -278,6 +300,20 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
             if (onUpdate) onUpdate();
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    const repeatTodo = async (id, repeatUntilDate) => {
+        try {
+            await axios.post(`${API_URL}/api/todos/${id}/repeat`, {
+                repeatUntil: repeatUntilDate
+            });
+            setRepeatingId(null);
+            fetchTodos(); // Refresh the list to show new tasks
+            if (onUpdate) onUpdate();
+        } catch (err) {
+            console.error(err);
+            alert("Failed to repeat task: " + (err.response?.data?.message || err.message));
         }
     };
 
@@ -512,6 +548,9 @@ const TodoList = ({ agencyWorkId, goalId, title = "To-Do List", onUpdate, readOn
                                         reschedulingId={reschedulingId}
                                         setReschedulingId={setReschedulingId}
                                         rescheduleTodo={rescheduleTodo}
+                                        repeatingId={repeatingId}
+                                        setRepeatingId={setRepeatingId}
+                                        repeatTodo={repeatTodo}
                                         deleteTodo={deleteTodo}
                                     />
                                 ))}

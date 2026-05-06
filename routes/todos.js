@@ -111,6 +111,61 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
+// Repeat a todo
+router.post('/:id/repeat', auth, async (req, res) => {
+    try {
+        const { repeatUntil } = req.body;
+        if (!repeatUntil) return res.status(400).json({ message: 'Repeat until date is required' });
+
+        const originalTodo = await Todo.findById(req.params.id);
+        if (!originalTodo) return res.status(404).json({ message: 'Todo not found' });
+
+        const startDate = new Date(originalTodo.date);
+        const endDate = new Date(repeatUntil);
+
+        if (endDate <= startDate) {
+            return res.status(400).json({ message: 'Repeat until date must be after the original task date' });
+        }
+
+        const newTodos = [];
+        let currentDate = new Date(startDate);
+        currentDate.setDate(currentDate.getDate() + 1); // Start from the next day
+
+        // Loop through each day until the end date
+        while (currentDate <= endDate) {
+            const todoData = {
+                task: originalTodo.task,
+                date: new Date(currentDate),
+                author: originalTodo.author,
+                tags: originalTodo.tags,
+                priority: originalTodo.priority,
+                agencyWork: originalTodo.agencyWork,
+                goal: originalTodo.goal,
+                order: originalTodo.order,
+                isCompleted: false // New repetitions are always incomplete
+            };
+            newTodos.push(todoData);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (newTodos.length > 0) {
+            await Todo.insertMany(newTodos);
+            
+            // Update agency work progress if needed
+            if (originalTodo.agencyWork) {
+                await updateAgencyWorkProgress(originalTodo.agencyWork);
+            }
+        }
+
+        res.json({ 
+            message: `Task repeated successfully until ${repeatUntil}`,
+            count: newTodos.length 
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Toggle completion
 router.put('/:id', auth, async (req, res) => {
     try {
