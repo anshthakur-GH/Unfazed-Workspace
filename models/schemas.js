@@ -107,6 +107,7 @@ const invoiceSchema = new mongoose.Schema({
     }],
     notes: { type: String },
     subtotal: { type: Number, default: 0 },
+    shipping: { type: Number, default: 0 },
     tax: {
         type: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
         value: { type: Number, default: 0 }
@@ -122,6 +123,11 @@ const invoiceSchema = new mongoose.Schema({
     project: { type: String },
     paymentDetails: { type: String },
     howToProceed: { type: String },
+    poNumber: { type: String },
+    paymentTerms: { type: String },
+    shipTo: {
+        address: { type: String }
+    },
     createdBy: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
