@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+console.log('[DEBUG] routes/todos.js has been LOADED');
 const { Todo, AgencyWork } = require('../models/schemas');
 const auth = require('../middleware/auth');
 
