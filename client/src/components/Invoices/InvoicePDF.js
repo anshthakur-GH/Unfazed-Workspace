@@ -41,7 +41,7 @@ export const generateInvoicePDF = (invoice) => {
     doc.setTextColor(...MUTED_TEXT);
     doc.text('unfazedai.in', 20, 54);
     doc.text('Ghaziabad, Uttar Pradesh 201016, India', 20, 59);
-    doc.text(`hello@unfazedai.in | +91 7460011985`, 20, 64);
+    doc.text(`unfazedai.in@gmail.com | +91 7460011985`, 20, 64);
 
     // Document Title
     doc.setFontSize(48);
@@ -53,8 +53,8 @@ export const generateInvoicePDF = (invoice) => {
     // Document ID
     doc.setFontSize(14);
     doc.setTextColor(...ORANGE);
-    const idLabel = invoice.type === 'quotation' ? '# UFZ-QT-' : '# UFZ-INV-';
-    doc.text(`${idLabel}${invoice.invoiceNumber}`, 190, 50, { align: 'right' });
+    const idLabel = invoice.type === 'quotation' ? '#' : '#';
+    doc.text(`${idLabel} ${invoice.invoiceNumber}`, 190, 50, { align: 'right' });
 
     // Main Divider
     doc.setDrawColor(...ORANGE);
@@ -86,12 +86,12 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...MUTED_TEXT);
-    
+
     let currentMetaY = metaY;
     const metaLabels = [
         { label: 'DATE', value: formatDate(invoice.date) },
         { label: invoice.type === 'quotation' ? 'VALID UNTIL' : 'DUE DATE', value: formatDate(invoice.dueDate || new Date()) },
-        { label: invoice.type === 'quotation' ? 'QUOTE NO.' : 'INVOICE NO.', value: `UFZ-${invoice.type === 'quotation' ? 'QT' : 'INV'}-${invoice.invoiceNumber}` }
+        { label: invoice.type === 'quotation' ? 'QUOTE NO.' : 'INVOICE NO.', value: invoice.invoiceNumber }
     ];
 
     if (invoice.type === 'quotation' && invoice.project) {
@@ -140,8 +140,8 @@ export const generateInvoicePDF = (invoice) => {
             fillColor: [0, 0, 0],
             textColor: 255,
             fontSize: 10,
-            fontStyle: 'bold',
-            halign: 'left'
+            fontStyle: 'normal',
+            cellPadding: 3
         },
         alternateRowStyles: {
             fillColor: LIGHT_GRAY
@@ -149,7 +149,7 @@ export const generateInvoicePDF = (invoice) => {
         styles: {
             fontSize: 10,
             textColor: 50,
-            cellPadding: 6,
+            cellPadding: 4,
             valign: 'middle'
         },
         columnStyles: {
@@ -163,54 +163,54 @@ export const generateInvoicePDF = (invoice) => {
 
     // --- TOTALS SECTION ---
     let finalY = doc.lastAutoTable.finalY + 10;
-    const totalsWidth = 80;
-    const totalsX = 110;
+    const totalsX = 130;
 
-    // Background for totals
-    doc.setFillColor(...LIGHT_GRAY);
-    doc.rect(totalsX, finalY, totalsWidth + 20, 45, 'F');
-
-    doc.setFontSize(11);
-    doc.setTextColor(...MUTED_TEXT);
+    doc.setFontSize(10);
+    doc.setTextColor(...DARK_GRAY);
     doc.setFont('helvetica', 'normal');
 
     // Subtotal
-    doc.text('Subtotal', totalsX + 5, finalY + 10);
-    doc.text(formatCurrencyPDF(invoice.subtotal), 190, finalY + 10, { align: 'right' });
+    doc.text('Subtotal', totalsX, finalY);
+    doc.text(formatCurrencyPDF(invoice.subtotal), 190, finalY, { align: 'right' });
+    
+    let currentY = finalY + 8;
 
     // Discount
     if (invoice.discount?.value > 0) {
-        const discountAmount = invoice.discount.type === 'percentage' 
-            ? (invoice.subtotal * invoice.discount.value / 100) 
+        const discountAmount = invoice.discount.type === 'percentage'
+            ? (invoice.subtotal * invoice.discount.value / 100)
             : invoice.discount.value;
         const discountLabel = `Discount (${invoice.discount.type === 'percentage' ? invoice.discount.value + '%' : 'Fixed'})`;
-        doc.text(discountLabel, totalsX + 5, finalY + 18);
-        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, 190, finalY + 18, { align: 'right' });
+        doc.text(discountLabel, totalsX, currentY);
+        doc.text(`- ${formatCurrencyPDF(discountAmount)}`, 190, currentY, { align: 'right' });
+        currentY += 8;
     }
 
-    // Thick Orange Divider
-    doc.setDrawColor(...ORANGE);
-    doc.setLineWidth(1.5);
-    doc.line(totalsX, finalY + 25, 210, finalY + 25);
+    // Divider before Total
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.5);
+    doc.line(totalsX, currentY - 4, 190, currentY - 4);
 
     // Total
-    doc.setFontSize(16);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...DARK_GRAY);
-    doc.text('TOTAL', totalsX + 5, finalY + 34);
-    doc.setTextColor(...ORANGE);
-    doc.text(formatCurrencyPDF(invoice.total), 190, finalY + 34, { align: 'right' });
+    doc.text('Total', totalsX, currentY);
+    doc.text(formatCurrencyPDF(invoice.total), 190, currentY, { align: 'right' });
+    currentY += 8;
+
+    // Divider before Balance Due
+    doc.line(totalsX, currentY - 4, 190, currentY - 4);
 
     // Balance Due / Estimate
-    doc.setFontSize(14);
-    doc.setTextColor(...DARK_GRAY);
-    const balanceLabel = invoice.type === 'quotation' ? 'TOTAL ESTIMATE' : 'BALANCE DUE';
-    doc.text(balanceLabel, totalsX + 5, finalY + 42);
+    doc.setFontSize(12);
     doc.setTextColor(...ORANGE);
-    doc.text(formatCurrencyPDF(invoice.balanceDue || invoice.total), 190, finalY + 42, { align: 'right' });
+    const balanceLabel = invoice.type === 'quotation' ? 'Total Estimate' : 'Balance Due';
+    doc.text(balanceLabel, totalsX, currentY);
+    doc.text(formatCurrencyPDF(invoice.balanceDue !== undefined ? invoice.balanceDue : invoice.total), 190, currentY, { align: 'right' });
 
     // --- FOOTER SECTION (4 COLUMNS) ---
-    const footerY = Math.max(finalY + 65, 230);
+    const footerY = Math.max(currentY + 20, 230);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...DARK_GRAY);
@@ -246,7 +246,7 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...MUTED_TEXT);
-    doc.text(doc.splitTextToSize(invoice.terms || '', colWidth), currentX, footerY + 6);
+    doc.text(doc.splitTextToSize(invoice.terms || invoice.paymentTerms || '', colWidth), currentX, footerY + 6);
 
     // Column 4: HOW TO PROCEED (Quotation only)
     if (invoice.type === 'quotation') {
@@ -270,7 +270,7 @@ export const generateInvoicePDF = (invoice) => {
     doc.setTextColor(...MUTED_TEXT);
     doc.text("Thank you for choosing Unfazed AI. We build systems that work 24/7 so you don't have to.", 105, 282, { align: 'center' });
     doc.setFont('helvetica', 'bold');
-    doc.text("unfazedai.in | hello@unfazedai.in | +91 7460011985 | Ghaziabad, UP 201016", 105, 287, { align: 'center' });
+    doc.text("unfazedai.in | unfazedai.in@gmail.com | +91 7460011985 | Ghaziabad, UP 201016", 105, 287, { align: 'center' });
 
     doc.save(`${invoice.type === 'quotation' ? 'Quotation' : 'Invoice'}_${invoice.invoiceNumber}.pdf`);
 };

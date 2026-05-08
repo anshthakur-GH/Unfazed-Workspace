@@ -125,6 +125,7 @@ const invoiceSchema = new mongoose.Schema({
     howToProceed: { type: String },
     poNumber: { type: String },
     paymentTerms: { type: String },
+    terms: { type: String },
     shipTo: {
         address: { type: String }
     },
