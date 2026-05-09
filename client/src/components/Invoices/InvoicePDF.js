@@ -224,7 +224,11 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...MUTED_TEXT);
-    doc.text(doc.splitTextToSize(invoice.notes || '', colWidth), currentX, footerY + 6);
+    let finalNotes = invoice.notes || "Workflow Setup: Designing and configuring n8n workflows with nodes for triggers, actions, and data flows.\nAPI Integrations: Connecting external APIs (e.g., LinkedIn, WhatsApp) with auth, error handling, and data mapping.\nCustom Logic, Testing & Deployment: Adding JS/Python code for logic, full testing cycles, and live deployment to your server.";
+    if (finalNotes.includes('Workflow setup, API integrations, custom business logic')) {
+        finalNotes = "Workflow Setup: Designing and configuring n8n workflows with nodes for triggers, actions, and data flows.\nAPI Integrations: Connecting external APIs (e.g., LinkedIn, WhatsApp) with auth, error handling, and data mapping.\nCustom Logic, Testing & Deployment: Adding JS/Python code for logic, full testing cycles, and live deployment to your server.";
+    }
+    doc.text(doc.splitTextToSize(finalNotes, colWidth), currentX, footerY + 6);
 
     // Column 2: PAYMENT DETAILS
     currentX += colWidth + gap;

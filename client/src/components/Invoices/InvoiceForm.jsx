@@ -17,11 +17,11 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         tax: { type: 'percentage', value: 0 },
         shipping: 0,
         amountPaid: 0,
-        notes: 'Workflow setup, API integrations, custom business logic, full QA testing, deployment, and 7-day post-launch support.',
+        notes: 'Workflow Setup: Designing and configuring n8n workflows with nodes for triggers, actions, and data flows.\nAPI Integrations: Connecting external APIs (e.g., LinkedIn, WhatsApp) with auth, error handling, and data mapping.\nCustom Logic, Testing & Deployment: Adding JS/Python code for logic, full testing cycles, and live deployment to your server.',
         terms: 'Full Terms: unfazedai.in/policies\n50% advance required to begin work.\nBalance due upon delivery.\nRevisions beyond scope billed separately.',
         project: 'WhatsApp Marketing Automation',
         paymentDetails: 'UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.',
-        howToProceed: 'Reply to this quotation or reach out via LinkedIn / WhatsApp to confirm. We begin within 24 hours of confirmation.',
+        howToProceed: 'Reply to this quotation or reach out to confirm. We begin within 24 hours of confirmation.',
     });
     const [isSaving, setIsSaving] = useState(false);
 
