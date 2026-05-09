@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         console.timeEnd('Fetch Records List');
         res.json(records);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -23,7 +23,7 @@ router.get('/:id', async (req, res) => {
         if (!record) return res.status(404).json({ message: 'Record not found' });
         res.json(record);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -44,7 +44,7 @@ router.post('/', auth, async (req, res) => {
         await record.save();
         res.json(record);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -71,7 +71,7 @@ router.put('/:id', auth, async (req, res) => {
         );
         res.json(record);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -89,7 +89,7 @@ router.delete('/:id', auth, async (req, res) => {
         await Record.findByIdAndDelete(req.params.id);
         res.json({ message: 'Record deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 

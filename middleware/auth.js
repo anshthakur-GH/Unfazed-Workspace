@@ -14,7 +14,7 @@ const auth = (req, res, next) => {
         const tokenString = token.startsWith('Bearer ') ? token.slice(7) : token;
 
         // Verify token
-        const decoded = jwt.verify(tokenString, process.env.JWT_SECRET || 'fallback_secret');
+        const decoded = jwt.verify(tokenString, process.env.JWT_SECRET);
 
         const username = decoded.username;
 

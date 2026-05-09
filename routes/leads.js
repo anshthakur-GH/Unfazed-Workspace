@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
         console.timeEnd('Fetch Leads');
         res.json(leads);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
         const newLead = await lead.save();
         res.status(201).json(newLead);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -67,7 +67,7 @@ router.put('/:id', async (req, res) => {
         const updatedLead = await lead.save();
         res.json(updatedLead);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(400).json({ message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -80,7 +80,7 @@ router.delete('/:id', async (req, res) => {
         await lead.deleteOne();
         res.json({ message: 'Lead deleted' });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 

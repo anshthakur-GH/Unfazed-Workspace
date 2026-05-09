@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
         console.timeEnd('Fetch Subspaces List');
         res.json(subspaces);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -29,7 +29,7 @@ router.put('/reorder', auth, async (req, res) => {
         await Promise.all(updates);
         res.json({ message: 'Subspaces reordered successfully' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -49,7 +49,7 @@ router.post('/', auth, async (req, res) => {
         await subspace.save();
         res.json(subspace);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -77,7 +77,7 @@ router.put('/:id', auth, async (req, res) => {
         );
         res.json(subspace);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -95,7 +95,7 @@ router.delete('/:id', auth, async (req, res) => {
         await Subspace.findByIdAndDelete(req.params.id);
         res.json({ message: 'Subspace deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 

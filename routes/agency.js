@@ -54,7 +54,7 @@ router.get('/', auth, async (req, res) => {
         res.json(worksWithTodosStatus);
     } catch (err) {
         console.error('Fetch Agency Works Error:', err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -74,7 +74,7 @@ router.post('/', auth, async (req, res) => {
         await work.save();
         res.json(work);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -104,7 +104,7 @@ router.put('/:id', auth, async (req, res) => {
         );
         res.json(work);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -122,7 +122,7 @@ router.delete('/:id', auth, async (req, res) => {
         await AgencyWork.findByIdAndDelete(req.params.id);
         res.json({ message: 'Work deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 

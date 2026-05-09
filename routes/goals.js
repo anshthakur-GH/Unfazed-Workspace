@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
         console.timeEnd('Fetch Goals');
         res.json(goals);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -44,7 +44,7 @@ router.post('/', auth, async (req, res) => {
         await goal.save();
         res.json(goal);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -67,7 +67,7 @@ router.put('/:id', auth, async (req, res) => {
         );
         res.json(updatedGoal);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -84,7 +84,7 @@ router.delete('/:id', auth, async (req, res) => {
         await Goal.findByIdAndDelete(req.params.id);
         res.json({ message: 'Goal deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 

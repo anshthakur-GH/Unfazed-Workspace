@@ -5,9 +5,18 @@ const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const rateLimit = require('express-rate-limit');
 const { User } = require('../models/schemas');
 
 const app = express();
+
+// Fail-safe: ensure JWT_SECRET is defined in production
+if (!process.env.JWT_SECRET) {
+    console.error('FATAL ERROR: JWT_SECRET is not defined. Server shutting down.');
+    process.exit(1);
+}
 
 // Connect to Database
 connectDB();
@@ -25,7 +34,25 @@ app.use(cors({
     credentials: true,
     maxAge: 86400 // Cache CORS preflight results for 24 hours
 }));
+
+// Security Middleware
+app.use(helmet()); // Secure HTTP headers
+app.use(mongoSanitize()); // Prevent NoSQL injection
 app.use(express.json({ limit: '1mb' })); // Limit JSON size for faster parsing
+
+// Rate Limiting
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // Limit each IP to 1000 requests per windowMs
+    message: { error: 'Too many requests, please try again later.' }
+});
+app.use('/api/', globalLimiter);
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 login requests per windowMs
+    message: { success: false, message: 'Too many login attempts, please try again later.' }
+});
 
 // Request Timing Middleware
 app.use((req, res, next) => {
@@ -64,7 +91,7 @@ app.use('/api/goals', require('../routes/goals'));
 
 
 // Auth Route
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', authLimiter, async (req, res) => {
     const { username, password } = req.body;
     const loginStart = Date.now();
 
@@ -90,7 +117,7 @@ app.post('/api/auth/login', async (req, res) => {
 
         const token = jwt.sign(
             { id: user._id, username: user.username },
-            process.env.JWT_SECRET || 'fallback_secret',
+            process.env.JWT_SECRET,
             { expiresIn: '1d' }
         );
 

@@ -20,7 +20,7 @@ router.get('/', auth, async (req, res) => {
         console.timeEnd('Fetch Invoices');
         res.json(invoices);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -30,7 +30,7 @@ router.get('/:id', auth, async (req, res) => {
         const invoice = await Invoice.findById(req.params.id).lean();
         res.json(invoice);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -49,7 +49,7 @@ router.post('/', auth, adminCheck, async (req, res) => {
         await invoice.save();
         res.status(201).json(invoice);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -61,7 +61,7 @@ router.put('/:id', auth, adminCheck, async (req, res) => {
         if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
         res.json(invoice);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(400).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
@@ -72,7 +72,7 @@ router.delete('/:id', auth, adminCheck, async (req, res) => {
         if (!invoice) return res.status(404).json({ message: 'Invoice not found' });
         res.json({ message: 'Invoice deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message });
     }
 });
 
