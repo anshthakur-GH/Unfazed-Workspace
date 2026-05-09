@@ -209,67 +209,56 @@ export const generateInvoicePDF = (invoice) => {
     doc.text(balanceLabel, totalsX, currentY);
     doc.text(formatCurrencyPDF(invoice.balanceDue !== undefined ? invoice.balanceDue : invoice.total), 190, currentY, { align: 'right' });
 
-    // --- FOOTER SECTION (4 COLUMNS) ---
-    const footerY = Math.max(currentY + 20, 230);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...DARK_GRAY);
+    // --- FOOTER SECTION (STACKED VERTICALLY) ---
+    let blockY = currentY + 15;
+    const fullWidth = 170;
 
-    const colWidth = 42;
-    const gap = 3;
-    let currentX = 20;
+    const renderBlock = (title, text) => {
+        if (!text) return;
+        
+        // Ensure we don't draw off the page
+        if (blockY > 265) {
+            doc.addPage();
+            blockY = 20;
+        }
 
-    // Column 1: WHAT'S INCLUDED
-    doc.text("WHAT'S INCLUDED", currentX, footerY);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED_TEXT);
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...DARK_GRAY);
+        doc.text(title, 20, blockY);
+        
+        blockY += 4;
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...MUTED_TEXT);
+        const splitText = doc.splitTextToSize(text, fullWidth);
+        doc.text(splitText, 20, blockY);
+        
+        blockY += (splitText.length * 3.5) + 4; // Advance Y based on text height
+    };
+
+    // Section 1: WHAT'S INCLUDED
     let finalNotes = invoice.notes || "Workflow Setup: Designing and configuring n8n workflows with nodes for triggers, actions, and data flows.\nAPI Integrations: Connecting external APIs (e.g., LinkedIn, WhatsApp) with auth, error handling, and data mapping.\nCustom Logic, Testing & Deployment: Adding JS/Python code for logic, full testing cycles, and live deployment to your server.";
     if (finalNotes.toLowerCase().includes('workflow setup') && !finalNotes.includes('n8n')) {
         finalNotes = "Workflow Setup: Designing and configuring n8n workflows with nodes for triggers, actions, and data flows.\nAPI Integrations: Connecting external APIs (e.g., LinkedIn, WhatsApp) with auth, error handling, and data mapping.\nCustom Logic, Testing & Deployment: Adding JS/Python code for logic, full testing cycles, and live deployment to your server.";
     }
-    doc.text(doc.splitTextToSize(finalNotes, colWidth), currentX, footerY + 6);
+    renderBlock("WHAT'S INCLUDED", finalNotes);
 
-    // Column 2: PAYMENT DETAILS
-    currentX += colWidth + gap;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...DARK_GRAY);
-    doc.text("PAYMENT DETAILS", currentX, footerY);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED_TEXT);
-    
+    // Section 2: PAYMENT DETAILS
     let finalPaymentDetails = invoice.paymentDetails || "UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.";
     if (!finalPaymentDetails.includes('\n') && (finalPaymentDetails.includes('7393800862@upi') || finalPaymentDetails.includes('unfazedai@upi'))) {
         finalPaymentDetails = "UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.";
     }
-    doc.text(doc.splitTextToSize(finalPaymentDetails, colWidth), currentX, footerY + 6);
+    renderBlock("PAYMENT DETAILS", finalPaymentDetails);
 
-    // Column 3: TERMS & CONDITIONS
-    currentX += colWidth + gap;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...DARK_GRAY);
-    doc.text("TERMS & CONDITIONS", currentX, footerY);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED_TEXT);
-    
+    // Section 3: TERMS & CONDITIONS
     const finalTerms = invoice.terms || invoice.paymentTerms || "Full Terms: unfazedai.in/policies\n50% advance required to begin work.\nBalance due upon delivery.\nRevisions beyond scope billed separately.";
-    doc.text(doc.splitTextToSize(finalTerms, colWidth), currentX, footerY + 6);
+    renderBlock("TERMS & CONDITIONS", finalTerms);
 
-    // Column 4: HOW TO PROCEED (Quotation only)
+    // Section 4: HOW TO PROCEED (Quotation only)
     if (invoice.type === 'quotation') {
-        currentX += colWidth + gap;
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...DARK_GRAY);
-        doc.text("HOW TO PROCEED", currentX, footerY);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(8);
-        doc.setTextColor(...MUTED_TEXT);
-        doc.text(doc.splitTextToSize(invoice.howToProceed || '', colWidth), currentX, footerY + 6);
+        renderBlock("HOW TO PROCEED", invoice.howToProceed || '');
     }
 
     // Final Bottom Footer
