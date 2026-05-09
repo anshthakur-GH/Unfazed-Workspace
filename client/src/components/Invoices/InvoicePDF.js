@@ -235,7 +235,12 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...MUTED_TEXT);
-    doc.text(doc.splitTextToSize(invoice.paymentDetails || '', colWidth), currentX, footerY + 6);
+    
+    let finalPaymentDetails = invoice.paymentDetails || "UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.";
+    if (!finalPaymentDetails.includes('\n') && (finalPaymentDetails.includes('7393800862@upi') || finalPaymentDetails.includes('unfazedai@upi'))) {
+        finalPaymentDetails = "UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.";
+    }
+    doc.text(doc.splitTextToSize(finalPaymentDetails, colWidth), currentX, footerY + 6);
 
     // Column 3: TERMS & CONDITIONS
     currentX += colWidth + gap;
@@ -246,7 +251,9 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...MUTED_TEXT);
-    doc.text(doc.splitTextToSize(invoice.terms || invoice.paymentTerms || '', colWidth), currentX, footerY + 6);
+    
+    const finalTerms = invoice.terms || invoice.paymentTerms || "Full Terms: unfazedai.in/policies\n50% advance required to begin work.\nBalance due upon delivery.\nRevisions beyond scope billed separately.";
+    doc.text(doc.splitTextToSize(finalTerms, colWidth), currentX, footerY + 6);
 
     // Column 4: HOW TO PROCEED (Quotation only)
     if (invoice.type === 'quotation') {
