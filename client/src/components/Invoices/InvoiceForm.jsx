@@ -193,7 +193,6 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none"
                         />
                     </div>
-                    </div>
                 </div>
 
                 {/* Client Info */}
