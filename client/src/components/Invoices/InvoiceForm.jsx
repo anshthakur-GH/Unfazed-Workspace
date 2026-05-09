@@ -4,7 +4,7 @@ import { calculateLineItemAmount, calculateTotal } from './utils';
 
 const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
     const [formData, setFormData] = useState({
-        type: 'invoice', // or 'quotation'
+        type: 'invoice',
         invoiceNumber: '',
         date: new Date().toISOString().split('T')[0],
         dueDate: '',
@@ -21,7 +21,6 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         terms: 'Full Terms: unfazedai.in/policies\n50% advance required to begin work.\nBalance due upon delivery.\nRevisions beyond scope billed separately.',
         project: 'WhatsApp Marketing Automation',
         paymentDetails: 'UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.',
-        howToProceed: 'Reply to this quotation or reach out to confirm. We begin within 24 hours of confirmation.',
     });
     const [isSaving, setIsSaving] = useState(false);
 
@@ -131,12 +130,11 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                     </div>
                 </div>
 
-                {/* Right Side: Invoice/Quotation Toggle */}
+                {/* Right Side: Invoice Header */}
                 <div className="flex flex-col items-start md:items-end w-full md:w-auto">
-                    <h2 className="text-3xl font-bold text-text cursor-pointer select-none text-right" onClick={() => setFormData(prev => ({ ...prev, type: prev.type === 'invoice' ? 'quotation' : 'invoice' }))}>
-                        {formData.type === 'invoice' ? 'INVOICE' : 'QUOTATION'}
+                    <h2 className="text-3xl font-bold text-text select-none text-right">
+                        INVOICE
                     </h2>
-                    <span className="text-xs text-text-muted font-normal">(Click to toggle)</span>
 
                     <button
                         type="button"
@@ -195,19 +193,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none"
                         />
                     </div>
-                    {formData.type === 'quotation' && (
-                        <div>
-                            <label className="block text-xs font-semibold text-text-muted uppercase mb-1">Project Name</label>
-                            <input
-                                type="text"
-                                name="project"
-                                value={formData.project}
-                                onChange={handleInputChange}
-                                placeholder="e.g. WhatsApp Automation"
-                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none"
-                            />
-                        </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Client Info */}
@@ -412,19 +398,6 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none text-sm resize-none"
                             />
                         </div>
-                        {formData.type === 'quotation' && (
-                            <div>
-                                <label className="block text-xs font-semibold text-text-muted uppercase mb-1">How to Proceed</label>
-                                <textarea
-                                    name="howToProceed"
-                                    value={formData.howToProceed}
-                                    onChange={handleInputChange}
-                                    placeholder="Next steps for the client..."
-                                    rows="2"
-                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-text focus:border-accent focus:outline-none text-sm resize-none"
-                                />
-                            </div>
-                        )}
                     </div>
 
                     <div className="w-full md:w-1/3 space-y-3">
@@ -493,28 +466,25 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                             <span>₹{total.toFixed(2)}</span>
                         </div>
 
-                        {formData.type !== 'quotation' && (
-                            <div className="flex justify-between items-center text-text-muted text-sm mt-4">
-                                <span>Amount Paid</span>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-xs">₹</span>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={formData.amountPaid}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, amountPaid: Number(e.target.value) }))}
-                                        className="w-24 bg-background border border-border/50 rounded px-1 py-1 text-right focus:border-accent focus:outline-none text-sm"
-                                    />
-                                </div>
+                        <div className="flex justify-between items-center text-text-muted text-sm mt-2">
+                            <span>Amount Paid</span>
+                            <div className="flex items-center gap-1">
+                                <span className="text-text-muted">₹</span>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={formData.amountPaid}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, amountPaid: Number(e.target.value) }))}
+                                    className="w-24 bg-background border border-border/50 rounded px-1 py-1 text-right focus:border-accent focus:outline-none text-sm"
+                                />
                             </div>
-                        )}
+                        </div>
 
-                        {formData.type !== 'quotation' && (
-                            <div className="flex justify-between text-md font-bold text-accent mt-2 pt-2 border-t border-dashed border-border">
-                                <span>Balance Due</span>
-                                <span>₹{balanceDue.toFixed(2)}</span>
-                            </div>
-                        )}
+                        <div className="flex justify-between text-md font-bold text-accent mt-2 pt-2 border-t border-dashed border-border">
+                            <span>Balance Due</span>
+                            <span>₹{balanceDue.toFixed(2)}</span>
+                        </div>
                     </div>
                 </div>
 

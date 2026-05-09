@@ -90,7 +90,7 @@ leadSchema.index({ assignedTo: 1, reminderDate: 1 });
 leadSchema.index({ status: 1 });
 
 const invoiceSchema = new mongoose.Schema({
-    type: { type: String, enum: ['invoice', 'quotation'], default: 'invoice' },
+    type: { type: String, default: 'invoice' },
     invoiceNumber: { type: String, required: true },
     billTo: {
         name: { type: String, required: true },

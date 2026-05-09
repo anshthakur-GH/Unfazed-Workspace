@@ -47,14 +47,12 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...DARK_GRAY);
-    const typeText = invoice.type === 'quotation' ? 'QUOTATION' : 'INVOICE';
-    doc.text(typeText, 190, 25, { align: 'right' });
+    doc.text('INVOICE', 190, 25, { align: 'right' });
 
     // Document ID
     doc.setFontSize(12);
     doc.setTextColor(...ORANGE);
-    const idLabel = invoice.type === 'quotation' ? '#' : '#';
-    doc.text(`${idLabel} ${invoice.invoiceNumber}`, 190, 32, { align: 'right' });
+    doc.text(`# ${invoice.invoiceNumber}`, 190, 32, { align: 'right' });
 
     // Main Divider
     doc.setDrawColor(...ORANGE);
@@ -66,7 +64,7 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...MUTED_TEXT);
-    doc.text(invoice.type === 'quotation' ? 'PREPARED FOR' : 'BILL TO', 20, metaY);
+    doc.text('BILL TO', 20, metaY);
 
     // Client Details
     doc.setFontSize(12);
@@ -90,13 +88,9 @@ export const generateInvoicePDF = (invoice) => {
     let currentMetaY = metaY;
     const metaLabels = [
         { label: 'DATE', value: formatDate(invoice.date) },
-        { label: invoice.type === 'quotation' ? 'VALID UNTIL' : 'DUE DATE', value: formatDate(invoice.dueDate || new Date()) },
-        { label: invoice.type === 'quotation' ? 'QUOTE NO.' : 'INVOICE NO.', value: invoice.invoiceNumber }
+        { label: 'DUE DATE', value: formatDate(invoice.dueDate || new Date()) },
+        { label: 'INVOICE NO.', value: invoice.invoiceNumber }
     ];
-
-    if (invoice.type === 'quotation' && invoice.project) {
-        metaLabels.push({ label: 'PROJECT', value: invoice.project });
-    }
 
     metaLabels.forEach(m => {
         doc.setFont('helvetica', 'bold');
@@ -108,18 +102,7 @@ export const generateInvoicePDF = (invoice) => {
         currentMetaY += 7;
     });
 
-    // Disclaimer Box (Quotation only)
     let tableStartY = 125;
-    if (invoice.type === 'quotation') {
-        doc.setFillColor(...LIGHT_GRAY);
-        doc.rect(20, currentMetaY + 5, 170, 15, 'F');
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(80);
-        const disclaimer = "This is a non-binding estimate based on our initial discovery call. Scope and pricing may be refined after a detailed audit. Valid for 14 days from the date above.";
-        doc.text(doc.splitTextToSize(disclaimer, 160), 25, currentMetaY + 12);
-        tableStartY = currentMetaY + 30;
-    }
 
     // --- TABLE ---
     const tableColumn = ["#", "Description", "Qty", "Rate", "Amount"];
@@ -202,11 +185,10 @@ export const generateInvoicePDF = (invoice) => {
     // Divider before Balance Due
     doc.line(totalsX, currentY - 4, 190, currentY - 4);
 
-    // Balance Due / Estimate
+    // Balance Due
     doc.setFontSize(12);
     doc.setTextColor(...ORANGE);
-    const balanceLabel = invoice.type === 'quotation' ? 'Total Estimate' : 'Balance Due';
-    doc.text(balanceLabel, totalsX, currentY);
+    doc.text('Balance Due', totalsX, currentY);
     doc.text(formatCurrencyPDF(invoice.balanceDue !== undefined ? invoice.balanceDue : invoice.total), 190, currentY, { align: 'right' });
 
     // --- FOOTER SECTION (STACKED VERTICALLY) ---
@@ -256,10 +238,7 @@ export const generateInvoicePDF = (invoice) => {
     const finalTerms = invoice.terms || invoice.paymentTerms || "Full Terms: unfazedai.in/policies\n50% advance required to begin work.\nBalance due upon delivery.\nRevisions beyond scope billed separately.";
     renderBlock("TERMS & CONDITIONS", finalTerms);
 
-    // Section 4: HOW TO PROCEED (Quotation only)
-    if (invoice.type === 'quotation') {
-        renderBlock("HOW TO PROCEED", invoice.howToProceed || '');
-    }
+
 
     // Final Bottom Footer
     doc.setDrawColor(230);
@@ -272,5 +251,5 @@ export const generateInvoicePDF = (invoice) => {
     doc.setFont('helvetica', 'bold');
     doc.text("unfazedai.in | unfazedai.in@gmail.com | +91 7460011985 | Ghaziabad, UP 201016", 105, 287, { align: 'center' });
 
-    doc.save(`${invoice.type === 'quotation' ? 'Quotation' : 'Invoice'}_${invoice.invoiceNumber}.pdf`);
+    doc.save(`Invoice_${invoice.invoiceNumber}.pdf`);
 };
