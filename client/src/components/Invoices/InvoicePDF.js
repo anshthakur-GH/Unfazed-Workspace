@@ -44,17 +44,17 @@ export const generateInvoicePDF = (invoice) => {
     doc.text(`unfazedai.in@gmail.com | +91 7460011985`, 20, 64);
 
     // Document Title
-    doc.setFontSize(48);
+    doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...DARK_GRAY);
     const typeText = invoice.type === 'quotation' ? 'QUOTATION' : 'INVOICE';
-    doc.text(typeText, 190, 40, { align: 'right' });
+    doc.text(typeText, 190, 25, { align: 'right' });
 
     // Document ID
-    doc.setFontSize(14);
+    doc.setFontSize(12);
     doc.setTextColor(...ORANGE);
     const idLabel = invoice.type === 'quotation' ? '#' : '#';
-    doc.text(`${idLabel} ${invoice.invoiceNumber}`, 190, 50, { align: 'right' });
+    doc.text(`${idLabel} ${invoice.invoiceNumber}`, 190, 32, { align: 'right' });
 
     // Main Divider
     doc.setDrawColor(...ORANGE);
@@ -172,7 +172,7 @@ export const generateInvoicePDF = (invoice) => {
     // Subtotal
     doc.text('Subtotal', totalsX, finalY);
     doc.text(formatCurrencyPDF(invoice.subtotal), 190, finalY, { align: 'right' });
-    
+
     let currentY = finalY + 8;
 
     // Discount

@@ -18,9 +18,9 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
         shipping: 0,
         amountPaid: 0,
         notes: 'Workflow setup, API integrations, custom business logic, full QA testing, deployment, and 7-day post-launch support.',
-        terms: 'Full Terms: unfazed-ai.online/policies 50% advance required to begin work. Balance due upon delivery. Revisions beyond scope billed separately.',
+        terms: 'Full Terms: unfazedai.in/policies\n50% advance required to begin work.\nBalance due upon delivery.\nRevisions beyond scope billed separately.',
         project: 'WhatsApp Marketing Automation',
-        paymentDetails: 'UPI: unfazedai@upi Bank: HDFC, A/C 00001234567, IFSC: HDFC0001234 Please include invoice number in payment reference.',
+        paymentDetails: 'UPI: 7393800862@upi\nBank: BOB \nA/C 44890100012075\nIFSC: BARB0ATARSU\nPlease include invoice number in\npayment reference.',
         howToProceed: 'Reply to this quotation or reach out via LinkedIn / WhatsApp to confirm. We begin within 24 hours of confirmation.',
     });
     const [isSaving, setIsSaving] = useState(false);
@@ -125,7 +125,7 @@ const InvoiceForm = ({ existingInvoice, onSave, onCancel }) => {
                     <div>
                         <div className="flex items-center gap-3">
                             <h1 className="text-xl font-bold text-text">Unfazed AI</h1>
-                            <span className="text-text-muted text-sm border-l border-text-muted/30 pl-3">unfazed-ai.online</span>
+                            <span className="text-text-muted text-sm border-l border-text-muted/30 pl-3">unfazedai.in</span>
                         </div>
                         <p className="text-text-muted text-sm mt-1">Ghaziabad, Uttar Pradesh</p>
                     </div>
