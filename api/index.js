@@ -37,8 +37,8 @@ app.use(cors({
 
 // Security Middleware
 app.use(helmet()); // Secure HTTP headers
-app.use(mongoSanitize()); // Prevent NoSQL injection
 app.use(express.json({ limit: '1mb' })); // Limit JSON size for faster parsing
+app.use(mongoSanitize()); // Prevent NoSQL injection
 
 // Rate Limiting
 const globalLimiter = rateLimit({
@@ -134,6 +134,12 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
         
         res.status(500).json({ success: false, message: err.message, stack: err.stack });
     }
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled Express Error:', err);
+    res.status(500).json({ error: 'Global Express Error', message: err.message, stack: process.env.NODE_ENV === 'production' ? null : err.stack });
 });
 
 module.exports = app;
