@@ -19,7 +19,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Connect to Database
-connectDB();
+connectDB().catch(err => console.error('Initial DB connection error:', err.message));
 
 // Middleware
 const allowedOrigins = [
