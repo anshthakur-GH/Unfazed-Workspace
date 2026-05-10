@@ -6,7 +6,6 @@ const connectDB = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
 const rateLimit = require('express-rate-limit');
 const { User } = require('../models/schemas');
 
@@ -38,7 +37,6 @@ app.use(cors({
 // Security Middleware
 app.use(helmet()); // Secure HTTP headers
 app.use(express.json({ limit: '1mb' })); // Limit JSON size for faster parsing
-app.use(mongoSanitize()); // Prevent NoSQL injection
 
 // Rate Limiting
 const globalLimiter = rateLimit({
