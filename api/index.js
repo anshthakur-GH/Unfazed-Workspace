@@ -132,7 +132,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
             return res.status(503).json({ success: false, message: 'Database connection failed' });
         }
         
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.status(500).json({ success: false, message: err.message, stack: err.stack });
     }
 });
 
