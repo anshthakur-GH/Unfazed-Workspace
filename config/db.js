@@ -19,7 +19,6 @@ const connectDB = async () => {
         minPoolSize: 0,  // Set to 0 for serverless efficiency
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
-        family: 4,
         retryWrites: true,
         w: 'majority'
     };
