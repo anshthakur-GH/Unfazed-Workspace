@@ -38,7 +38,7 @@ const Sidebar = ({ isOpen, toggleSidebar, closeSidebar }) => {
     };
 
     const username = localStorage.getItem('username');
-    const allowedInvoiceUsers = ['Ansh_Unfazed', 'Ayush_Unfazed', 'AnshSaxena_Unfazed'];
+    const allowedInvoiceUsers = ['Ansh_Unfazed', 'Ayush_Unfazed'];
     const canViewInvoices = allowedInvoiceUsers.includes(username);
 
     const navItems = [

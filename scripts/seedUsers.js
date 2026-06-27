@@ -9,9 +9,7 @@ const seedUsers = async () => {
 
     const users = [
         { username: process.env.SEED_USER_1_USERNAME, password: process.env.SEED_USER_1_PASSWORD },
-        { username: process.env.SEED_USER_2_USERNAME, password: process.env.SEED_USER_2_PASSWORD },
-        { username: process.env.SEED_USER_3_USERNAME, password: process.env.SEED_USER_3_PASSWORD },
-        { username: process.env.SEED_USER_4_USERNAME, password: process.env.SEED_USER_4_PASSWORD }
+        { username: process.env.SEED_USER_2_USERNAME, password: process.env.SEED_USER_2_PASSWORD }
     ];
 
     // Filter out any users with missing credentials

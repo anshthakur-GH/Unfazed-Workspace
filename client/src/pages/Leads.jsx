@@ -696,9 +696,7 @@ const Leads = () => {
                                             onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
                                         >
                                             <option value="Ansh_Unfazed">Ansh</option>
-                                            <option value="AnshSaxena_Unfazed">Ansh Saxena</option>
                                             <option value="Ayush_Unfazed">Ayush</option>
-                                            <option value="Navtej_Unfazed">Navtej</option>
                                         </select>
                                     </div>
                                 </div>

@@ -27,7 +27,7 @@ todoSchema.index({ author: 1 });
 
 const agencyWorkSchema = new mongoose.Schema({
     note: { type: String, required: true },
-    assignedTo: { type: String, enum: ['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'], required: true },
+    assignedTo: { type: String, enum: ['Ansh', 'Ayush'], required: true },
     progress: { type: Number, default: 0, min: 0, max: 100 },
     priority: { type: String, enum: ['High', 'Medium', 'Low'], default: 'Medium' },
     deadline: { type: Date },
@@ -52,7 +52,7 @@ recordSchema.index({ createdAt: -1 });
 const goalSchema = new mongoose.Schema({
     title: { type: String, required: true },
     type: { type: String, enum: ['global', 'individual'], default: 'individual' },
-    member: { type: String }, // 'Ansh Thakur', 'Navtej', 'Ansh Saxena', 'Ayush'
+    member: { type: String }, // 'Ansh Thakur', 'Ayush'
     author: { type: String, required: true },
     isCompleted: { type: Boolean, default: false },
     month: { type: String },

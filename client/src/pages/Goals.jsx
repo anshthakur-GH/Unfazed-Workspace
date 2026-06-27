@@ -96,7 +96,7 @@ const Goals = () => {
 
     const username = localStorage.getItem('username');
     const isAdmin = username === 'Ansh_Unfazed';
-    const members = ['Ansh Thakur', 'Navtej', 'Ansh Saxena', 'Ayush'];
+    const members = ['Ansh Thakur', 'Ayush'];
 
     const currentMonth = format(new Date(), 'MMMM');
     const currentYear = format(new Date(), 'yyyy');

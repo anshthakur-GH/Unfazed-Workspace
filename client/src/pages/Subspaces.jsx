@@ -96,9 +96,7 @@ const Subspaces = () => {
     const currentUsername = localStorage.getItem('username');
     const USER_MAP = {
         'Ansh_Unfazed': 'Ansh',
-        'Navtej_unfazed': 'Navtej',
-        'Ayush_Unfazed': 'Ayush',
-        'AnshSaxena_Unfazed': 'Ansh Saxena'
+        'Ayush_Unfazed': 'Ayush'
     };
     const friendlyName = USER_MAP[currentUsername] || 'Unknown';
 

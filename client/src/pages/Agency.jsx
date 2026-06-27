@@ -201,7 +201,7 @@ const Agency = () => {
                                         <>
                                             <div className="fixed inset-0 z-[80]" onClick={() => setShowAssignDropdown(false)} />
                                             <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-xl shadow-2xl overflow-hidden z-[90] animate-scale-up origin-top">
-                                                {['Ansh', 'Navtej', 'Ayush', 'Ansh Saxena'].map((user) => (
+                                                {['Ansh', 'Ayush'].map((user) => (
                                                     <button
                                                         key={user}
                                                         type="button"

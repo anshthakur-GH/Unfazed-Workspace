@@ -21,9 +21,7 @@ const auth = (req, res, next) => {
         // Map username to friendly name (preserving existing logic)
         let friendlyName = 'Unknown';
         if (username === 'Ansh_Unfazed') friendlyName = 'Ansh';
-        else if (username === 'Navtej_unfazed') friendlyName = 'Navtej';
         else if (username === 'Ayush_Unfazed') friendlyName = 'Ayush';
-        else if (username === 'AnshSaxena_Unfazed') friendlyName = 'Ansh Saxena';
         else friendlyName = username; // Fallback to username if no mapping found
 
         req.user = {
