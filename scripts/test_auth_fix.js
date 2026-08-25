@@ -1,6 +1,15 @@
-const API_URL = 'http://127.0.0.1:5000/api';
+require('dotenv').config();
+
+const API_URL = process.env.API_URL || 'http://127.0.0.1:5000/api';
+const username = process.env.TEST_AUTH_USERNAME || process.env.SEED_USER_1_USERNAME || 'Ansh_Unfazed';
+const password = process.env.TEST_AUTH_PASSWORD || process.env.SEED_USER_1_PASSWORD;
 
 async function testAuth() {
+    if (!password) {
+        console.error("Error: TEST_AUTH_PASSWORD or SEED_USER_1_PASSWORD environment variable is required.");
+        return;
+    }
+
     try {
         console.log("1. Attempting Login...");
 
@@ -8,8 +17,8 @@ async function testAuth() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                username: 'Ansh_Unfazed',
-                password: '***REMOVED***'
+                username,
+                password
             })
         });
 
